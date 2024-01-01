@@ -5769,7 +5769,8 @@ static bool getFromTransferable(
                 return true;
         }
 
-        SetLastExceptionMsg("Flavor " + aFlavor.MimeType + " is not supported");
+        // MACRO-1919: useless, frequent log
+        // SetLastExceptionMsg("Flavor " + aFlavor.MimeType + " is not supported");
         return false;
     }
 
