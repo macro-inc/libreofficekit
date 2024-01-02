@@ -5720,6 +5720,11 @@ static bool encodeTextAsHTML(
     if (!getFromTransferable(xTransferable, aMimeType, aRet))
         return false;
 
+    // MACRO-1919: do not encode an empty string as HTML {
+    if (aRet.getLength() == 0)
+        return false;
+    // MACRO-1919: }
+
     // Embed in HTML - FIXME: needs some escaping.
     aRet = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n"
         "<html><head>"
@@ -5769,7 +5774,8 @@ static bool getFromTransferable(
                 return true;
         }
 
-        SetLastExceptionMsg("Flavor " + aFlavor.MimeType + " is not supported");
+        // MACRO-1919: useless, frequent log
+        // SetLastExceptionMsg("Flavor " + aFlavor.MimeType + " is not supported");
         return false;
     }
 
