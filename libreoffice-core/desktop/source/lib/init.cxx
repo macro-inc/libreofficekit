@@ -7319,7 +7319,9 @@ static void doc_postWindow(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindo
         if (!aMimeType.isEmpty() && aData.hasElements())
         {
             uno::Reference<datatransfer::XTransferable> xTransferable(new LOKTransferable(aMimeType, aData));
-            uno::Reference<datatransfer::clipboard::XClipboard> xClipboard(new LOKClipboard);
+            // MACRO-1919: This won't have an associated view id, so -1 is used {
+            uno::Reference<datatransfer::clipboard::XClipboard> xClipboard(new LOKClipboard(-1));
+            // MACRO-1919 }
             xClipboard->setContents(xTransferable, uno::Reference<datatransfer::clipboard::XClipboardOwner>());
             pWindow->SetClipboard(xClipboard);
 
