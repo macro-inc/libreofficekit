@@ -1907,7 +1907,9 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                                 // redline w/out extent loops
                                 if (*pStt != *pEnd)
                                 {
-                                    pNewRedl->PushData( *pRedl, false );
+
+                                    // NOTE: MACRO-1723
+                                    /* pNewRedl->PushData( *pRedl, false ); */
                                     pRedl->SetStart( *pEnd, pRStt );
                                     // re-insert
                                     maRedlineTable.Remove( n );
@@ -1917,7 +1919,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                             }
                             else
                             {
-                                pNewRedl->PushData( *pRedl, false );
+                                // NOTE: [MACRO-1723]
+                                /* pNewRedl->PushData( *pRedl, false ); */
                                 if( *pREnd != *pEnd )
                                 {
                                     pNew = new SwRangeRedline( *pRedl );
