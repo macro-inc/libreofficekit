@@ -474,7 +474,7 @@ public:
     bool supportsCommand(std::u16string_view rCommand) override;
 
     /// @see vcl::ITiledRenderable::gotoOutline().
-    void gotoOutline(tools::JsonWriter& rJsonWriter, int idx) override;
+    bool gotoOutline(tools::JsonWriter& rJsonWriter, int idx) override;
 
     /// @see vcl::ITiledRenderable::createTable().
     void createTable(int row, int col) override;

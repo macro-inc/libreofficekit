@@ -386,8 +386,9 @@ public:
     }
 
     /// Used to force the cursor to given element in the document outline
-    virtual void gotoOutline(tools::JsonWriter& /*rJsonWriter*/, int /*idx*/)
+    virtual bool gotoOutline(tools::JsonWriter& /*rJsonWriter*/, int /*idx*/)
     {
+        return false;
     }
 
     /// Used to create tables

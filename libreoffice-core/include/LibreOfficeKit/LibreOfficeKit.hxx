@@ -497,7 +497,7 @@ public:
     /**
      * Forces your cursor to a given outline
      * @param idx the id of the outline you want to navigate to
-     * @return {destRect: ""} The rect of the outline
+     * @return null | {destRect: ""} The rect of the outline if the index is valid, null otherwise
     */
     char* gotoOutline(int idx)
     {

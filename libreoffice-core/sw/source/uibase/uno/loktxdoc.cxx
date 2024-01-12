@@ -574,15 +574,18 @@ void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, std::stri
     }
 }
 
-void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
+bool SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
 {
     SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
 
+    if (idx < 0) return false;
+    if ((size_t)idx >= m_pDocShell->GetDoc()->GetNodes().GetOutLineNds().size()) return false;
     mrSh->GotoOutline(idx);
 
     SwRect destRect = mrSh->GetCharRect();
 
     rJsonWriter.put("destRect", destRect.SVRect().toString());
+    return true;
 }
 
 void SwXTextDocument::createTable(int row, int col)
