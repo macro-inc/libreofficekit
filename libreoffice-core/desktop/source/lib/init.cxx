@@ -6870,9 +6870,10 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
 
     tools::JsonWriter aJsonWriter;
 
-    pDoc->gotoOutline(aJsonWriter, idx);
-
-    return aJsonWriter.extractData();
+    if (pDoc->gotoOutline(aJsonWriter, idx))
+        return aJsonWriter.extractData();
+    else
+        return nullptr;
 }
 
 static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size), const char* pFormat)
