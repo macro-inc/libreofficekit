@@ -32,6 +32,7 @@ jobs:
       - name: Fetch and build
         run: |
           cd libreoffice-core
+          export PATH=/opt/local/libexec/gnubin:/opt/local/bin:/opt/local/sbin:$PATH
           ./autogen.sh --with-distro=LOKit-Mac --with-external-tar="$RUNNER_TOOL_CACHE/lokit-external"
           make build
           tar -cJf ../libreofficekit-mac-${{ matrix.arch }}.tar.xz instdir
