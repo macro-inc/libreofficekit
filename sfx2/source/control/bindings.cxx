@@ -50,6 +50,8 @@
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/msgpool.hxx>
+#include <sfx2/lokhelper.hxx>
+#include <comphelper/lok.hxx>
 
 #include <cstddef>
 #include <memory>
@@ -1217,6 +1219,9 @@ void SfxBindings::UpdateControllers_Impl
 
 IMPL_LINK( SfxBindings, NextJob, Timer *, pTimer, void )
 {
+    SfxViewFrame* pFrame = pDispatcher ? pDispatcher->GetFrame() : nullptr;
+    SfxLokLanguageGuard aGuard(pFrame ? pFrame->GetViewShell() : nullptr);
+
     NextJob_Impl(pTimer);
 }
 
@@ -1778,6 +1783,11 @@ uno::Reference < frame::XDispatch > SfxBindings::GetDispatch( const SfxSlot* pSl
     }
 
     return xRet;
+}
+
+Timer& SfxBindings::GetTimer()
+{
+    return pImpl->aAutoTimer;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

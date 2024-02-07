@@ -891,6 +891,24 @@ void ScModelObj::setTextSelection(int nType, int nX, int nY)
     }
 }
 
+OUString ScModelObj::hyperlinkInfoAtPosition(int x, int y)
+{
+    if (ScViewData* pViewData = ScDocShell::GetViewData())
+    {
+        ScGridWindow* pGridWindow = pViewData->GetActiveWin();
+        if (pGridWindow)
+        {
+            const Point point(x * pViewData->GetPPTX(), y * pViewData->GetPPTY());
+            OUString name;
+            OUString url;
+            pGridWindow->GetEditUrl(point, &name, &url);
+            return url;
+        }
+    }
+
+    return OUString();
+}
+
 uno::Reference<datatransfer::XTransferable> ScModelObj::getSelection()
 {
     SolarMutexGuard aGuard;
@@ -1054,6 +1072,8 @@ void ScModelObj::setClientZoom(int nTilePixelWidth_, int nTilePixelHeight_, int 
         return;
 
     pViewData->SetZoom(newZoomX, newZoomY, true);
+    if (ScTabViewShell* pViewShell = pViewData->GetViewShell())
+        pViewShell->SyncGridWindowMapModeFromDrawMapMode();
 
     // refresh our view's take on other view's cursors & selections
     pViewData->GetActiveWin()->updateKitOtherCursors();
@@ -1256,25 +1276,20 @@ void ScModelObj::completeFunction(const OUString& rFunctionName)
 OString ScModelObj::getViewRenderState(SfxViewShell* pViewShell)
 {
     OStringBuffer aState;
-    ScViewData* pViewData = nullptr;
 
-    if (pViewShell)
+    ScTabViewShell* pTabViewShell = dynamic_cast<ScTabViewShell*>(pViewShell);
+    if (!pTabViewShell)
     {
-        ScTabViewShell* pTabViewShell = dynamic_cast< ScTabViewShell*>(pViewShell);
-        if (pTabViewShell)
-            pViewData = &pTabViewShell->GetViewData();
-    }
-    else
-    {
-        pViewData = ScDocShell::GetViewData();
+        ScViewData* pViewData = ScDocShell::GetViewData();
+        pTabViewShell = pViewData ? pViewData->GetViewShell() : nullptr;
     }
 
-    if (pViewData)
+    if (pTabViewShell)
     {
         aState.append(';');
 
-        const ScViewOptions& aViewOptions = pViewData->GetOptions();
-        OString aThemeName = OUStringToOString(aViewOptions.GetColorSchemeName(), RTL_TEXTENCODING_UTF8);
+        const ScViewRenderingOptions& rViewRenderingOptions = pTabViewShell->GetViewRenderingData();
+        OString aThemeName = OUStringToOString(rViewRenderingOptions.GetColorSchemeName(), RTL_TEXTENCODING_UTF8);
         aState.append(aThemeName);
     }
 

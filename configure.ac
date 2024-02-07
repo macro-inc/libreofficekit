@@ -9,7 +9,7 @@ dnl in order to create a configure script.
 # several non-alphanumeric characters, those are split off and used only for the
 # ABOUTBOXPRODUCTVERSIONSUFFIX in openoffice.lst. Why that is necessary, no idea.
 
-AC_INIT([Collabora Office],[23.05.5.2],[],[],[https://collaboraoffice.com/])
+AC_INIT([Collabora Office],[23.05.8.4],[],[],[https://collaboraoffice.com/])
 
 dnl libnumbertext needs autoconf 2.68, but that can pick up autoconf268 just fine if it is installed
 dnl whereas aclocal (as run by autogen.sh) insists on using autoconf and fails hard
@@ -3535,6 +3535,21 @@ if test $_os = Darwin; then
     my_xcode_ver3=$(printf %s "$my_xcode_ver2" | $AWK -F. '{ print $1*100+($2<100?$2:99) }')
     if test "$my_xcode_ver3" -ge 1205; then
         AC_MSG_RESULT([yes ($my_xcode_ver2)])
+        if test $MAC_OS_X_VERSION_MIN_REQUIRED -lt 120000; then
+            if test "$my_xcode_ver3" -ge 1600; then
+                dnl the Xcode 15 relnotes state that the classic linker will disappear in the next version, but nothing about
+                dnl fixing the problem with weak symbols/macOS 11 compatibility, so assume for now that Xcode 16 will break it...
+                AC_MSG_ERROR([Check that Xcode 16 still supports the old linker/that it doesn't break macOS 11 compatibility, then remove this check]);
+            fi
+            if test "$my_xcode_ver3" -ge 1500; then
+                AC_MSG_WARN([Xcode 15 has a new linker that causes runtime crashes on macOS 11])
+                add_warning "Xcode 15 has a new linker that causes runtime crashes on macOS 11, forcing the old linker."
+                add_warning "see https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes#Linking"
+                LDFLAGS="$LDFLAGS -Wl,-ld_classic"
+                # if LDFLAGS weren't set already, a check above sets x_LDFLAGS=[#] to comment-out the export LDFLAGS line in config_host.mk
+                x_LDFLAGS=
+            fi
+        fi
     else
         AC_MSG_ERROR(["$my_xcode_ver1" is too old or unrecognized, must be at least Xcode 12.5])
     fi
@@ -7563,7 +7578,7 @@ AC_SUBST(GPERF)
 dnl ===================================================================
 dnl Check for system libcmis
 dnl ===================================================================
-libo_CHECK_SYSTEM_MODULE([libcmis],[LIBCMIS],[libcmis-0.5 >= 0.5.2],enabled)
+libo_CHECK_SYSTEM_MODULE([libcmis],[LIBCMIS],[libcmis-0.6 >= 0.6.1],enabled)
 
 dnl ===================================================================
 dnl C++11
@@ -7589,27 +7604,11 @@ if test -z "${CXXFLAGS_CXX11+x}"; then
             fi
             save_CXXFLAGS=$CXXFLAGS
             CXXFLAGS="$CXXFLAGS $flag -Werror"
-            if test "$SYSTEM_LIBCMIS" = TRUE; then
-                CXXFLAGS="$CXXFLAGS -DSYSTEM_LIBCMIS $LIBCMIS_CFLAGS"
-            fi
             AC_LANG_PUSH([C++])
             AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
                 #include <algorithm>
                 #include <functional>
                 #include <vector>
-
-                #if defined SYSTEM_LIBCMIS
-                // See ucb/source/ucp/cmis/auth_provider.hxx:
-                #if !defined __clang__
-                #pragma GCC diagnostic push
-                #pragma GCC diagnostic ignored "-Wdeprecated"
-                #pragma GCC diagnostic ignored "-Wunused-but-set-parameter"
-                #endif
-                #include <libcmis/libcmis.hxx>
-                #if !defined __clang__
-                #pragma GCC diagnostic pop
-                #endif
-                #endif
 
                 void f(std::vector<int> & v, std::function<bool(int, int)> fn) {
                     std::sort(v.begin(), v.end(), fn);
@@ -11093,6 +11092,9 @@ if test "$enable_openssl" = "yes"; then
         OPENSSL_LIBS="-lssl -lcrypto"
     else
         libo_CHECK_SYSTEM_MODULE([openssl],[OPENSSL],[openssl])
+        if test -n "${SYSTEM_OPENSSL}"; then
+            AC_DEFINE([SYSTEM_OPENSSL])
+        fi
     fi
     if test "$with_system_openssl" = "yes"; then
         AC_MSG_CHECKING([whether openssl supports SHA512])
@@ -12828,6 +12830,7 @@ if test "$enable_report_builder" != "no" -a "$with_java" != "no"; then
         BUILD_TYPE="$BUILD_TYPE JFREEREPORT"
         NEED_ANT=TRUE
     fi
+    BUILD_TYPE="$BUILD_TYPE REPORTBUILDER"
 else
     AC_MSG_RESULT([no])
     ENABLE_REPORTBUILDER=

@@ -102,7 +102,7 @@
 #include <PostItMgr.hxx>
 #include <annotsh.hxx>
 #include <swruler.hxx>
-#include <svx/theme/ThemeColorPaletteManager.hxx>
+#include <svx/theme/ThemeColorChangerCommon.hxx>
 #include <com/sun/star/document/XDocumentProperties.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
 
@@ -256,7 +256,8 @@ void SwView::SelectShell()
 {
     // Attention: Maintain the SelectShell for the WebView additionally
 
-    if(m_bInDtor)
+    // In case of m_bDying, our SfxShells are already gone, don't try to select a shell at all.
+    if(m_bInDtor || m_bDying)
         return;
 
     // Decision if the UpdateTable has to be called
@@ -1178,6 +1179,11 @@ SwView::~SwView()
     m_pFormatClipboard.reset();
 }
 
+void SwView::SetDying()
+{
+    m_bDying = true;
+}
+
 void SwView::afterCallbackRegistered()
 {
     if (!comphelper::LibreOfficeKit::isActive())
@@ -1189,8 +1195,9 @@ void SwView::afterCallbackRegistered()
     auto* pDocShell = GetDocShell();
     if (pDocShell)
     {
-        svx::ThemeColorPaletteManager aManager(pDocShell->GetThemeColors());
-        libreOfficeKitViewCallback(LOK_CALLBACK_COLOR_PALETTES, aManager.generateJSON().getStr());
+        std::shared_ptr<model::ColorSet> pThemeColors = pDocShell->GetThemeColors();
+        std::set<Color> aDocumentColors = pDocShell->GetDocColors();
+        svx::theme::notifyLOK(pThemeColors, aDocumentColors);
     }
 }
 

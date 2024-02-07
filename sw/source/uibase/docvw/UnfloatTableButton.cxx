@@ -53,8 +53,11 @@ UnfloatTableButton::UnfloatTableButton(SwEditWin* pEditWin, const SwFrame* pFram
 {
     m_xPushButton->set_accessible_name(m_sLabel);
     m_xVirDev = m_xPushButton->create_virtual_device();
+    m_xPushButton->connect_clicked(LINK(this, UnfloatTableButton, ClickHdl));
     SetVirDevFont();
 }
+
+weld::Button* UnfloatTableButton::GetButton() { return m_xPushButton.get(); }
 
 UnfloatTableButton::~UnfloatTableButton() { disposeOnce(); }
 
@@ -89,7 +92,7 @@ void UnfloatTableButton::SetOffset(Point aTopRightPixel)
     PaintButton();
 }
 
-void UnfloatTableButton::MouseButtonDown(const MouseEvent& /*rMEvt*/)
+IMPL_LINK_NOARG(UnfloatTableButton, ClickHdl, weld::Button&, void)
 {
     assert(GetFrame()->IsFlyFrame());
     // const_cast is needed because of bad design of ISwFrameControl and derived classes
@@ -119,8 +122,6 @@ void UnfloatTableButton::MouseButtonDown(const MouseEvent& /*rMEvt*/)
     SwTextFrame* pTextFrame = static_cast<SwTextFrame*>(pAnchoreFrame);
     if (pTextFrame->GetTextNodeFirst() == nullptr)
         return;
-
-    SwNodeIndex aInsertPos((*pTextFrame->GetTextNodeFirst()));
 
     SwTableNode* pTableNode = pTableFrame->GetTable()->GetTableNode();
     if (pTableNode == nullptr)
@@ -170,18 +171,8 @@ void UnfloatTableButton::MouseButtonDown(const MouseEvent& /*rMEvt*/)
         }
     }
 
-    // Move the table outside of the text frame
-    SwNodeRange aRange(*pTableNode, SwNodeOffset(0), *pTableNode->EndOfSectionNode(),
-                       SwNodeOffset(1));
-    rDoc.getIDocumentContentOperations().MoveNodeRange(aRange, aInsertPos.GetNode(),
-                                                       SwMoveFlags::DEFAULT);
-
-    // Remove the floating table's frame
-    SwFlyFrameFormat* pFrameFormat = pFlyFrame->GetFormat();
-    if (pFrameFormat)
-    {
-        rDoc.getIDocumentLayoutAccess().DelLayoutFormat(pFrameFormat);
-    }
+    SwWrtShell& rWrtShell = GetEditWin()->GetView().GetWrtShell();
+    rWrtShell.UnfloatFlyFrame();
 
     rDoc.getIDocumentState().SetModified();
 

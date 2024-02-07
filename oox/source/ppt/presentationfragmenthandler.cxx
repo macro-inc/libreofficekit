@@ -199,13 +199,12 @@ void PresentationFragmentHandler::importCustomSlideShow(std::vector<CustomShow>&
     }
 }
 
-SlidePersistPtr PresentationFragmentHandler::importMasterSlide(const Reference<frame::XModel>& xModel,
-                                                               PowerPointImport& rFilter,
-                                                               const OUString& rLayoutFragmentPath,
-                                                               const OUString& rMasterFragmentPath)
+void PresentationFragmentHandler::importMasterSlide(const Reference<frame::XModel>& xModel,
+                                                    PowerPointImport& rFilter,
+                                                    const OUString& rMasterFragmentPath)
 {
     OUString aLayoutFragmentPath;
-    SlidePersistPtr pMasterPersistPtr, pMasterPtr;
+    SlidePersistPtr pMasterPersistPtr;
     Reference< drawing::XDrawPage > xMasterPage;
     Reference< drawing::XMasterPagesSupplier > xMPS( xModel, uno::UNO_QUERY_THROW );
     Reference< drawing::XDrawPages > xMasterPages( xMPS->getMasterPages(), uno::UNO_SET_THROW );
@@ -213,6 +212,9 @@ SlidePersistPtr PresentationFragmentHandler::importMasterSlide(const Reference<f
 
     for (const auto& rEntry : *xMasterRelations)
     {
+        if (!rEntry.second.maType.endsWith("relationships/slideLayout"))
+            continue;
+
         aLayoutFragmentPath = xMasterRelations->getFragmentPathFromRelation(rEntry.second);
 
         sal_Int32 nIndex;
@@ -269,19 +271,15 @@ SlidePersistPtr PresentationFragmentHandler::importMasterSlide(const Reference<f
         pMasterPersistPtr->createBackground( rFilter );
         pMasterPersistPtr->createXShapes( rFilter );
 
+        uno::Reference< beans::XPropertySet > xSet(pMasterPersistPtr->getPage(), uno::UNO_QUERY_THROW);
+        xSet->setPropertyValue("SlideLayout", Any(pMasterPersistPtr->getLayoutFromValueToken()));
+
         oox::drawingml::ThemePtr pTheme = pMasterPersistPtr->getTheme();
         if (pTheme)
         {
             pTheme->addTheme(pMasterPersistPtr->getPage());
         }
-
-        if (pMasterPersistPtr->getLayoutPath() == rLayoutFragmentPath)
-        {
-            pMasterPtr = pMasterPersistPtr;
-        }
     }
-
-    return pMasterPtr;
 }
 
 void PresentationFragmentHandler::saveThemeToGrabBag(const oox::drawingml::ThemePtr& pThemePtr,
@@ -350,6 +348,19 @@ void PresentationFragmentHandler::saveThemeToGrabBag(const oox::drawingml::Theme
     }
 }
 
+void PresentationFragmentHandler::importMasterSlides()
+{
+    OUString aMasterFragmentPath;
+    PowerPointImport& rFilter = dynamic_cast<PowerPointImport&>(getFilter());
+    Reference<frame::XModel> xModel(rFilter.getModel());
+
+    for (sal_uInt32 nMaster = 0; nMaster < maSlideMasterVector.size(); ++nMaster)
+    {
+        aMasterFragmentPath = getFragmentPathFromRelId(maSlideMasterVector[nMaster]);
+        importMasterSlide(xModel, rFilter, aMasterFragmentPath);
+    }
+}
+
 void PresentationFragmentHandler::importSlide(sal_uInt32 nSlide, bool bFirstPage, bool bImportNotesPage)
 {
     PowerPointImport& rFilter = dynamic_cast< PowerPointImport& >( getFilter() );
@@ -364,7 +375,10 @@ void PresentationFragmentHandler::importSlide(sal_uInt32 nSlide, bool bFirstPage
     try {
 
         if( bFirstPage )
+        {
             xDrawPages->getByIndex( 0 ) >>= xSlide;
+            importMasterSlides();
+        }
         else
             xSlide = xDrawPages->insertNewByIndex( xDrawPages->getCount() );
 
@@ -396,11 +410,6 @@ void PresentationFragmentHandler::importSlide(sal_uInt32 nSlide, bool bFirstPage
                             pMasterPersistPtr = masterPage;
                             break;
                         }
-                    }
-
-                    if ( !pMasterPersistPtr )
-                    {   // masterpersist not found, we have to load it
-                        pMasterPersistPtr = importMasterSlide(xModel, rFilter, aLayoutFragmentPath, aMasterFragmentPath);
                     }
                 }
             }

@@ -12,10 +12,10 @@
 
 #include <sfx2/dllapi.h>
 #include <rtl/ustring.hxx>
+#include <vcl/notebookbar/notebookbar.hxx>
 #include <vcl/WeldedTabbedNotebookbar.hxx>
 #include <vcl/EnumContext.hxx>
 
-#include <map>
 #include <memory>
 #include <string_view>
 
@@ -32,7 +32,7 @@ class SfxBindings;
 class SfxViewFrame;
 class SfxViewShell;
 class SystemWindow;
-class WeldedTabbedNotebookbar;
+class ViewInstanceManager;
 
 namespace sfx2
 {
@@ -74,10 +74,8 @@ private:
     static bool m_bLock;
     static bool m_bHide;
 
-    static std::map<const SfxViewShell*, std::shared_ptr<WeldedTabbedNotebookbar>>
-        m_pNotebookBarWeldedWrapper;
-
     static void ResetActiveToolbarModeToDefault(vcl::EnumContext::Application eApp);
+    static void RemoveCurrentLOKWrapper();
 
     DECL_DLLPRIVATE_STATIC_LINK(SfxNotebookBar, VclDisposeHdl, const SfxViewShell*, void);
 };

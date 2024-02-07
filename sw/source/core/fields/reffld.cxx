@@ -75,7 +75,9 @@ using namespace ::com::sun::star::lang;
 static std::pair<OUString, bool> MakeRefNumStr(SwRootFrame const* pLayout,
       const SwTextNode& rTextNodeOfField,
       const SwTextNode& rTextNodeOfReferencedItem,
-      sal_uInt32 nRefNumFormat);
+      sal_uInt16 nSubType,
+      sal_uInt32 nRefNumFormat,
+      sal_uInt16 nFlags);
 
 static void lcl_GetLayTree( const SwFrame* pFrame, std::vector<const SwFrame*>& rArr )
 {
@@ -426,30 +428,6 @@ static OUString lcl_formatStringByCombiningCharacter(std::u16string_view sText, 
     return sRet.makeStringAndClear();
 }
 
-void SwGetRefField::StylerefStripNonnumerical(OUString& rText) const
-{
-    // for STYLEREF, hide text that is neither a delimiter nor a number if that flag is set
-    if ( m_nSubType != REF_STYLE || (GetFlags() & REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL) != REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL )
-        return;
-
-    std::vector<sal_Unicode> charactersToKeep;
-
-    for (int i = 0; i < rText.getLength(); i++) {
-        auto character = rText[i];
-
-        if (
-            (character >= '(' && character <= '@') || // includes 0-9 and most of the punctuation we want
-            (character >= '[' && character <= '_')  // includes the rest of the punctuation we want
-        )
-            charactersToKeep.push_back(character);
-    }
-
-    if (charactersToKeep.size())
-        rText = OUString(&charactersToKeep[0], charactersToKeep.size());
-    else
-        rText = OUString();
-}
-
 // #i85090#
 OUString SwGetRefField::GetExpandedTextOfReferencedTextNode(
         SwRootFrame const& rLayout, SwTextNode* pTextNode, SwFrame* pFrame) const
@@ -468,8 +446,6 @@ OUString SwGetRefField::GetExpandedTextOfReferencedTextNode(
        sRet = sw::GetExpandTextMerged(&rLayout, *pReferencedTextNode, true, false, ExpandMode(0));
        sRet = lcl_formatStringByCombiningCharacter( sRet, cStrikethrough );
     }
-
-    StylerefStripNonnumerical(sRet);
 
     return sRet;
 }
@@ -707,7 +683,7 @@ void SwGetRefField::UpdateField(const SwTextField* pFieldTextAttr, SwFrame* pFra
                         rText = pTextNd->GetExpandText(pLayout, nStart, nEnd - nStart, false, false,
                                                        false, ExpandMode(0));
                 }
-                FilterText(m_sText, GetLanguage(), m_sSetReferenceLanguage);
+                FilterText(rText, GetLanguage(), m_sSetReferenceLanguage);
             }
         }
         break;
@@ -799,7 +775,7 @@ void SwGetRefField::UpdateField(const SwTextField* pFieldTextAttr, SwFrame* pFra
             if ( pFieldTextAttr && pFieldTextAttr->GetpTextNode() )
             {
                 auto result =
-                    MakeRefNumStr(pLayout, pFieldTextAttr->GetTextNode(), *pTextNd, GetFormat());
+                    MakeRefNumStr(pLayout, pFieldTextAttr->GetTextNode(), *pTextNd, m_nSubType, GetFormat(), GetFlags());
                 rText = result.first;
                 // for differentiation of Roman numbers and letters in Hungarian article handling
                 bool bClosingParenthesis = result.second;
@@ -809,22 +785,25 @@ void SwGetRefField::UpdateField(const SwTextField* pFieldTextAttr, SwFrame* pFra
                 }
             }
         }
+
         break;
 
     default:
         OSL_FAIL("<SwGetRefField::UpdateField(..)> - unknown format type");
     }
-
-    StylerefStripNonnumerical(rText);
 }
+
 
 // #i81002#
 static std::pair<OUString, bool> MakeRefNumStr(
         SwRootFrame const*const pLayout,
         const SwTextNode& i_rTextNodeOfField,
         const SwTextNode& i_rTextNodeOfReferencedItem,
-        const sal_uInt32 nRefNumFormat)
+        const sal_uInt16 nSubType,
+        const sal_uInt32 nRefNumFormat,
+        const sal_uInt16 nFlags)
 {
+    bool bHideNonNumerical = (nSubType == REF_STYLE) && ((nFlags & REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL) == REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL);
     SwTextNode const& rTextNodeOfField(pLayout
             ?   *sw::GetParaPropsNode(*pLayout, i_rTextNodeOfField)
             :   i_rTextNodeOfField);
@@ -898,7 +877,8 @@ static std::pair<OUString, bool> MakeRefNumStr(
                 rTextNodeOfReferencedItem.GetNumRule()->MakeRefNumString(
                     *(rTextNodeOfReferencedItem.GetNum(pLayout)),
                     bInclSuperiorNumLabels,
-                    nRestrictInclToThisLevel ),
+                    nRestrictInclToThisLevel,
+                    bHideNonNumerical ),
                 rTextNodeOfReferencedItem.GetNumRule()->MakeNumString(
                     *(rTextNodeOfReferencedItem.GetNum(pLayout)),
                     true).endsWith(")") );
@@ -974,6 +954,9 @@ bool SwGetRefField::QueryValue( uno::Any& rAny, sal_uInt16 nWhichId ) const
             }
             rAny <<= nSource;
         }
+        break;
+    case FIELD_PROP_USHORT3:
+        rAny <<= m_nFlags;
         break;
     case FIELD_PROP_PAR1:
     {
@@ -1077,6 +1060,13 @@ bool SwGetRefField::PutValue( const uno::Any& rAny, sal_uInt16 nWhichId )
     case FIELD_PROP_PAR4:
         rAny >>= m_sSetReferenceLanguage;
         break;
+    case FIELD_PROP_USHORT3:
+        {
+            sal_uInt16 nSetFlags = 0;
+            rAny >>= nSetFlags;
+            m_nFlags = nSetFlags;
+        }
+        break;
     case FIELD_PROP_SHORT1:
         {
             sal_Int16 nSetSeq = 0;
@@ -1156,6 +1146,33 @@ void SwGetRefFieldType::UpdateGetReferences()
         pGRef->UpdateField(pFormatField->GetTextField(), nullptr);
     }
     CallSwClientNotify(sw::LegacyModifyHint(nullptr, nullptr));
+}
+
+void SwGetRefFieldType::UpdateStyleReferences()
+{
+    std::vector<SwFormatField*> vFields;
+    GatherFields(vFields, false);
+    bool bModified = false;
+    for(auto pFormatField: vFields)
+    {
+        // update only the GetRef fields which are also STYLEREF fields
+        SwGetRefField* pGRef = static_cast<SwGetRefField*>(pFormatField->GetField());
+
+        if (pGRef->GetSubType() != REF_STYLE) continue;
+
+        const SwTextField* pTField;
+        if(!pGRef->GetLanguage() &&
+            nullptr != (pTField = pFormatField->GetTextField()) &&
+            pTField->GetpTextNode())
+        {
+            pGRef->SetLanguage(pTField->GetpTextNode()->GetLang(pTField->GetStart()));
+        }
+
+        pGRef->UpdateField(pFormatField->GetTextField(), nullptr);
+        bModified = true;
+    }
+    if (bModified)
+        CallSwClientNotify(sw::LegacyModifyHint(nullptr, nullptr));
 }
 
 void SwGetRefFieldType::SwClientNotify(const SwModify&, const SfxHint& rHint)
@@ -1368,8 +1385,6 @@ SwTextNode* SwGetRefFieldType::FindAnchor(SwDoc* pDoc, const OUString& rRefMark,
         case REF_STYLE:
             if (!pSelf) break;
 
-            bool bFlagFromBottom = (nFlags & REFFLDFLAG_STYLE_FROM_BOTTOM) == REFFLDFLAG_STYLE_FROM_BOTTOM;
-
             const SwNodes& nodes = pDoc->GetNodes();
 
             StyleRefElementType elementType = StyleRefElementType::Default;
@@ -1417,6 +1432,8 @@ SwTextNode* SwGetRefFieldType::FindAnchor(SwDoc* pDoc, const OUString& rRefMark,
                 {
                     // For marginals, styleref tries to act on the current page first
                     // 1. Get the page we're on, search it from top to bottom
+
+                    bool bFlagFromBottom = (nFlags & REFFLDFLAG_STYLE_FROM_BOTTOM) == REFFLDFLAG_STYLE_FROM_BOTTOM;
 
                     Point aPt;
                     std::pair<Point, bool> const tmp(aPt, false);
@@ -1483,10 +1500,7 @@ SwTextNode* SwGetRefFieldType::FindAnchor(SwDoc* pDoc, const OUString& rRefMark,
 
                         if (beforeStart)
                         {
-                            if (bFlagFromBottom)
-                                pSearchThird.push_front(nodes[n]);
-                            else
-                                pSearchSecond.push_front(nodes[n]);
+                            pSearchSecond.push_front(nodes[n]);
                         }
                         else if (beforeEnd)
                         {
@@ -1500,8 +1514,6 @@ SwTextNode* SwGetRefFieldType::FindAnchor(SwDoc* pDoc, const OUString& rRefMark,
                                 beforeEnd = false;
                             }
                         }
-                        else if (bFlagFromBottom)
-                            pSearchSecond.push_back(nodes[n]);
                         else
                             pSearchThird.push_back(nodes[n]);
                     }
@@ -1563,20 +1575,14 @@ SwTextNode* SwGetRefFieldType::FindAnchor(SwDoc* pDoc, const OUString& rRefMark,
                     {
                         if (beforeElement)
                         {
-                            if (bFlagFromBottom)
-                                pSearchSecond.push_front(nodes[n]);
-                            else
-                                pSearchFirst.push_front(nodes[n]);
+                            pSearchFirst.push_front(nodes[n]);
 
                             if (*pReference == *nodes[n])
                             {
                                 beforeElement = false;
                             }
                         }
-                        else if (bFlagFromBottom)
-                            pSearchFirst.push_back(nodes[n]);
-                        else
-                            pSearchSecond.push_back(nodes[n]);
+                        pSearchSecond.push_back(nodes[n]);
                     }
 
                     // 1. Search up until we hit the top of the document

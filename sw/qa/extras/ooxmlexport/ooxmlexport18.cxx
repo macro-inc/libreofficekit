@@ -22,6 +22,7 @@
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextField.hpp>
+#include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/util/XRefreshable.hpp>
 
 
@@ -325,6 +326,19 @@ DECLARE_OOXMLEXPORT_TEST(testTdf153964_topMarginAfterBreak15, "tdf153964_topMarg
     // The top margin was not applied to paragraph 11, and with compat15 it shouldn't apply here.
     xPara.set(getParagraph(12, u""), uno::UNO_QUERY); // after page break
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(xPara, "ParaTopMargin"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf76022_textboxWrap)
+{
+    // Granted, this is an ODT with a bit of an anomoly - tables ignore fly wrapping.
+    createSwDoc("tdf76022_textboxWrap.odt");
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Did you make wrapping sane/interoperable?", 1, getPages());
+
+    // When saving to DOCX, the table should obey the fly wrapping
+    reload("Office Open XML Text", "");
+
+    // The fly takes up the whole page, so the table needs to shift down to the next page.
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf149551_mongolianVert)
@@ -730,6 +744,101 @@ DECLARE_OOXMLEXPORT_TEST(testTdf155736, "tdf155736_PageNumbers_footer.docx")
     //- Actual  : Page of
     CPPUNIT_ASSERT_EQUAL(OUString("Page * of *"), parseDump("/root/page[1]/footer/txt/text()"));
     CPPUNIT_ASSERT_EQUAL(OUString("Page * of *"), parseDump("/root/page[2]/footer/txt/text()"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSvgExtensionsSupport)
+{
+    loadAndSave("SvgImageTest.odt");
+
+    xmlDocUniquePtr pXmlDocRels = parseExport("word/_rels/document.xml.rels");
+
+    // Check we have 2 relationships - one for PNG and one for SVG files
+    assertXPath(pXmlDocRels,
+                "/rels:Relationships/rels:Relationship[@Target='media/image1.png']", "Id",
+                "rId2");
+
+    assertXPath(pXmlDocRels,
+                "/rels:Relationships/rels:Relationship[@Target='media/image2.svg']", "Id",
+                "rId3");
+
+    // Check there is the extension present
+    xmlDocUniquePtr pXmlDocContent = parseExport("word/document.xml");
+
+    OString aPath(
+        "/w:document/w:body/w:p/w:r/w:drawing/wp:anchor/a:graphic/a:graphicData/pic:pic/pic:blipFill/a:blip");
+    assertXPath(pXmlDocContent, aPath, "embed", "rId2");
+
+    assertXPath(pXmlDocContent, aPath + "/a:extLst/a:ext", "uri",
+                "{96DAC541-7B7A-43D3-8B79-37D633B846F1}");
+    assertXPath(pXmlDocContent, aPath + "/a:extLst/a:ext/asvg:svgBlip", "embed", "rId3");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf158855)
+{
+    // Given a table immediately followed by a section break
+    loadFromURL(u"section_break_after_table.docx");
+
+    // Check that the import doesn't produce an extra empty paragraph before a page break
+    CPPUNIT_ASSERT_EQUAL(2, getPages()); // was 3
+    CPPUNIT_ASSERT_EQUAL(2, getParagraphs()); // was 3
+    uno::Reference<text::XTextTable>(getParagraphOrTable(1), uno::UNO_QUERY_THROW);
+    getParagraph(2, "Next page"); // was empty, with the 3rd being "Next page"
+
+    saveAndReload(OUString::createFromAscii(mpFilter));
+
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    CPPUNIT_ASSERT_EQUAL(2, getParagraphs());
+    uno::Reference<text::XTextTable>(getParagraphOrTable(1), uno::UNO_QUERY_THROW);
+    getParagraph(2, "Next page");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf158971)
+{
+    // Given a section break and an SDT in the following paragraph
+    loadFromURL(u"sdt_after_section_break.docx");
+
+    // Check that the import doesn't introduce unwanted character properties in the paragraph after
+    // the section break
+    CPPUNIT_ASSERT_EQUAL(2, getParagraphs());
+    {
+        auto para = getParagraph(2, "text");
+        css::uno::Reference<css::beans::XPropertyState> xRunState(getRun(para, 1, ""),
+                                                                  css::uno::UNO_QUERY_THROW);
+        // without the fix, this would fail with
+        // - Expected: 1
+        // - Actual  : 0
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("RubyAdjust"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("RubyIsAbove"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("RubyPosition"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("UnvisitedCharStyleName"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("VisitedCharStyleName"));
+    }
+
+    // Saving must not fail assertions
+    saveAndReload(OUString::createFromAscii(mpFilter));
+
+    // Check again
+    CPPUNIT_ASSERT_EQUAL(2, getParagraphs());
+    {
+        auto para = getParagraph(2, "text");
+        css::uno::Reference<css::beans::XPropertyState> xRunState(getRun(para, 1, ""),
+                                                                  css::uno::UNO_QUERY_THROW);
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("RubyAdjust"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("RubyIsAbove"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("RubyPosition"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("UnvisitedCharStyleName"));
+        CPPUNIT_ASSERT_EQUAL(css::beans::PropertyState_DEFAULT_VALUE,
+                             xRunState->getPropertyState("VisitedCharStyleName"));
+    }
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

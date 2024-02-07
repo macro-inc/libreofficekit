@@ -3322,6 +3322,17 @@ void AttributeOutputBase::TextField( const SwFormatField& rField )
                     break;
                 case ww::eSTYLEREF:
                     sExtraFlags = ""; // styleref fields do not work if they have a hyperlink
+
+                    {
+                        sal_uInt16 stylerefFlags = ((SwGetRefField*)pField)->GetFlags();
+                        if ((stylerefFlags & REFFLDFLAG_STYLE_FROM_BOTTOM) == REFFLDFLAG_STYLE_FROM_BOTTOM) {
+                            sExtraFlags += "\\l ";
+                        }
+                        if ((stylerefFlags & REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL) == REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL) {
+                            sExtraFlags += "\\t ";
+                        }
+                    }
+
                     [[fallthrough]];
                 default:
                     switch (pField->GetFormat())
@@ -3418,6 +3429,9 @@ void AttributeOutputBase::TextField( const SwFormatField& rField )
                 } else {
                     // Otherwise, get the style of the text and use it as the style name
                     const SwTextNode* pOutlineNd = pTextNd->FindOutlineNodeOfLevel(aCopy.GetLevel());
+
+                    if (!pOutlineNd) break;
+                    // Sometimes we can't find the outline node, in that case let's just fallback to exporting the text
 
                     sStr = FieldString(ww::eSTYLEREF)
                          + GetExport().GetStyleRefName(pOutlineNd->GetFormatColl()->GetName());

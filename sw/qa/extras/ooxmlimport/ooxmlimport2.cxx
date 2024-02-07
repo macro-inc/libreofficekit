@@ -520,18 +520,6 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf43017)
                                  getProperty<sal_Int32>(xText, "CharColor"));
 }
 
-CPPUNIT_TEST_FIXTURE(Test, testTdf127778)
-{
-    createSwDoc("tdf127778.docx");
-    xmlDocUniquePtr pLayout = parseLayoutDump();
-    // Without the accompanying fix in place, this test would have failed with:
-    // equality assertion failed
-    // - Expected: 0
-    // - Actual  : 1
-    // i.e. the 2nd page had an unexpected header.
-    assertXPath(pLayout, "//page[2]/header", 0);
-}
-
 // related tdf#43017
 CPPUNIT_TEST_FIXTURE(Test, testTdf124754)
 {

@@ -1256,23 +1256,43 @@ void DrawingML::WriteOutline( const Reference<XPropertySet>& rXPropSet, Referenc
     mpFS->endElementNS( XML_a, XML_ln );
 }
 
-const char* DrawingML::GetComponentDir() const
+OUString DrawingML::GetComponentDir() const
 {
-    return getComponentDir(meDocumentType);
+    return OUString(getComponentDir(meDocumentType));
 }
 
-const char* DrawingML::GetRelationCompPrefix() const
+OUString DrawingML::GetRelationCompPrefix() const
 {
-    return getRelationCompPrefix(meDocumentType);
+    return OUString(getRelationCompPrefix(meDocumentType));
 }
 
-OUString GraphicExport::writeBlip(Graphic const& rGraphic, std::vector<model::BlipEffect> const& rEffects, bool bRelPathToMedia)
+void GraphicExport::writeSvgExtension(OUString const& rSvgRelId)
 {
-    OUString sRelId;
+    if (rSvgRelId.isEmpty())
+        return;
 
-    sRelId = writeToStorage(rGraphic, bRelPathToMedia);
+    mpFS->startElementNS(XML_a, XML_extLst);
+    mpFS->startElementNS(XML_a, XML_ext, XML_uri, "{96DAC541-7B7A-43D3-8B79-37D633B846F1}");
+    mpFS->singleElementNS(XML_asvg, XML_svgBlip,
+            FSNS(XML_xmlns, XML_asvg), mpFilterBase->getNamespaceURL(OOX_NS(asvg)),
+            FSNS(XML_r, XML_embed), rSvgRelId);
+    mpFS->endElementNS(XML_a, XML_ext);
+    mpFS->endElementNS( XML_a, XML_extLst);
+}
+
+void GraphicExport::writeBlip(Graphic const& rGraphic, std::vector<model::BlipEffect> const& rEffects, bool bRelPathToMedia)
+{
+    OUString sRelId = writeToStorage(rGraphic, bRelPathToMedia);
 
     mpFS->startElementNS(XML_a, XML_blip, FSNS(XML_r, XML_embed), sRelId);
+
+    auto const& rVectorGraphicDataPtr = rGraphic.getVectorGraphicData();
+
+    if (rVectorGraphicDataPtr && rVectorGraphicDataPtr->getType() == VectorGraphicDataType::Svg)
+    {
+        OUString sSvgRelId = writeToStorage(rGraphic, bRelPathToMedia, TypeHint::SVG);
+        writeSvgExtension(sSvgRelId);
+    }
 
     for (auto const& rEffect : rEffects)
     {
@@ -1384,148 +1404,203 @@ OUString GraphicExport::writeBlip(Graphic const& rGraphic, std::vector<model::Bl
     }
 
     mpFS->endElementNS(XML_a, XML_blip);
-
-    return sRelId;
 }
 
-OUString GraphicExport::writeToStorage(const Graphic& rGraphic , bool bRelPathToMedia)
+OUString GraphicExport::writeNewEntryToStorage(const Graphic& rGraphic, bool bRelPathToMedia)
 {
-    GfxLink aLink = rGraphic.GetGfxLink ();
-    BitmapChecksum aChecksum = rGraphic.GetChecksum();
+    GfxLink const& rLink = rGraphic.GetGfxLink();
+
     OUString sMediaType;
-    const char* pExtension = "";
-    OUString sRelId;
+    OUString aExtension;
+
+    SvMemoryStream aStream;
+    const void* aData = rLink.GetData();
+    std::size_t nDataSize = rLink.GetDataSize();
+
+    switch (rLink.GetType())
+    {
+        case GfxLinkType::NativeGif:
+            sMediaType = "image/gif";
+            aExtension = "gif";
+            break;
+
+        // #i15508# added BMP type for better exports
+        // export not yet active, so adding for reference (not checked)
+        case GfxLinkType::NativeBmp:
+            sMediaType = "image/bmp";
+            aExtension = "bmp";
+            break;
+
+        case GfxLinkType::NativeJpg:
+            sMediaType = "image/jpeg";
+            aExtension = "jpeg";
+            break;
+        case GfxLinkType::NativePng:
+            sMediaType = "image/png";
+            aExtension = "png";
+            break;
+        case GfxLinkType::NativeTif:
+            sMediaType = "image/tiff";
+            aExtension = "tif";
+            break;
+        case GfxLinkType::NativeWmf:
+            sMediaType = "image/x-wmf";
+            aExtension = "wmf";
+            break;
+        case GfxLinkType::NativeMet:
+            sMediaType = "image/x-met";
+            aExtension = "met";
+            break;
+        case GfxLinkType::NativePct:
+            sMediaType = "image/x-pict";
+            aExtension = "pct";
+            break;
+        case GfxLinkType::NativeMov:
+            sMediaType = "application/movie";
+            aExtension = "MOV";
+            break;
+        default:
+        {
+            GraphicType aType = rGraphic.GetType();
+            if (aType == GraphicType::Bitmap || aType == GraphicType::GdiMetafile)
+            {
+                if (aType == GraphicType::Bitmap)
+                {
+                    (void)GraphicConverter::Export(aStream, rGraphic, ConvertDataFormat::PNG);
+                    sMediaType = "image/png";
+                    aExtension = "png";
+                }
+                else
+                {
+                    (void)GraphicConverter::Export(aStream, rGraphic, ConvertDataFormat::EMF);
+                    sMediaType = "image/x-emf";
+                    aExtension = "emf";
+                }
+            }
+            else
+            {
+                SAL_WARN("oox.shape", "unhandled graphic type " << static_cast<int>(aType));
+
+                /*Earlier, even in case of unhandled graphic types we were
+                  proceeding to write the image, which would eventually
+                  write an empty image with a zero size, and return a valid
+                  relationID, which is incorrect.
+                  */
+                return OUString();
+            }
+
+            aData = aStream.GetData();
+            nDataSize = aStream.GetEndOfData();
+        }
+        break;
+    }
+
+    GraphicExportCache& rGraphicExportCache = GraphicExportCache::get();
+    auto sImageCountString = OUString::number(rGraphicExportCache.nextImageCount());
+
+    OUString sComponentDir(getComponentDir(meDocumentType));
+
+    OUString sImagePath = sComponentDir + "/media/image" + sImageCountString + "." + aExtension;
+
+    Reference<XOutputStream> xOutStream = mpFilterBase->openFragmentStream(sImagePath, sMediaType);
+    xOutStream->writeBytes(Sequence<sal_Int8>(static_cast<const sal_Int8*>(aData), nDataSize));
+    xOutStream->closeOutput();
+
+    OUString sRelationCompPrefix;
+    if (bRelPathToMedia)
+        sRelationCompPrefix = "../";
+    else
+        sRelationCompPrefix = getRelationCompPrefix(meDocumentType);
+
+    OUString sPath = sRelationCompPrefix + "media/image" + sImageCountString + "." + aExtension;
+
+    rGraphicExportCache.addExportGraphics(rGraphic.GetChecksum(), sPath);
+
+    return sPath;
+}
+
+namespace
+{
+BitmapChecksum makeChecksumUniqueForSVG(BitmapChecksum const& rChecksum)
+{
+    // need to modify the checksum so we know it's for SVG - just invert it
+    return ~rChecksum;
+}
+
+} // end anonymous namespace
+
+OUString GraphicExport::writeNewSvgEntryToStorage(const Graphic& rGraphic, bool bRelPathToMedia)
+{
+    OUString sMediaType = "image/svg";
+    OUString aExtension = "svg";
+
+    GfxLink const& rLink = rGraphic.GetGfxLink();
+    if (rLink.GetType() != GfxLinkType::NativeSvg)
+        return OUString();
+
+    const void* aData = rLink.GetData();
+    std::size_t nDataSize = rLink.GetDataSize();
+
+    GraphicExportCache& rGraphicExportCache = GraphicExportCache::get();
+    auto sImageCountString = OUString::number(rGraphicExportCache.nextImageCount());
+
+    OUString sComponentDir(getComponentDir(meDocumentType));
+
+    OUString sImagePath = sComponentDir + "/media/image" + sImageCountString + "." + aExtension;
+
+    Reference<XOutputStream> xOutStream = mpFilterBase->openFragmentStream(sImagePath, sMediaType);
+    xOutStream->writeBytes(Sequence<sal_Int8>(static_cast<const sal_Int8*>(aData), nDataSize));
+    xOutStream->closeOutput();
+
+    OUString sRelationCompPrefix;
+    if (bRelPathToMedia)
+        sRelationCompPrefix = "../";
+    else
+        sRelationCompPrefix = getRelationCompPrefix(meDocumentType);
+
+    OUString sPath = sRelationCompPrefix + "media/image" + sImageCountString + "." + aExtension;
+
+    rGraphicExportCache.addExportGraphics(makeChecksumUniqueForSVG(rGraphic.GetChecksum()), sPath);
+
+    return sPath;
+}
+
+OUString GraphicExport::writeToStorage(const Graphic& rGraphic, bool bRelPathToMedia, TypeHint eHint)
+{
     OUString sPath;
 
-    // tdf#74670 tdf#91286 Save image only once
+    auto aChecksum = rGraphic.GetChecksum();
+    if (eHint == TypeHint::SVG)
+        aChecksum = makeChecksumUniqueForSVG(aChecksum);
+
     GraphicExportCache& rGraphicExportCache = GraphicExportCache::get();
     sPath = rGraphicExportCache.findExportGraphics(aChecksum);
 
     if (sPath.isEmpty())
     {
-        SvMemoryStream aStream;
-        const void* aData = aLink.GetData();
-        std::size_t nDataSize = aLink.GetDataSize();
-
-        switch (aLink.GetType())
-        {
-            case GfxLinkType::NativeGif:
-                sMediaType = "image/gif";
-                pExtension = ".gif";
-                break;
-
-            // #i15508# added BMP type for better exports
-            // export not yet active, so adding for reference (not checked)
-            case GfxLinkType::NativeBmp:
-                sMediaType = "image/bmp";
-                pExtension = ".bmp";
-                break;
-
-            case GfxLinkType::NativeJpg:
-                sMediaType = "image/jpeg";
-                pExtension = ".jpeg";
-                break;
-            case GfxLinkType::NativePng:
-                sMediaType = "image/png";
-                pExtension = ".png";
-                break;
-            case GfxLinkType::NativeSvg:
-                sMediaType = "image/svg";
-                pExtension = ".svg";
-                break;
-            case GfxLinkType::NativeTif:
-                sMediaType = "image/tiff";
-                pExtension = ".tif";
-                break;
-            case GfxLinkType::NativeWmf:
-                sMediaType = "image/x-wmf";
-                pExtension = ".wmf";
-                break;
-            case GfxLinkType::NativeMet:
-                sMediaType = "image/x-met";
-                pExtension = ".met";
-                break;
-            case GfxLinkType::NativePct:
-                sMediaType = "image/x-pict";
-                pExtension = ".pct";
-                break;
-            case GfxLinkType::NativeMov:
-                sMediaType = "application/movie";
-                pExtension = ".MOV";
-                break;
-            default:
-            {
-                GraphicType aType = rGraphic.GetType();
-                if (aType == GraphicType::Bitmap || aType == GraphicType::GdiMetafile)
-                {
-                    if (aType == GraphicType::Bitmap)
-                    {
-                        (void)GraphicConverter::Export(aStream, rGraphic, ConvertDataFormat::PNG);
-                        sMediaType = "image/png";
-                        pExtension = ".png";
-                    }
-                    else
-                    {
-                        (void)GraphicConverter::Export(aStream, rGraphic, ConvertDataFormat::EMF);
-                        sMediaType = "image/x-emf";
-                        pExtension = ".emf";
-                    }
-                }
-                else
-                {
-                    SAL_WARN("oox.shape", "unhandled graphic type " << static_cast<int>(aType));
-                    /*Earlier, even in case of unhandled graphic types we were
-                      proceeding to write the image, which would eventually
-                      write an empty image with a zero size, and return a valid
-                      relationID, which is incorrect.
-                      */
-                    return sRelId;
-                }
-
-                aData = aStream.GetData();
-                nDataSize = aStream.GetEndOfData();
-                break;
-            }
-        }
-
-        sal_Int32 nImageCount = rGraphicExportCache.nextImageCount();
-        Reference<XOutputStream> xOutStream = mpFilterBase->openFragmentStream(
-            OUStringBuffer()
-                .appendAscii(getComponentDir(meDocumentType))
-                .append("/media/image" + OUString::number(nImageCount))
-                .appendAscii(pExtension)
-                .makeStringAndClear(),
-            sMediaType);
-        xOutStream->writeBytes(Sequence<sal_Int8>(static_cast<const sal_Int8*>(aData), nDataSize));
-        xOutStream->closeOutput();
-
-        const OString sRelPathToMedia = "media/image";
-        OString sRelationCompPrefix;
-        if (bRelPathToMedia)
-            sRelationCompPrefix = "../";
+        if (eHint == TypeHint::SVG)
+            sPath = writeNewSvgEntryToStorage(rGraphic, bRelPathToMedia);
         else
-            sRelationCompPrefix = getRelationCompPrefix(meDocumentType);
-        sPath = OUStringBuffer()
-                    .appendAscii(sRelationCompPrefix.getStr())
-                    .appendAscii(sRelPathToMedia.getStr())
-                    .append(nImageCount)
-                    .appendAscii(pExtension)
-                    .makeStringAndClear();
+            sPath = writeNewEntryToStorage(rGraphic, bRelPathToMedia);
 
-        rGraphicExportCache.addExportGraphics(aChecksum, sPath);
+        if (sPath.isEmpty())
+            return OUString(); // couldn't store
     }
 
-    sRelId = mpFilterBase->addRelation( mpFS->getOutputStream(),
-                                oox::getRelationship(Relationship::IMAGE),
-                                sPath );
+    OUString sRelId = mpFilterBase->addRelation(mpFS->getOutputStream(), oox::getRelationship(Relationship::IMAGE), sPath);
 
     return sRelId;
 }
 
-OUString DrawingML::WriteImage( const Graphic& rGraphic , bool bRelPathToMedia )
+std::shared_ptr<GraphicExport> DrawingML::createGraphicExport()
 {
-    GraphicExport exporter(mpFS, mpFB, meDocumentType);
-    return exporter.writeToStorage(rGraphic, bRelPathToMedia);
+    return std::make_shared<GraphicExport>(mpFS, mpFB, meDocumentType);
+}
+
+OUString DrawingML::writeGraphicToStorage(const Graphic& rGraphic , bool bRelPathToMedia, GraphicExport::TypeHint eHint)
+{
+    GraphicExport aExporter(mpFS, mpFB, meDocumentType);
+    return aExporter.writeToStorage(rGraphic, bRelPathToMedia, eHint);
 }
 
 void DrawingML::WriteMediaNonVisualProperties(const css::uno::Reference<css::drawing::XShape>& xShape)
@@ -1590,10 +1665,7 @@ void DrawingML::WriteMediaNonVisualProperties(const css::uno::Reference<css::dra
     {
         sal_Int32  nImageCount = GraphicExportCache::get().nextImageCount();
 
-        OUString sFileName = OUStringBuffer()
-            .appendAscii(GetComponentDir())
-            .append("/media/media" + OUString::number(nImageCount) + aExtension)
-            .makeStringAndClear();
+        OUString sFileName = GetComponentDir() + "/media/media" + OUString::number(nImageCount) + aExtension;
 
         // copy the video stream
         Reference<XOutputStream> xOutStream = mpFB->openFragmentStream(sFileName, aMimeType);
@@ -1604,9 +1676,8 @@ void DrawingML::WriteMediaNonVisualProperties(const css::uno::Reference<css::dra
         xOutStream->closeOutput();
 
         // create the relation
-        OUString aPath = OUStringBuffer().appendAscii(GetRelationCompPrefix())
-                                         .append("media/media" + OUString::number(nImageCount) + aExtension)
-                                         .makeStringAndClear();
+        OUString aPath = GetRelationCompPrefix() + "media/media" + OUString::number(nImageCount) + aExtension;
+
         aVideoFileRelId = mpFB->addRelation(mpFS->getOutputStream(), oox::getRelationship(eMediaType), aPath);
         aMediaRelId = mpFB->addRelation(mpFS->getOutputStream(), oox::getRelationship(Relationship::MEDIA), aPath);
     }
@@ -1683,27 +1754,36 @@ void DrawingML::WriteImageBrightnessContrastTransparence(uno::Reference<beans::X
     }
 }
 
-OUString DrawingML::WriteXGraphicBlip(uno::Reference<beans::XPropertySet> const & rXPropSet,
+void DrawingML::WriteXGraphicBlip(uno::Reference<beans::XPropertySet> const & rXPropSet,
                                       uno::Reference<graphic::XGraphic> const & rxGraphic,
                                       bool bRelPathToMedia)
 {
     OUString sRelId;
 
     if (!rxGraphic.is())
-        return sRelId;
+        return;
 
     Graphic aGraphic(rxGraphic);
-    sRelId = WriteImage(aGraphic, bRelPathToMedia);
+
+    sRelId = writeGraphicToStorage(aGraphic, bRelPathToMedia);
 
     mpFS->startElementNS(XML_a, XML_blip, FSNS(XML_r, XML_embed), sRelId);
+
+    auto pVectorGraphicDataPtr = aGraphic.getVectorGraphicData();
+
+    if (pVectorGraphicDataPtr && pVectorGraphicDataPtr->getType() == VectorGraphicDataType::Svg)
+    {
+        GraphicExport aExporter(mpFS, mpFB, meDocumentType);
+        OUString sSvgRelId =  aExporter.writeToStorage(aGraphic, bRelPathToMedia, GraphicExport::TypeHint::SVG);
+        if (!sSvgRelId.isEmpty())
+            aExporter.writeSvgExtension(sSvgRelId);
+    }
 
     WriteImageBrightnessContrastTransparence(rXPropSet);
 
     WriteArtisticEffect(rXPropSet);
 
     mpFS->endElementNS(XML_a, XML_blip);
-
-    return sRelId;
 }
 
 void DrawingML::WriteXGraphicBlipMode(uno::Reference<beans::XPropertySet> const & rXPropSet,
@@ -3155,12 +3235,12 @@ void DrawingML::WriteParagraphNumbering(const Reference< XPropertySet >& rXPropS
             BitmapEx aDestBitmap(Bitmap(aDestSize, vcl::PixelFormat::N24_BPP), aMask);
             aDestBitmap.CopyPixel(aDestRect, aSourceRect, &aSourceBitmap);
             Graphic aDestGraphic(aDestBitmap);
-            sRelationId = WriteImage(aDestGraphic);
+            sRelationId = writeGraphicToStorage(aDestGraphic);
             fBulletSizeRel = 1.0f;
         }
         else
         {
-            sRelationId = WriteImage(aGraphic);
+            sRelationId = writeGraphicToStorage(aGraphic);
         }
 
         mpFS->singleElementNS( XML_a, XML_buSzPct,
@@ -6087,16 +6167,14 @@ OString DrawingML::WriteWdpPicture( const OUString& rFileId, const Sequence< sal
 
     sal_Int32 nWdpImageCount = rGraphicExportCache.nextWdpImageCount();
     OUString sFileName = "media/hdphoto" + OUString::number(nWdpImageCount) + ".wdp";
-    OUString sFragment = OUStringBuffer().appendAscii(GetComponentDir()).append( "/" + sFileName).makeStringAndClear();
+    OUString sFragment = GetComponentDir() + "/" + sFileName;
     Reference< XOutputStream > xOutStream = mpFB->openFragmentStream(sFragment, "image/vnd.ms-photo");
     xOutStream->writeBytes( rPictureData );
     xOutStream->closeOutput();
 
-    aId = mpFB->addRelation( mpFS->getOutputStream(),
-                             oox::getRelationship(Relationship::HDPHOTO),
-                             OUStringBuffer()
-                             .appendAscii( GetRelationCompPrefix() )
-                             .append( sFileName ) );
+    aId = mpFB->addRelation(mpFS->getOutputStream(),
+                            oox::getRelationship(Relationship::HDPHOTO),
+                            Concat2View(GetRelationCompPrefix() + sFileName));
 
     rGraphicExportCache.addToWdpCache(rFileId, aId);
 
@@ -6200,7 +6278,7 @@ void DrawingML::WriteDiagram(const css::uno::Reference<css::drawing::XShape>& rX
     mpFS->startElementNS(XML_a, XML_graphicData, XML_uri,
                          "http://schemas.openxmlformats.org/drawingml/2006/diagram");
 
-    OUString sRelationCompPrefix = OUString::createFromAscii(GetRelationCompPrefix());
+    OUString sRelationCompPrefix = GetRelationCompPrefix();
 
     // add data relation
     OUString dataFileName = "diagrams/data" + OUString::number(nDiagramId) + ".xml";
@@ -6266,7 +6344,7 @@ void DrawingML::WriteDiagram(const css::uno::Reference<css::drawing::XShape>& rX
     uno::Reference<xml::sax::XWriter> writer
         = xml::sax::Writer::create(comphelper::getProcessComponentContext());
 
-    OUString sDir = OUString::createFromAscii(GetComponentDir());
+    OUString sDir = GetComponentDir();
 
     // write data file
     serializer.set(dataDom, uno::UNO_QUERY);
@@ -6366,7 +6444,7 @@ void DrawingML::writeDiagramRels(const uno::Sequence<uno::Sequence<uno::Any>>& x
 
         mpFB->addRelation(xOutStream, sType, Concat2View("../" + sFragment));
 
-        OUString sDir = OUString::createFromAscii(GetComponentDir());
+        OUString sDir = GetComponentDir();
         uno::Reference<io::XOutputStream> xBinOutStream
             = mpFB->openFragmentStream(sDir + "/" + sFragment, sContentType);
 

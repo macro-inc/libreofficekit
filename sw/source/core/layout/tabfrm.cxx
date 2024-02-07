@@ -2608,6 +2608,43 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                     // See if this is a split fly that can also grow.
                     auto pUpperFly = static_cast<SwFlyFrame*>(GetUpper());
                     bFlySplit = pUpperFly->IsFlySplitAllowed();
+
+                    if (bFlySplit && bTryToSplit)
+                    {
+                        // This is a split fly that wants to split the row itself. See if it's also
+                        // nested. If so, we'll want to know if the row split has rowspans.
+                        SwTextFrame* pAnchorCharFrame = pUpperFly->FindAnchorCharFrame();
+                        if (pAnchorCharFrame && pAnchorCharFrame->IsInFly())
+                        {
+                            // Find the row we'll split.
+                            SwTwips nRemaining
+                                = aRectFnSet.YDiff(nDeadLine, aRectFnSet.GetTop(getFrameArea()));
+                            nRemaining -= aRectFnSet.GetTopMargin(*this);
+                            const SwFrame* pRow = Lower();
+                            for (; pRow->GetNext(); pRow = pRow->GetNext())
+                            {
+                                if (nRemaining < aRectFnSet.GetHeight(pRow->getFrameArea()))
+                                {
+                                    break;
+                                }
+
+                                nRemaining -= aRectFnSet.GetHeight(pRow->getFrameArea());
+                            }
+                            // See if any cells have rowspans.
+                            for (const SwFrame* pLower = pRow->GetLower(); pLower;
+                                 pLower = pLower->GetNext())
+                            {
+                                auto pCellFrame = static_cast<const SwCellFrame*>(pLower);
+                                if (pCellFrame->GetTabBox()->getRowSpan() != 1)
+                                {
+                                    // The cell has a rowspan, don't split the row itself in this
+                                    // case (but just move it forward, i.e. split between the rows).
+                                    bTryToSplit = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
                 if( IsInSct() || GetUpper()->IsInTab() || bFlySplit )
                     nDeadLine = aRectFnSet.YInc( nDeadLine,
@@ -2666,6 +2703,7 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                         aRectFnSet.GetTopMargin(*this) +
                          lcl_GetHeightOfRows( GetLower(), nMinNumOfLines ) );
 
+                bool bHadFollowFlowLineBeforeSplit = false;
                 // Some more checks if we want to call the split algorithm or not:
                 // The repeating lines / keeping lines still fit into the upper or
                 // if we do not have an (in)direct Prev, we split anyway.
@@ -2681,6 +2719,7 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                         if (!nThrowAwayValidLayoutLimit)
                             continue;
                         const bool bInitialLoopEndCondition(isFrameAreaDefinitionValid());
+                        bHadFollowFlowLineBeforeSplit = true;
                         RemoveFollowFlowLine();
                         const bool bFinalLoopEndCondition(isFrameAreaDefinitionValid());
 
@@ -2714,7 +2753,15 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                     // If splitting the table was successful or not,
                     // we do not want to have 'empty' follow tables.
                     if ( GetFollow() && !GetFollow()->GetFirstNonHeadlineRow() )
-                        Join();
+                    {
+                        // For split flys, if we just removed the follow flow line before split,
+                        // then avoid the join in the error + rowsplit case, so split can be called
+                        // again, this time without a rowsplit.
+                        if (!bFlySplit || !bHadFollowFlowLineBeforeSplit || !bSplitError || !bTryToSplit)
+                        {
+                            Join();
+                        }
+                    }
 
                     // We want to restore the situation before the failed
                     // split operation as good as possible. Therefore we
@@ -2728,6 +2775,8 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                         continue;
                     }
 
+                    // If split failed, then next time try without
+                    // allowing to split the table rows.
                     bTryToSplit = !bSplitError;
 
                     //To avoid oscillations the Follow must become valid now
@@ -3022,10 +3071,17 @@ bool SwTabFrame::CalcFlyOffsets( SwTwips& rUpper,
                 //   at the page frame, the table is on, but it's anchor character
                 //   text frame has already changed its page.
                 const SwTextFrame* pAnchorCharFrame = pFly->FindAnchorCharFrame();
+                const SwFormatHoriOrient& rHori= pFly->GetFormat()->GetHoriOrient();
+                // TODO: why not just ignore HoriOrient?
+                bool isHoriOrientShiftDown =
+                       rHori.GetHoriOrient() == text::HoriOrientation::NONE
+                    || rHori.GetHoriOrient() == text::HoriOrientation::LEFT;
+                // Only consider invalid Writer fly frames if they'll be shifted down.
+                bool bIgnoreFlyValidity = bAddVerticalFlyOffsets && isHoriOrientShiftDown;
                 bool bConsiderFly =
                     // #i46807# - do not consider invalid
                     // Writer fly frames.
-                    (pFly->isFrameAreaDefinitionValid() || bAddVerticalFlyOffsets) &&
+                    (pFly->isFrameAreaDefinitionValid() || bIgnoreFlyValidity) &&
                     // fly anchored at character or at paragraph
                     pFly->IsFlyAtContentFrame() &&
                     // fly overlaps with corresponding table rectangle
@@ -3068,13 +3124,21 @@ bool SwTabFrame::CalcFlyOffsets( SwTwips& rUpper,
 
                 if ( bConsiderFly )
                 {
-                    const SwFormatSurround   &rSur = pFly->GetFormat()->GetSurround();
-                    const SwFormatHoriOrient &rHori= pFly->GetFormat()->GetHoriOrient();
-                    bool bShiftDown = css::text::WrapTextMode_NONE == rSur.GetSurround();
+                    text::WrapTextMode nSurround = pFly->GetFormat()->GetSurround().GetSurround();
+                    // If the frame format is a TextBox of a draw shape,
+                    // then use the surround of the original shape.
+                    bool bWrapThrough = nSurround == text::WrapTextMode_THROUGH;
+                    SwTextBoxHelper::getShapeWrapThrough(pFly->GetFormat(), bWrapThrough);
+                    if (bWrapThrough && nSurround != text::WrapTextMode_THROUGH)
+                        nSurround = text::WrapTextMode_THROUGH;
+                    else if (!bWrapThrough && nSurround == text::WrapTextMode_THROUGH)
+                        nSurround = text::WrapTextMode_PARALLEL;
+
+                    bool bShiftDown = css::text::WrapTextMode_NONE == nSurround;
+                    bool bSplitFly = pFly->IsFlySplitAllowed();
                     if (!bShiftDown && bAddVerticalFlyOffsets)
                     {
-                        if (rSur.GetSurround() == text::WrapTextMode_PARALLEL
-                            && rHori.GetHoriOrient() == text::HoriOrientation::NONE)
+                        if (nSurround == text::WrapTextMode_PARALLEL && isHoriOrientShiftDown)
                         {
                             // We know that wrapping was requested and the table frame overlaps with
                             // the fly frame. Check if the print area overlaps with the fly frame as
@@ -3094,6 +3158,18 @@ bool SwTabFrame::CalcFlyOffsets( SwTwips& rUpper,
                             // normally an SwFlyPortion is created instead that increases the height
                             // of the first table row.
                             bShiftDown = aTabRange.overlaps(aFlyRange);
+
+                            if (bSplitFly && pFly->GetAnchorFrame()->GetUpper() == GetUpper())
+                            {
+                                // Split fly followed by an inline table. Check if we have enough space to shift
+                                // to the right instead.
+                                SwTwips nShiftedTabRight = aFlyRectWithoutSpaces.Right() + getFramePrintArea().Width();
+                                SwTwips nRightShiftDeadline = pFly->GetAnchorFrame()->GetUpper()->getFrameArea().Right();
+                                if (aRectFnSet.XDiff(nRightShiftDeadline, nShiftedTabRight) >= 0)
+                                {
+                                    bShiftDown = false;
+                                }
+                            }
                         }
                     }
 
@@ -3133,9 +3209,17 @@ bool SwTabFrame::CalcFlyOffsets( SwTwips& rUpper,
                             bInvalidatePrtArea = true;
                         }
                     }
-                    if ( (css::text::WrapTextMode_RIGHT    == rSur.GetSurround() ||
-                          css::text::WrapTextMode_PARALLEL == rSur.GetSurround())&&
-                         text::HoriOrientation::LEFT == rHori.GetHoriOrient() )
+                    bool bFlyHoriOrientLeft = text::HoriOrientation::LEFT == rHori.GetHoriOrient();
+                    if (bSplitFly && !bFlyHoriOrientLeft)
+                    {
+                        // If a split fly is oriented "from left", we already checked if it has enough space on
+                        // the right, so from-left and left means the same here.
+                        bFlyHoriOrientLeft = rHori.GetHoriOrient() == text::HoriOrientation::NONE;
+                    }
+                    if ((css::text::WrapTextMode_RIGHT == nSurround
+                         || css::text::WrapTextMode_PARALLEL == nSurround) &&
+                         bFlyHoriOrientLeft &&
+                         !bShiftDown )
                     {
                         const tools::Long nWidth = aRectFnSet.XDiff(
                             aRectFnSet.GetRight(aFlyRect),
@@ -3143,8 +3227,8 @@ bool SwTabFrame::CalcFlyOffsets( SwTwips& rUpper,
                         rLeftOffset = std::max( rLeftOffset, nWidth );
                         bInvalidatePrtArea = true;
                     }
-                    if ( (css::text::WrapTextMode_LEFT     == rSur.GetSurround() ||
-                          css::text::WrapTextMode_PARALLEL == rSur.GetSurround())&&
+                    if ((css::text::WrapTextMode_LEFT == nSurround
+                         || css::text::WrapTextMode_PARALLEL == nSurround) &&
                          text::HoriOrientation::RIGHT == rHori.GetHoriOrient() )
                     {
                         const tools::Long nWidth = aRectFnSet.XDiff(

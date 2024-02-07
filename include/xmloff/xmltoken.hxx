@@ -742,7 +742,7 @@ namespace xmloff::token {
         XML_EMBEDDED_VISIBLE_AREA,
         XML_EMBOSSED,
         XML_EMISSIVE_COLOR,
-        XML_EMPTY,
+        XML_TOKEN_EMPTY,
         XML_EMPTY_LINE_REFRESH,
         XML_ENABLE_NUMBERING,
         XML_ENABLED,
@@ -1344,6 +1344,7 @@ namespace xmloff::token {
         XML_MOVE_FROM_LEFT,
         XML_MOVE_FROM_RIGHT,
         XML_MOVE_FROM_TOP,
+        XML_MOVE_ID,
         XML_MOVE_PROTECT,
         XML_MOVE_SHORT,
         XML_MOVEMENT,
@@ -1604,6 +1605,8 @@ namespace xmloff::token {
         XML_REFERENCE,
         XML_REFERENCE_END,
         XML_REFERENCE_FORMAT,
+        XML_REFERENCE_FROM_BOTTOM,
+        XML_REFERENCE_HIDE_NON_NUMERICAL,
         XML_REFERENCE_MARK,
         XML_REFERENCE_MARK_END,
         XML_REFERENCE_MARK_START,
@@ -3534,6 +3537,7 @@ namespace xmloff::token {
         XML_FILL_USE_SLIDE_BACKGROUND,
 
         XML_MAY_BREAK_BETWEEN_PAGES,
+        XML_WRAP_TEXT_AT_FRAME_START,
 
         XML_GRADIENT_STOP, // multi-color-gradient
         XML_OPACITY_STOP,

@@ -57,7 +57,14 @@ void response_help(vcl::Window* pWindow)
     vcl::Window* pButtonWindow = pDialog->get_widget_for_response(RET_HELP);
     ::Button* pButton = dynamic_cast<::Button*>(pButtonWindow);
     if (!pButton)
+    {
+        // Is it a wizard dialog?
+        vcl::RoadmapWizard* pWizard = dynamic_cast<vcl::RoadmapWizard*>(pWindow);
+        if (!pWizard || !pWizard->m_pHelp)
+            return;
+        pWizard->m_pHelp->Click();
         return;
+    }
 
     pButton->Click();
 }
@@ -1661,7 +1668,11 @@ void JSComboBox::set_entry_text_without_notify(const OUString& rText)
 void JSComboBox::set_entry_text(const OUString& rText)
 {
     SalInstanceComboBoxWithEdit::set_entry_text(rText);
-    sendUpdate();
+
+    std::unique_ptr<jsdialog::ActionDataMap> pMap = std::make_unique<jsdialog::ActionDataMap>();
+    (*pMap)[ACTION_TYPE] = "setText";
+    (*pMap)["text"] = rText;
+    sendAction(std::move(pMap));
 }
 
 void JSComboBox::set_active(int pos)
@@ -1670,7 +1681,11 @@ void JSComboBox::set_active(int pos)
         return;
 
     SalInstanceComboBoxWithEdit::set_active(pos);
-    sendUpdate();
+
+    std::unique_ptr<jsdialog::ActionDataMap> pMap = std::make_unique<jsdialog::ActionDataMap>();
+    (*pMap)[ACTION_TYPE] = "select";
+    (*pMap)["position"] = OUString::number(pos);
+    sendAction(std::move(pMap));
 }
 
 void JSComboBox::set_active_id(const OUString& rStr)
@@ -1974,8 +1989,10 @@ void JSToolbar::set_menu_item_active(const OString& rIdent, bool bActive)
 
 void JSToolbar::set_item_sensitive(const OString& rIdent, bool bSensitive)
 {
+    bool bWasSensitive = get_item_sensitive(rIdent);
     SalInstanceToolbar::set_item_sensitive(rIdent, bSensitive);
-    sendUpdate();
+    if (bWasSensitive != bSensitive)
+        sendUpdate();
 }
 
 void JSToolbar::set_item_icon_name(const OString& rIdent, const OUString& rIconName)

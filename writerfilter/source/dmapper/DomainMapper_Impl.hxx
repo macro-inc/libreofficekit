@@ -254,22 +254,6 @@ public:
     std::vector<FieldParagraph>& GetParagraphsToFinish() { return m_aParagraphsToFinish; }
 };
 
-struct TextAppendContext
-{
-    css::uno::Reference<css::text::XTextAppend> xTextAppend;
-    css::uno::Reference<css::text::XTextRange> xInsertPosition;
-    css::uno::Reference<css::text::XParagraphCursor> xCursor;
-    ParagraphPropertiesPtr pLastParagraphProperties;
-
-    /**
-     * Objects anchored to the current paragraph, may affect the paragraph
-     * spacing.
-     */
-    std::vector<AnchoredObjectInfo> m_aAnchoredObjects;
-
-    inline TextAppendContext(css::uno::Reference<css::text::XTextAppend> xAppend, const css::uno::Reference<css::text::XTextCursor>& xCur);
-};
-
 struct AnchoredContext
 {
     css::uno::Reference<css::text::XTextContent> xTextContent;
@@ -437,6 +421,27 @@ struct AnchoredObjectsInfo
     std::vector<AnchoredObjectInfo> m_aAnchoredObjects;
 };
 
+struct TextAppendContext
+{
+    css::uno::Reference<css::text::XTextAppend> xTextAppend;
+    css::uno::Reference<css::text::XParagraphCursor> xCursor;
+    css::uno::Reference<css::text::XTextRange> xInsertPosition;
+    ParagraphPropertiesPtr pLastParagraphProperties;
+
+    /**
+     * Objects anchored to the current paragraph, may affect the paragraph
+     * spacing.
+     */
+    std::vector<AnchoredObjectInfo> m_aAnchoredObjects;
+
+    TextAppendContext(css::uno::Reference<css::text::XTextAppend> const& i_xAppend,
+                      css::uno::Reference<css::text::XTextCursor> const& i_xCursor)
+        : xTextAppend(i_xAppend)
+        , xCursor(i_xCursor, css::uno::UNO_QUERY)
+        , xInsertPosition(xCursor)
+    {}
+};
+
 struct SymbolData
 {
     sal_Unicode cSymbol;
@@ -475,7 +480,8 @@ private:
     std::stack<TextAppendContext>                                                   m_aTextAppendStack;
     std::stack<AnchoredContext>                                                     m_aAnchoredStack;
     std::stack<HeaderFooterContext>                                                 m_aHeaderFooterStack;
-    std::stack<std::pair<TextAppendContext, bool>>                                  m_aHeaderFooterTextAppendStack;
+    std::stack<std::pair<TextAppendContext, PagePartType>> m_aHeaderFooterTextAppendStack;
+
     std::deque<FieldContextPtr> m_aFieldStack;
     bool m_bForceGenericFields;
     /// Type of decimal symbol associated to the document language in Writer locale definition
@@ -500,6 +506,10 @@ private:
     unsigned int                                                                    m_nStartGenericField;
     bool                                                                            m_bTextInserted;
     LineNumberSettings                                                              m_aLineNumberSettings;
+
+    std::vector<OUString>                                                           m_aRedlineMoveIDs;
+    // Remember the last used redline MoveID. To avoid regression, because of wrong docx export
+    sal_uInt32                                                                      m_nLastRedlineMovedID;
 
     BookmarkMap_t                                                                   m_aBookmarkMap;
     OUString                                                                        m_sCurrentBkmkId;
@@ -597,7 +607,6 @@ private:
     bool                            m_bIsFirstParaInSectionAfterRedline;
     bool                            m_bIsFirstParaInShape = false;
     bool                            m_bDummyParaAddedForTableInSection;
-    bool                            m_bDummyParaAddedForTableInSectionPage;
     bool                            m_bTextFrameInserted;
     bool                            m_bIsPreviousParagraphFramed;
     bool                            m_bIsLastParaInSection;
@@ -700,7 +709,13 @@ public:
 
     void RemoveDummyParaForTableInSection();
     void AddDummyParaForTableInSection();
-    void RemoveLastParagraph( );
+    void RemoveLastParagraph();
+
+    void checkIfHeaderFooterIsEmpty(PagePartType ePagePartType, PageType eType);
+    void prepareHeaderFooterContent(css::uno::Reference<css::beans::XPropertySet> const& xPageStyle,
+                                    PagePartType ePagePartType, PropertyIds eID,
+                                    bool bAppendToHeaderAndFooterTextStack);
+
     void SetIsDecimalComma() { m_bIsDecimalComma = true; };
     void SetIsLastParagraphInSection( bool bIsLast );
     bool GetIsLastParagraphInSection() const { return m_bIsLastParaInSection;}
@@ -721,8 +736,6 @@ public:
     bool GetIsFirstParagraphInShape() const { return m_bIsFirstParaInShape; }
     void SetIsDummyParaAddedForTableInSection( bool bIsAdded );
     bool GetIsDummyParaAddedForTableInSection() const { return m_bDummyParaAddedForTableInSection;}
-    void SetIsDummyParaAddedForTableInSectionPage(bool bIsAdded);
-    bool GetIsDummyParaAddedForTableInSectionPage() const { return m_bDummyParaAddedForTableInSectionPage; }
 
     /// Track if a textframe has been inserted into this section
     void SetIsTextFrameInserted( bool bIsInserted );
@@ -866,10 +879,7 @@ public:
     /// Get the first pending shape, if there are any.
     css::uno::Reference<css::drawing::XShape> PopPendingShape();
 
-    void PushPageHeader(SectionPropertyMap::PageType eType);
-    void PushPageFooter(SectionPropertyMap::PageType eType);
-
-    void PopPageHeaderFooter();
+    void PopPageHeaderFooter(PagePartType ePagePartType, PageType eType);
     bool IsInHeaderFooter() const { return m_eInHeaderFooterImport != HeaderFooterImportState::none; }
     void ConvertHeaderFooterToTextFrame(bool, bool);
     static void fillEmptyFrameProperties(std::vector<css::beans::PropertyValue>& rFrameProperties, bool bSetAnchorToChar);
@@ -1210,7 +1220,7 @@ public:
     OUString ConvertTOCStyleName(OUString const&);
 
 private:
-    void PushPageHeaderFooter(bool bHeader, SectionPropertyMap::PageType eType);
+    void PushPageHeaderFooter(PagePartType ePagePartType, PageType eType);
     // Start a new index section; if needed, finish current paragraph
     css::uno::Reference<css::beans::XPropertySet> StartIndexSectionChecked(const OUString& sServiceName);
     std::vector<css::uno::Reference< css::drawing::XShape > > m_vTextFramesForChaining ;
@@ -1230,13 +1240,6 @@ private:
 
     std::unordered_map<OUString, CommentProperties> m_aCommentProps;
 };
-
-TextAppendContext::TextAppendContext(css::uno::Reference<css::text::XTextAppend> xAppend, const css::uno::Reference<css::text::XTextCursor>& xCur)
-    : xTextAppend(std::move(xAppend))
-{
-    xCursor.set(xCur, css::uno::UNO_QUERY);
-    xInsertPosition = xCursor;
-}
 
 } //namespace writerfilter::dmapper
 

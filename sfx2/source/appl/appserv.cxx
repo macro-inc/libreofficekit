@@ -604,7 +604,12 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
             }
             const OUString& rSchemeName = pNewThemeArg->GetValue();
             svtools::EditableColorConfig aEditableConfig;
-            if (aEditableConfig.GetCurrentSchemeName() != rSchemeName)
+            // kit explicitly ignores changes to the global color scheme, except for the current ViewShell,
+            // so an attempted change to the same global color scheme when the now current ViewShell ignored
+            // the last change requires re-sending the change. In which case individual shells will have to
+            // decide if this color-scheme change is a change from their perspective to avoid unnecessary
+            // invalidations.
+            if (aEditableConfig.GetCurrentSchemeName() != rSchemeName || comphelper::LibreOfficeKit::isActive())
                 aEditableConfig.LoadScheme(rSchemeName);
             break;
         }
@@ -824,7 +829,7 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
 
                 aCurrentMode = comphelper::getString( aAppNode.getNodeValue( "Active" ) );
 
-                if ( aCurrentMode == aNewName )
+                if ( !comphelper::LibreOfficeKit::isActive() && aCurrentMode == aNewName )
                 {
                     bDone = true;
                     break;
@@ -950,6 +955,8 @@ void SfxApplication::MiscExec_Impl( SfxRequest& rReq )
                     // Show/Hide the Notebookbar
                     const SfxStringItem pItem(SID_NOTEBOOKBAR, aNewName);
                     pViewFrame->GetDispatcher()->ExecuteList(SID_NOTEBOOKBAR, SfxCallMode::SYNCHRON, {&pItem});
+                    const SfxPoolItem *pNbItem;
+                    pViewFrame->GetDispatcher()->QueryState(SID_NOTEBOOKBAR, pNbItem);
 
                     // Show toolbars
                     for ( const OUString& rName : std::as_const(aMandatoryToolbars) )

@@ -208,7 +208,7 @@ public:
 
     void            DeleteContents( InsertDeleteFlags nFlags );
 
-    void SetWidthOrHeight(
+    SC_DLLPUBLIC void SetWidthOrHeight(
         bool bWidth, const std::vector<sc::ColRowSpan>& rRanges, ScSizeMode eMode,
         sal_uInt16 nSizeTwips, bool bRecord = true, const ScMarkData* pMarkData = nullptr );
 
@@ -236,7 +236,8 @@ public:
     bool            TestMergeCells();
     bool            TestRemoveMerge();
 
-    bool            MergeCells( bool bApi, bool& rDoContents, bool bCenter );
+    void            MergeCells( bool bApi, bool bDoContents, bool bCenter,
+                                const sal_uInt16 nSlot );
     bool            RemoveMerge();
 
     SC_DLLPUBLIC void
@@ -270,7 +271,8 @@ public:
     void            DeleteTables(SCTAB nTab, SCTAB nSheets);
 
     bool            RenameTable( const OUString& rName, SCTAB nTabNr );
-    void            MoveTable( sal_uInt16 nDestDocNo, SCTAB nDestTab, bool bCopy, const OUString* pNewTabName = nullptr );
+    void            MoveTable( sal_uInt16 nDestDocNo, SCTAB nDestTab, bool bCopy, const OUString* pNewTabName = nullptr,
+                               bool bContextMenu = false, SCTAB nContextMenuSourceTab = -1 );
     void            ImportTables( ScDocShell* pSrcShell,
                                     SCTAB nCount, const SCTAB* pSrcTabs,
                                     bool bLink,SCTAB nTab);
@@ -343,6 +345,10 @@ public:
     void            OnLOKInsertDeleteRow(SCROW nStartRow, tools::Long nOffset);
     void            OnLOKSetWidthOrHeight(SCCOLROW nStart, bool bWidth);
 
+    bool            TestFormatArea( SCCOL nCol, SCROW nRow, SCTAB nTab, bool bAttrChanged );
+    void            DoAutoAttributes( SCCOL nCol, SCROW nRow, SCTAB nTab,
+                                        bool bAttrChanged );
+
                                                 // Internal helper functions
 protected:
     static void     UpdateLineAttrs( ::editeng::SvxBorderLine&        rLine,
@@ -370,9 +376,6 @@ private:
     sal_uInt16      GetOptimalColWidth( SCCOL nCol, SCTAB nTab, bool bFormula );
 
     void            StartFormatArea();
-    bool            TestFormatArea( SCCOL nCol, SCROW nRow, SCTAB nTab, bool bAttrChanged );
-    void            DoAutoAttributes( SCCOL nCol, SCROW nRow, SCTAB nTab,
-                                        bool bAttrChanged );
 
     void            MarkAndJumpToRanges(const ScRangeList& rRanges);
     void            CopyAutoSpellData( FillDir eDir, SCCOL nStartCol, SCROW nStartRow,

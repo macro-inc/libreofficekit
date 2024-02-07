@@ -2171,7 +2171,9 @@ bool SwDoc::MoveParagraphImpl(SwPaM& rPam, SwNodeOffset const nOffset,
                            : aIdx.GetNode().GetTextNode());
             bool bIsEmptyNode = pIsEmptyNode && pIsEmptyNode->Len() == 0;
 
-            getIDocumentContentOperations().CopyRange(*oPam, aInsPos, SwCopyFlags::CheckPosInFly);
+            sal_uInt32 nMovedID = getIDocumentRedlineAccess().GetRedlineTable().getNewMovedID();
+            getIDocumentContentOperations().CopyRange(*oPam, aInsPos, SwCopyFlags::CheckPosInFly,
+                                                      nMovedID);
 
             // now delete all the delete redlines that were copied
 #ifndef NDEBUG
@@ -2205,7 +2207,7 @@ bool SwDoc::MoveParagraphImpl(SwPaM& rPam, SwNodeOffset const nOffset,
                         pam.GetMark()->Assign(pam.GetMark()->GetNodeIndex() + nCurrentOffset,
                                               pam.GetMark()->GetContentIndex());
 
-                        pNewRedline = new SwRangeRedline( RedlineType::Delete, pam );
+                        pNewRedline = new SwRangeRedline( RedlineType::Delete, pam, nMovedID );
                     }
                     // note: effectively this will DeleteAndJoin the pam!
                     getIDocumentRedlineAccess().AppendRedline(pNewRedline, true);
@@ -2265,14 +2267,14 @@ bool SwDoc::MoveParagraphImpl(SwPaM& rPam, SwNodeOffset const nOffset,
                     std::make_unique<SwUndoRedlineDelete>(*oPam, SwUndoId::DELETE));
             }
 
-            SwRangeRedline* pNewRedline = new SwRangeRedline( RedlineType::Delete, *oPam );
+            SwRangeRedline* pNewRedline = new SwRangeRedline( RedlineType::Delete, *oPam, nMovedID );
 
             // prevent assertion from aPam's target being deleted
             SwNodeIndex bound1(oPam->GetBound().GetNode());
             SwNodeIndex bound2(oPam->GetBound(false).GetNode());
             oPam.reset();
 
-            getIDocumentRedlineAccess().AppendRedline( pNewRedline, true );
+            getIDocumentRedlineAccess().AppendRedline( pNewRedline, true, nMovedID );
 
             oPam.emplace(bound1, bound2);
             sw::UpdateFramesForAddDeleteRedline(*this, *oPam);

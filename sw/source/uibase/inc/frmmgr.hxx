@@ -124,6 +124,9 @@ public:
     const SfxItemSet &GetAttrSet() const { return m_aSet; }
     SfxItemSet &GetAttrSet()       { return m_aSet; }
     void                     SetAttrSet(const SfxItemSet& rSet);
+    void SetFrameSizeFromTable();
+    /// Checks if we have a table selection and that covers exactly 1 full table.
+    static const SwTableFormat* SingleTableSelected(SwWrtShell& rWrtShell);
 
     inline const SwFormatVertOrient &GetVertOrient() const;
     inline const SwFormatHoriOrient &GetHoriOrient() const;

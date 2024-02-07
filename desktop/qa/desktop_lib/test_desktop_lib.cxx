@@ -68,6 +68,7 @@
 #include <vcl/filter/PDFiumLibrary.hxx>
 #include <svtools/colorcfg.hxx>
 #include <sal/types.h>
+#include <test/lokcallback.hxx>
 
 #if USE_TLS_NSS
 #include <nss.h>
@@ -2891,7 +2892,8 @@ void DesktopLOKTest::testInsertCertificate_PEM_ODT()
     }
 
     int nState = pDocument->m_pDocumentClass->getSignatureState(pDocument);
-    CPPUNIT_ASSERT_EQUAL(int(1), nState);
+    // OK or NOTVALIDATED (signature is OK, but certificate could not be validated)
+    CPPUNIT_ASSERT(nState == 1 || nState == 4);
 }
 
 void DesktopLOKTest::testInsertCertificate_PEM_DOCX()
@@ -2946,7 +2948,8 @@ void DesktopLOKTest::testInsertCertificate_PEM_DOCX()
     }
 
     int nState = pDocument->m_pDocumentClass->getSignatureState(pDocument);
-    CPPUNIT_ASSERT_EQUAL(int(5), nState);
+    // PARTIAL_OK or NOTVALIDATED_PARTIAL_OK
+    CPPUNIT_ASSERT(nState == 5 || nState == 6);
 }
 
 void DesktopLOKTest::testSignDocument_PEM_PDF()
@@ -3294,35 +3297,11 @@ void DesktopLOKTest::testMultiDocuments()
     }
 }
 
-namespace
-{
-    SfxChildWindow* lcl_initializeSidebar()
-    {
-        // in init.cxx we do setupSidebar which creates the controller, do it here
-
-        SfxViewShell* pViewShell = SfxViewShell::Current();
-        CPPUNIT_ASSERT(pViewShell);
-
-        SfxViewFrame* pViewFrame = pViewShell->GetViewFrame();
-        CPPUNIT_ASSERT(pViewFrame);
-
-        SfxChildWindow* pSideBar = pViewFrame->GetChildWindow(SID_SIDEBAR);
-        CPPUNIT_ASSERT(pSideBar);
-
-        auto pDockingWin = dynamic_cast<sfx2::sidebar::SidebarDockingWindow *>(pSideBar->GetWindow());
-        CPPUNIT_ASSERT(pDockingWin);
-
-        pDockingWin->GetOrCreateSidebarController(); // just to create the controller
-
-        return pSideBar;
-    }
-};
-
 void DesktopLOKTest::testControlState()
 {
     LibLODocument_Impl* pDocument = loadDoc("search.ods");
     pDocument->pClass->postUnoCommand(pDocument, ".uno:StarShapes", nullptr, false);
-    lcl_initializeSidebar();
+    TestLokCallbackWrapper::InitializeSidebar();
     Scheduler::ProcessEventsToIdle();
 
     boost::property_tree::ptree aState;
@@ -3336,7 +3315,7 @@ void DesktopLOKTest::testMetricField()
 {
     LibLODocument_Impl* pDocument = loadDoc("search.ods");
     pDocument->pClass->postUnoCommand(pDocument, ".uno:StarShapes", nullptr, false);
-    SfxChildWindow* pSideBar = lcl_initializeSidebar();
+    SfxChildWindow* pSideBar = TestLokCallbackWrapper::InitializeSidebar();
     Scheduler::ProcessEventsToIdle();
 
     vcl::Window* pWin = pSideBar->GetWindow();
@@ -3732,8 +3711,11 @@ void DesktopLOKTest::testABI()
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(71),
                          offsetof(struct _LibreOfficeKitDocumentClass, getA11yCaretPosition));
 
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(72),
+                         offsetof(struct _LibreOfficeKitDocumentClass, hyperlinkInfoAtPosition));
+
     // As above
-    CPPUNIT_ASSERT_EQUAL(documentClassOffset(72), sizeof(struct _LibreOfficeKitDocumentClass));
+    CPPUNIT_ASSERT_EQUAL(documentClassOffset(73), sizeof(struct _LibreOfficeKitDocumentClass));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(DesktopLOKTest);

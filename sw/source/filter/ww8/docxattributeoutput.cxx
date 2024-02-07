@@ -52,6 +52,7 @@
 #include <oox/token/relationship.hxx>
 #include <oox/export/vmlexport.hxx>
 #include <oox/ole/olehelper.hxx>
+#include <oox/export/drawingml.hxx>
 
 #include <editeng/autokernitem.hxx>
 #include <editeng/unoprnms.hxx>
@@ -5074,6 +5075,7 @@ void DocxAttributeOutput::FlyFrameGraphic( const SwGrfNode* pGrfNode, const Size
     const SwFrameFormat* pFrameFormat = pGrfNode ? pGrfNode->GetFlyFormat() : pOLEFrameFormat;
     // create the relation ID
     OString aRelId;
+    OUString sSvgRelId;
     sal_Int32 nImageType;
     if ( pGrfNode && pGrfNode->IsLinkedFile() )
     {
@@ -5109,9 +5111,14 @@ void DocxAttributeOutput::FlyFrameGraphic( const SwGrfNode* pGrfNode, const Size
             aGraphic = *pOLENode->GetGraphic();
 
         m_rDrawingML.SetFS(m_pSerializer); // to be sure that we write to the right stream
-        OUString aImageId = m_rDrawingML.WriteImage(aGraphic, false);
+        auto pGraphicExport = m_rDrawingML.createGraphicExport();
+        OUString aImageId = pGraphicExport->writeToStorage(aGraphic, false);
         aRelId = OUStringToOString(aImageId, RTL_TEXTENCODING_UTF8);
 
+        if (aGraphic.getVectorGraphicData() && aGraphic.getVectorGraphicData()->getType() == VectorGraphicDataType::Svg)
+        {
+            sSvgRelId = pGraphicExport->writeToStorage(aGraphic, false, drawingml::GraphicExport::TypeHint::SVG);
+        }
         nImageType = XML_embed;
     }
 
@@ -5261,6 +5268,13 @@ void DocxAttributeOutput::FlyFrameGraphic( const SwGrfNode* pGrfNode, const Size
         else if (nMode == GraphicDrawMode::Watermark) //watermark has a brightness/luminance of 0,5 and contrast of -0.7 in LibreOffice
             m_pSerializer->singleElementNS( XML_a, XML_lum, XML_bright, OString::number(70000), XML_contrast, OString::number(-70000) );
     }
+
+    if (!sSvgRelId.isEmpty())
+    {
+        auto pGraphicExport = m_rDrawingML.createGraphicExport();
+        pGraphicExport->writeSvgExtension(sSvgRelId);
+    }
+
     m_pSerializer->endElementNS( XML_a, XML_blip );
 
     if (xShapePropSet)
@@ -5757,7 +5771,7 @@ void DocxAttributeOutput::WriteOLE( SwOLENode& rNode, const Size& rSize, const S
     // write preview image
     const Graphic* pGraphic = rNode.GetGraphic();
     m_rDrawingML.SetFS(m_pSerializer);
-    OUString sImageId = m_rDrawingML.WriteImage( *pGraphic );
+    OUString sImageId = m_rDrawingML.writeGraphicToStorage(*pGraphic);
 
     if ( sDrawAspect == "Content" )
     {
@@ -7245,10 +7259,16 @@ void DocxAttributeOutput::EmbedFont( std::u16string_view name, FontFamily family
 {
     if( !m_rExport.m_rDoc.getIDocumentSettingAccess().get( DocumentSettingId::EMBED_FONTS ))
         return; // no font embedding with this document
-    EmbedFontStyle( name, XML_embedRegular, family, ITALIC_NONE, WEIGHT_NORMAL, pitch );
-    EmbedFontStyle( name, XML_embedBold, family, ITALIC_NONE, WEIGHT_BOLD, pitch );
-    EmbedFontStyle( name, XML_embedItalic, family, ITALIC_NORMAL, WEIGHT_NORMAL, pitch );
-    EmbedFontStyle( name, XML_embedBoldItalic, family, ITALIC_NORMAL, WEIGHT_BOLD, pitch );
+    bool foundFont
+        = EmbedFontStyle(name, XML_embedRegular, family, ITALIC_NONE, WEIGHT_NORMAL, pitch);
+    foundFont
+        = EmbedFontStyle(name, XML_embedBold, family, ITALIC_NONE, WEIGHT_BOLD, pitch) || foundFont;
+    foundFont = EmbedFontStyle(name, XML_embedItalic, family, ITALIC_NORMAL, WEIGHT_NORMAL, pitch)
+                || foundFont;
+    foundFont = EmbedFontStyle(name, XML_embedBoldItalic, family, ITALIC_NORMAL, WEIGHT_BOLD, pitch)
+                || foundFont;
+    if (!foundFont)
+        EmbedFontStyle(name, XML_embedRegular, family, ITALIC_NONE, WEIGHT_DONTKNOW, pitch);
 }
 
 static char toHexChar( int value )
@@ -7256,21 +7276,21 @@ static char toHexChar( int value )
     return value >= 10 ? value + 'A' - 10 : value + '0';
 }
 
-void DocxAttributeOutput::EmbedFontStyle( std::u16string_view name, int tag, FontFamily family, FontItalic italic,
-    FontWeight weight, FontPitch pitch )
+bool DocxAttributeOutput::EmbedFontStyle(std::u16string_view name, int tag, FontFamily family,
+                                         FontItalic italic, FontWeight weight, FontPitch pitch)
 {
     // Embed font if at least viewing is allowed (in which case the opening app must check
     // the font license rights too and open either read-only or not use the font for editing).
     OUString fontUrl = EmbeddedFontsHelper::fontFileUrl( name, family, italic, weight, pitch,
         EmbeddedFontsHelper::FontRights::ViewingAllowed );
     if( fontUrl.isEmpty())
-        return;
+        return false;
     // TODO IDocumentSettingAccess::EMBED_SYSTEM_FONTS
     if( !m_FontFilesMap.count( fontUrl ))
     {
         osl::File file( fontUrl );
         if( file.open( osl_File_OpenFlag_Read ) != osl::File::E_None )
-            return;
+            return false;
         uno::Reference< css::io::XOutputStream > xOutStream = m_rExport.GetFilter().openFragmentStream(
             "word/fonts/font" + OUString::number(m_nextFontId) + ".odttf",
             "application/vnd.openxmlformats-officedocument.obfuscatedFont" );
@@ -7289,7 +7309,7 @@ void DocxAttributeOutput::EmbedFontStyle( std::u16string_view name, int tag, Fon
         {
             SAL_WARN( "sw.ww8", "Font file size too small (" << fontUrl << ")" );
             xOutStream->closeOutput();
-            return;
+            return false;
         }
         for( int i = 0;
              i < 16;
@@ -7306,7 +7326,7 @@ void DocxAttributeOutput::EmbedFontStyle( std::u16string_view name, int tag, Fon
             {
                 SAL_WARN( "sw.ww8", "Error reading font file " << fontUrl );
                 xOutStream->closeOutput();
-                return;
+                return false;
             }
             if( eof )
                 break;
@@ -7314,7 +7334,7 @@ void DocxAttributeOutput::EmbedFontStyle( std::u16string_view name, int tag, Fon
             {
                 SAL_WARN( "sw.ww8", "Error reading font file " << fontUrl );
                 xOutStream->closeOutput();
-                return;
+                return false;
             }
             if( readSize == 0 )
                 break;
@@ -7334,6 +7354,7 @@ void DocxAttributeOutput::EmbedFontStyle( std::u16string_view name, int tag, Fon
     m_pSerializer->singleElementNS( XML_w, tag,
         FSNS( XML_r, XML_id ), m_FontFilesMap[ fontUrl ].relId,
         FSNS( XML_w, XML_fontKey ), m_FontFilesMap[ fontUrl ].fontKey );
+    return true;
 }
 
 OString DocxAttributeOutput::TransHighlightColor( sal_uInt8 nIco )
@@ -10148,7 +10169,7 @@ void DocxAttributeOutput::BulletDefinition(int nId, const Graphic& rGraphic, Siz
             XML_style, aStyle.getStr(),
             FSNS(XML_o, XML_bullet), "t");
 
-    OUString aRelId = m_rDrawingML.WriteImage(rGraphic);
+    OUString aRelId = m_rDrawingML.writeGraphicToStorage(rGraphic);
     m_pSerializer->singleElementNS( XML_v, XML_imagedata,
             FSNS(XML_r, XML_id), OUStringToOString(aRelId, RTL_TEXTENCODING_UTF8),
             FSNS(XML_o, XML_title), "");

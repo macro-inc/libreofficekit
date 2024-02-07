@@ -754,7 +754,7 @@ namespace xmloff::token {
         TOKEN( "embedded-visible-area",           XML_EMBEDDED_VISIBLE_AREA ),
         TOKEN( "embossed",                        XML_EMBOSSED ),
         TOKEN( "emissive-color",                  XML_EMISSIVE_COLOR ),
-        TOKEN( "empty",                           XML_EMPTY ),
+        TOKEN( "empty",                           XML_TOKEN_EMPTY ),
         TOKEN( "empty-line-refresh",              XML_EMPTY_LINE_REFRESH ),
         TOKEN( "enable-numbering",                XML_ENABLE_NUMBERING ),
         TOKEN( "enabled",                         XML_ENABLED ),
@@ -1357,6 +1357,7 @@ namespace xmloff::token {
         TOKEN( "move-from-left",                  XML_MOVE_FROM_LEFT ),
         TOKEN( "move-from-right",                 XML_MOVE_FROM_RIGHT ),
         TOKEN( "move-from-top",                   XML_MOVE_FROM_TOP ),
+        TOKEN( "move-id",                         XML_MOVE_ID ),
         TOKEN( "move-protect",                    XML_MOVE_PROTECT ),
         TOKEN( "move-short",                      XML_MOVE_SHORT ),
         TOKEN( "movement",                        XML_MOVEMENT ),
@@ -1617,6 +1618,8 @@ namespace xmloff::token {
         TOKEN( "reference",                       XML_REFERENCE ),
         TOKEN( "reference-end",                   XML_REFERENCE_END ),
         TOKEN( "reference-format",                XML_REFERENCE_FORMAT ),
+        TOKEN( "reference-from-bottom",           XML_REFERENCE_FROM_BOTTOM ),
+        TOKEN( "reference-hide-non-numerical",    XML_REFERENCE_HIDE_NON_NUMERICAL ),
         TOKEN( "reference-mark",                  XML_REFERENCE_MARK ),
         TOKEN( "reference-mark-end",              XML_REFERENCE_MARK_END ),
         TOKEN( "reference-mark-start",            XML_REFERENCE_MARK_START ),
@@ -3536,6 +3539,7 @@ namespace xmloff::token {
         TOKEN("fill-use-slide-background", XML_FILL_USE_SLIDE_BACKGROUND),
 
         TOKEN("may-break-between-pages", XML_MAY_BREAK_BETWEEN_PAGES),
+        TOKEN("wrap-text-at-frame-start", XML_WRAP_TEXT_AT_FRAME_START),
 
         TOKEN("gradient-stop", XML_GRADIENT_STOP),
         TOKEN("opacity-stop", XML_OPACITY_STOP),

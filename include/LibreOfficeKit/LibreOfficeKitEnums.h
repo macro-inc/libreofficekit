@@ -1001,7 +1001,50 @@ typedef enum
      *   the user got in from the outer to the inner; row/column span default
      *   value is 1; paragraph is the cell text content.
      */
-    LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED = 67
+    LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED = 67,
+
+    /**
+     * Accessibility event: text editing in a shape or cell has been enabled/disabled
+     *
+     *  {
+     *      "cell": true/false (editing a cell ?)
+     *      "enabled": true|false
+     *      "selection": a selection description
+     *      "paragraph": focused paragraph
+     *  }
+     */
+    LOK_CALLBACK_A11Y_EDITING_IN_SELECTION_STATE = 68,
+
+    /**
+     * Accessibility event: a selection (of a shape/graphic, etc.) has changed
+     *
+     *  {
+     *      "cell": true/false (selected object is a cell ?)
+     *      "action": "create"|"add"|"remove"
+     *      "name": selected object name
+     *      "text": text content if any
+     *  }
+     */
+    LOK_CALLBACK_A11Y_SELECTION_CHANGED = 69,
+
+    /**
+     * Forwarding logs from core to client can be useful
+     * for keep track of the real core/client event sequence
+     *
+     * Payload is the log to be sent
+     */
+    LOK_CALLBACK_CORE_LOG = 70,
+
+    /**
+     * Tooltips shown in the documents, like redline author and date.
+     *
+     *  {
+     *      "text": "text of tooltip",
+     *      "rectangle": "x, y, width, height"
+     *  }
+     */
+    LOK_CALLBACK_TOOLTIP = 71,
+
 }
 LibreOfficeKitCallbackType;
 
@@ -1166,6 +1209,14 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_DOCUMENT_PASSWORD_RESET";
     case LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED:
         return "LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED";
+    case LOK_CALLBACK_A11Y_EDITING_IN_SELECTION_STATE:
+        return "LOK_CALLBACK_A11Y_EDITING_IN_SELECTION_STATE";
+    case LOK_CALLBACK_A11Y_SELECTION_CHANGED:
+        return "LOK_CALLBACK_A11Y_SELECTION_CHANGED";
+    case LOK_CALLBACK_CORE_LOG:
+        return "LOK_CALLBACK_CORE_LOG";
+    case LOK_CALLBACK_TOOLTIP:
+        return "LOK_CALLBACK_TOOLTIP";
     }
 
     assert(!"Unknown LibreOfficeKitCallbackType type.");

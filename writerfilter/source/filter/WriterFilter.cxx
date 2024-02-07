@@ -304,9 +304,9 @@ void WriterFilter::setTargetDocument(const uno::Reference<lang::XComponent>& xDo
     uno::Reference<beans::XPropertySet> xSettings(
         xFactory->createInstance("com.sun.star.document.Settings"), uno::UNO_QUERY);
 
-    xSettings->setPropertyValue("AddVerticalFrameOffsets", uno::Any(true));
     xSettings->setPropertyValue("UseOldNumbering", uno::Any(false));
     xSettings->setPropertyValue("IgnoreFirstLineIndentInNumbering", uno::Any(false));
+    xSettings->setPropertyValue("NoGapAfterNoteNumber", uno::Any(true));
     xSettings->setPropertyValue("DoNotResetParaAttrsForNumFont", uno::Any(false));
     xSettings->setPropertyValue("UseFormerLineSpacing", uno::Any(false));
     xSettings->setPropertyValue("AddParaSpacingToTableCells", uno::Any(true));

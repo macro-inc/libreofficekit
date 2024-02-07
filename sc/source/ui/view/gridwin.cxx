@@ -928,6 +928,7 @@ void ScGridWindow::LaunchAutoFilterMenu(SCCOL nCol, SCROW nRow)
     if (!pDBData)
         return;
 
+    pDBData->ExtendBackColorArea(rDoc);
     pData->mpData = pDBData;
     mpAutoFilterPopup->setExtendedData(std::move(pData));
 
@@ -5020,6 +5021,7 @@ void ScGridWindow::UpdateFormulas(SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2)
     if ( comphelper::LibreOfficeKit::isActive() )
     {
         ScTabViewShell* pViewShell = mrViewData.GetViewShell();
+
         if (nX1 < 0)
             nX1 = pViewShell->GetLOKStartHeaderCol() + 1;
         if (nY1 < 0)
@@ -5030,6 +5032,23 @@ void ScGridWindow::UpdateFormulas(SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2)
             nY2 = pViewShell->GetLOKEndHeaderRow();
 
         if (nX1 < 0 || nY1 < 0) return;
+
+        // Consider frozen ranges not in main pane range as candidates
+        // for update
+        SCCOLROW nFreezeCol = mrViewData.GetLOKSheetFreezeIndex(true);
+        SCCOLROW nFreezeRow = mrViewData.GetLOKSheetFreezeIndex(false);
+        if ((nFreezeCol || nFreezeRow) && (nX1 || nY1))
+        {
+            // top left
+            if (nFreezeCol && nFreezeRow)
+                UpdateFormulaRange(0, 0, nFreezeCol, nFreezeRow);
+            // bottom left
+            if (nFreezeCol && nX1)
+                UpdateFormulaRange(0, nY1, nFreezeCol, nY2);
+            // top right
+            if (nFreezeRow && nY1)
+                UpdateFormulaRange(nX1, 0, nX2, nFreezeRow);
+        }
     }
     else
     {
@@ -5039,6 +5058,11 @@ void ScGridWindow::UpdateFormulas(SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2)
         nY2 = nY1 + mrViewData.VisibleCellsY( eVWhich );
     }
 
+    UpdateFormulaRange(nX1, nY1, nX2, nY2);
+}
+
+void ScGridWindow::UpdateFormulaRange(SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2)
+{
     if (nX2 < nX1) nX2 = nX1;
     if (nY2 < nY1) nY2 = nY1;
 
@@ -5076,7 +5100,7 @@ void ScGridWindow::UpdateFormulas(SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2)
     double nPPTX = mrViewData.GetPPTX();
     double nPPTY = mrViewData.GetPPTY();
 
-    ScTableInfo aTabInfo;
+    ScTableInfo aTabInfo(nY1, nY2, true);
     rDoc.FillInfo( aTabInfo, nX1, nY1, nX2, nY2, nTab, nPPTX, nPPTY, false, false );
 
     Fraction aZoomX = mrViewData.GetZoomX();
@@ -6280,7 +6304,7 @@ void ScGridWindow::updateOtherKitSelections() const
     {
         auto pOther = dynamic_cast<const ScTabViewShell *>(it);
         if (!pOther)
-            return;
+            continue;
 
         // Fetch pixels & convert for each view separately.
         tools::Rectangle aBoundingBox;

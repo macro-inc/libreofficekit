@@ -357,6 +357,7 @@ SwEditRegionDlg::SwEditRegionDlg(weld::Window* pParent, SwWrtShell& rWrtSh)
     , m_xOptionsPB(m_xBuilder->weld_button("options"))
     , m_xDismiss(m_xBuilder->weld_button("remove"))
     , m_xHideFrame(m_xBuilder->weld_widget("hideframe"))
+    , m_xLinkFrame(m_xBuilder->weld_frame("linkframe"))
 {
     m_xTree->set_size_request(-1, m_xTree->get_height_rows(16));
     m_xFileCB->set_state(TRISTATE_FALSE);
@@ -418,6 +419,7 @@ SwEditRegionDlg::SwEditRegionDlg(weld::Window* pParent, SwWrtShell& rWrtSh)
 
     if(comphelper::LibreOfficeKit::isActive())
     {
+        m_xLinkFrame->hide();
         m_xDDECB->hide();
         m_xDDECommandFT->hide();
         m_xFileNameFT->hide();
@@ -818,12 +820,15 @@ IMPL_LINK_NOARG(SwEditRegionDlg, OkHdl, weld::Button&, void)
 
     aOrigArray.clear();
 
+    SwWrtShell& rSh = m_rSh;
+
     // response must be called ahead of EndAction's end,
     // otherwise ScrollError can occur.
     m_xDialog->response(RET_OK);
 
-    m_rSh.EndUndo();
-    m_rSh.EndAllAction();
+    // accessing 'this' after response isn't safe, as the callback might cause the dialog to be disposed
+    rSh.EndUndo();
+    rSh.EndAllAction();
 }
 
 // Toggle protect
