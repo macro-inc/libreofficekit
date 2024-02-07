@@ -25,10 +25,10 @@
 #include <editeng/lrspitem.hxx>
 #include <editeng/formatbreakitem.hxx>
 #include <editeng/rsiditem.hxx>
-#include <editeng/colritem.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <osl/diagnose.h>
 #include <svl/zforlist.hxx>
+#include <svx/DocumentColorHelper.hxx>
 #include <comphelper/processfactory.hxx>
 #include <unotools/configmgr.hxx>
 #include <sal/log.hxx>
@@ -1542,14 +1542,30 @@ void SwDoc::CopyPageDesc( const SwPageDesc& rSrcDesc, SwPageDesc& rDstDesc,
 
     // Copy the stashed formats as well between the page descriptors...
     for (bool bFirst : { true, false })
+    {
         for (bool bLeft : { true, false })
+        {
             for (bool bHeader : { true, false })
             {
                 if (!bLeft && !bFirst)
                     continue;
-                if (auto pStashedFormat = rSrcDesc.GetStashedFrameFormat(bHeader, bLeft, bFirst))
-                    rDstDesc.StashFrameFormat(*pStashedFormat, bHeader, bLeft, bFirst);
+
+                // Copy format only if it exists
+                if (auto pStashedFormatSrc = rSrcDesc.GetStashedFrameFormat(bHeader, bLeft, bFirst))
+                {
+                    if (pStashedFormatSrc->GetDoc() != this)
+                    {
+                        auto pFrameFormat = CopyFrameFormat(*pStashedFormatSrc);
+                        rDstDesc.StashFrameFormat(*pFrameFormat, bHeader, bLeft, bFirst);
+                    }
+                    else
+                    {
+                        rDstDesc.StashFrameFormat(*pStashedFormatSrc, bHeader, bLeft, bFirst);
+                    }
+                }
             }
+        }
+    }
 }
 
 void SwDoc::ReplaceStyles( const SwDoc& rSource, bool bIncludePageStyles )
@@ -2002,17 +2018,11 @@ std::set<Color> SwDoc::GetDocColors()
 {
     std::set<Color> aDocColors;
     SwAttrPool& rPool = GetAttrPool();
-    const sal_uInt16 pAttribs[] = {RES_CHRATR_COLOR, RES_CHRATR_HIGHLIGHT, RES_BACKGROUND};
-    for (sal_uInt16 nAttrib : pAttribs)
-    {
-        for (const SfxPoolItem* pItem : rPool.GetItemSurrogates(nAttrib))
-        {
-            auto pColorItem = static_cast<const SvxColorItem*>(pItem);
-            Color aColor( pColorItem->GetValue() );
-            if (COL_AUTO != aColor)
-                aDocColors.insert(aColor);
-        }
-    }
+
+    svx::DocumentColorHelper::queryColors<SvxColorItem>(RES_CHRATR_COLOR, &rPool, aDocColors);
+    svx::DocumentColorHelper::queryColors<SvxBrushItem>(RES_CHRATR_HIGHLIGHT, &rPool, aDocColors);
+    svx::DocumentColorHelper::queryColors<SvxBrushItem>(RES_CHRATR_BACKGROUND, &rPool, aDocColors);
+
     return aDocColors;
 }
 

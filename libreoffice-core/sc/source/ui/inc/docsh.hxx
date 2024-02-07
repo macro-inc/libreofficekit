@@ -182,6 +182,7 @@ public:
                                sal_Int32 nFileFormat,
                                bool bTemplate = false ) const override;
 
+    std::shared_ptr<sfx::IDocumentModelAccessor> GetDocumentModelAccessor() const override;
     virtual std::set<Color> GetDocColors() override;
     virtual std::shared_ptr<model::ColorSet> GetThemeColors() override;
 
@@ -199,7 +200,7 @@ public:
     virtual bool    DoSaveCompleted( SfxMedium * pNewStor=nullptr, bool bRegisterRecent=true ) override;     // SfxObjectShell
     virtual bool    QuerySlotExecutable( sal_uInt16 nSlotId ) override;
 
-    virtual void    Draw( OutputDevice *, const JobSetup & rSetup, sal_uInt16 nAspect ) override;
+    virtual void    Draw(OutputDevice *, const JobSetup & rSetup, sal_uInt16 nAspect, bool bOutputForScreen) override;
 
     virtual void    SetVisArea( const tools::Rectangle & rVisArea ) override;
 
@@ -314,13 +315,16 @@ public:
 
     void            PostEditView( ScEditEngineDefaulter* pEditEngine, const ScAddress& rCursorPos );
 
+    tools::Long     GetPixelWidthHint(const ScAddress& rPos);
+
     void            PostPaint( SCCOL nStartCol, SCROW nStartRow, SCTAB nStartTab,
                             SCCOL nEndCol, SCROW nEndRow, SCTAB nEndTab, PaintPartFlags nPart,
-                            sal_uInt16 nExtFlags = 0 );
-    void            PostPaint( const ScRangeList& rRanges, PaintPartFlags nPart, sal_uInt16 nExtFlags = 0 );
+                            sal_uInt16 nExtFlags = 0, tools::Long nMaxWidthAffectedHint = -1 );
+    void            PostPaint( const ScRangeList& rRanges, PaintPartFlags nPart, sal_uInt16 nExtFlags = 0,
+                               tools::Long nMaxWidthAffectedHint = -1 );
 
-    void            PostPaintCell( SCCOL nCol, SCROW nRow, SCTAB nTab );
-    void            PostPaintCell( const ScAddress& rPos );
+    void            PostPaintCell( SCCOL nCol, SCROW nRow, SCTAB nTab, tools::Long nMaxWidthAffectedHint = -1);
+    void            PostPaintCell( const ScAddress& rPos, tools::Long nMaxWidthAffectedHint = -1);
     void            PostPaintGridAll();
     void            PostPaintExtras();
 

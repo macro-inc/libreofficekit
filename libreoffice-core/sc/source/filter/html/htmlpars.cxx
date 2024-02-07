@@ -20,6 +20,7 @@
 #include <memory>
 #include <sal/config.h>
 
+#include <comphelper/lok.hxx>
 #include <comphelper/string.hxx>
 
 #include <scitems.hxx>
@@ -37,6 +38,7 @@
 #include <editeng/justifyitem.hxx>
 #include <sal/log.hxx>
 #include <sfx2/objsh.hxx>
+#include <sfx2/lokhelper.hxx>
 #include <svl/numformat.hxx>
 #include <svl/intitem.hxx>
 #include <utility>
@@ -47,6 +49,7 @@
 
 #include <vcl/outdev.hxx>
 #include <vcl/svapp.hxx>
+#include <tools/hostfilter.hxx>
 #include <tools/urlobj.hxx>
 #include <osl/diagnose.h>
 #include <o3tl/string_view.hxx>
@@ -60,6 +63,7 @@
 #include <rangelst.hxx>
 
 #include <orcus/css_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include <com/sun/star/document/XDocumentProperties.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
@@ -1318,6 +1322,13 @@ void ScHTMLLayoutParser::Image( HtmlImportInfo* pInfo )
         return ;
     }
 
+    if (comphelper::LibreOfficeKit::isActive())
+    {
+        INetURLObject aURL(pImage->aURL);
+        if (HostFilter::isForbidden(aURL.GetHost()))
+            SfxLokHelper::sendNetworkAccessError("paste");
+    }
+
     sal_uInt16 nFormat;
     std::optional<Graphic> oGraphic(std::in_place);
     GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
@@ -2112,6 +2123,27 @@ void ScHTMLTable::DataOn( const HtmlImportInfo& rInfo )
                             bool bValidFmt = GetFormatTable()->PutEntry(aNumFmt, nErrPos, nDummy, nNumberFormat);
                             if (!bValidFmt)
                                 nNumberFormat = NUMBERFORMAT_ENTRY_NOT_FOUND;
+                        }
+                    }
+                }
+                break;
+                case HtmlOptionId::DSVAL:
+                {
+                    // data-sheets-value from google sheets, value is a JSON.
+                    OString aEncodedOption = rOption.GetString().toUtf8();
+                    const char* pEncodedOption = aEncodedOption.getStr();
+                    std::stringstream aStream(pEncodedOption);
+                    boost::property_tree::ptree aTree;
+                    boost::property_tree::read_json(aStream, aTree);
+                    // The "1" key describes the original data type.
+                    auto it = aTree.find("1");
+                    if (it != aTree.not_found())
+                    {
+                        int nValueType = std::stoi(it->second.get_value<std::string>());
+                        // 2 is text.
+                        if (nValueType == 2)
+                        {
+                            nNumberFormat = NF_STANDARD_FORMAT_TEXT;
                         }
                     }
                 }

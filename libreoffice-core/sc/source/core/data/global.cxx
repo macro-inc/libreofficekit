@@ -39,6 +39,7 @@
 #include <svl/zformat.hxx>
 #include <vcl/keycodes.hxx>
 #include <vcl/virdev.hxx>
+#include <vcl/weld.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <unotools/charclass.hxx>
@@ -820,7 +821,7 @@ void ScGlobal::OpenURL(const OUString& rURL, const OUString& rTarget, bool bIgno
 
     OUString aUrlName( rURL );
     SfxViewFrame* pFrame = nullptr;
-    const SfxObjectShell* pObjShell = nullptr;
+    SfxObjectShell* pObjShell = nullptr;
     OUString aReferName;
     if ( pScActiveViewShell )
     {
@@ -853,6 +854,9 @@ void ScGlobal::OpenURL(const OUString& rURL, const OUString& rTarget, bool bIgno
         if (!aNewUrlName.isEmpty())
             aUrlName = aNewUrlName;
     }
+
+    if (!SfxObjectShell::AllowedLinkProtocolFromDocument(aUrlName, pObjShell, pFrame ? pFrame->GetFrameWeld() : nullptr))
+        return;
 
     SfxStringItem aUrl( SID_FILE_NAME, aUrlName );
     SfxStringItem aTarget( SID_TARGETNAME, rTarget );

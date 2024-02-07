@@ -130,6 +130,7 @@
 #include <com/sun/star/xml/crypto/XCertificateCreator.hpp>
 #include <com/sun/star/security/XCertificate.hpp>
 
+#include <com/sun/star/linguistic2/DictionaryList.hpp>
 #include <com/sun/star/linguistic2/LanguageGuessing.hpp>
 #include <com/sun/star/linguistic2/LinguServiceManager.hpp>
 #include <com/sun/star/linguistic2/XSpellChecker.hpp>
@@ -236,6 +237,8 @@
 #include <officecfg/Setup.hxx>
 #include <com/sun/star/ui/XAcceleratorConfiguration.hpp>
 #include <svtools/acceleratorexecute.hxx>
+
+#include <tools/hostfilter.hxx>
 
 using namespace css;
 using namespace vcl;
@@ -1165,6 +1168,9 @@ static void doc_postWindowExtTextInputEvent(LibreOfficeKitDocument* pThis,
                                             unsigned nWindowId,
                                             int nType,
                                             const char* pText);
+
+static char* doc_hyperlinkInfoAtPosition(LibreOfficeKitDocument *pThis, int x, int y);
+
 static void doc_removeTextContext(LibreOfficeKitDocument* pThis,
                                   unsigned nLOKWindowId,
                                   int nCharBefore,
@@ -1454,6 +1460,7 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->registerCallback = doc_registerCallback;
         m_pDocumentClass->postKeyEvent = doc_postKeyEvent;
         m_pDocumentClass->postWindowExtTextInputEvent = doc_postWindowExtTextInputEvent;
+        m_pDocumentClass->hyperlinkInfoAtPosition = doc_hyperlinkInfoAtPosition;
         m_pDocumentClass->removeTextContext = doc_removeTextContext;
         m_pDocumentClass->postWindowKeyEvent = doc_postWindowKeyEvent;
         m_pDocumentClass->postMouseEvent = doc_postMouseEvent;
@@ -1834,6 +1841,8 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
         case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
         case LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED:
         case LOK_CALLBACK_COLOR_PALETTES:
+        case LOK_CALLBACK_A11Y_EDITING_IN_SELECTION_STATE:
+        case LOK_CALLBACK_A11Y_SELECTION_CHANGED:
         {
             const auto& pos = std::find(m_queue1.rbegin(), m_queue1.rend(), type);
             auto pos2 = toQueue2(pos);
@@ -1870,6 +1879,7 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
             case LOK_CALLBACK_GRAPHIC_SELECTION:
             case LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR:
             case LOK_CALLBACK_INVALIDATE_TILES:
+            case LOK_CALLBACK_TOOLTIP:
                 if (removeAll(type))
                     SAL_INFO("lok", "Removed dups of [" << type << "]: [" << aCallbackData.getPayload() << "].");
                 break;
@@ -1897,6 +1907,7 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
             case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
             case LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED:
             case LOK_CALLBACK_COLOR_PALETTES:
+            case LOK_CALLBACK_TOOLTIP:
             {
                 if (removeAll(type))
                     SAL_INFO("lok", "Removed dups of [" << type << "]: [" << aCallbackData.getPayload() << "].");
@@ -1906,28 +1917,26 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
             // These are safe to use the latest state and ignore previous
             // ones (if any) since the last overrides previous ones,
             // but only if the view is the same.
+            case LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR:
+                // deleting the duplicate of visible cursor message can cause hyperlink popup not to show up on second/or more click on the same place.
+                // If the hyperlink is not empty we can bypass that to show the popup
+                if (aCallbackData.getPayload().find("\"hyperlink\":\"\"") == std::string::npos
+                    && aCallbackData.getPayload().find("\"hyperlink\": {}") == std::string::npos)
+                    break;
+                [[fallthrough]];
             case LOK_CALLBACK_CELL_VIEW_CURSOR:
             case LOK_CALLBACK_GRAPHIC_VIEW_SELECTION:
             case LOK_CALLBACK_INVALIDATE_VIEW_CURSOR:
-            case LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR:
             case LOK_CALLBACK_TEXT_VIEW_SELECTION:
             case LOK_CALLBACK_VIEW_CURSOR_VISIBLE:
             case LOK_CALLBACK_CALC_FUNCTION_LIST:
             case LOK_CALLBACK_FORM_FIELD_BUTTON:
             {
-                // deleting the duplicate of visible cursor message can cause hyperlink popup not to show up on second/or more click on the same place.
-                // If the hyperlink is not empty we can bypass that to show the popup
-                const bool hyperLinkException = type == LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR &&
-                    aCallbackData.getPayload().find("\"hyperlink\":\"\"") == std::string::npos &&
-                    aCallbackData.getPayload().find("\"hyperlink\": {}") == std::string::npos;
-                if(!hyperLinkException)
-                {
-                    const int nViewId = aCallbackData.getViewId();
-                    removeAll(type, [nViewId] (const CallbackData& elemData) {
-                            return (nViewId == elemData.getViewId());
-                        }
-                    );
-                }
+                const int nViewId = aCallbackData.getViewId();
+                removeAll(type, [nViewId] (const CallbackData& elemData) {
+                        return (nViewId == elemData.getViewId());
+                    }
+                );
             }
             break;
 
@@ -3847,7 +3856,8 @@ static void doc_iniUnoCommands ()
         OUString(".uno:InsertPlainTextContentControl"),
         OUString(".uno:InsertPictureContentControl"),
         OUString(".uno:DataFilterAutoFilter"),
-        OUString(".uno:CellProtection")
+        OUString(".uno:CellProtection"),
+        OUString(".uno:MoveKeepInsertMode")
     };
 
     util::URL aCommandURL;
@@ -4698,6 +4708,20 @@ static void doc_postWindowExtTextInputEvent(LibreOfficeKitDocument* pThis, unsig
     }
 
     SfxLokHelper::postExtTextEventAsync(pWindow, nType, OUString::fromUtf8(std::string_view(pText, strlen(pText))));
+}
+
+static char* doc_hyperlinkInfoAtPosition(LibreOfficeKitDocument* pThis, int x, int y)
+{
+    SolarMutexGuard aGuard;
+
+    ITiledRenderable* pDoc = getTiledRenderable(pThis);
+    if (!pDoc)
+    {
+        SetLastExceptionMsg("Document doesn't support tiled rendering");
+        return nullptr;
+    }
+
+    return convertOUString(pDoc->hyperlinkInfoAtPosition(x, y));
 }
 
 static void doc_removeTextContext(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, int nCharBefore, int nCharAfter)
@@ -7662,7 +7686,7 @@ static void doc_setAccessibilityState(SAL_UNUSED_PARAMETER LibreOfficeKitDocumen
     SolarMutexGuard aGuard;
 
     int nDocType = getDocumentType(pThis);
-    if (!(nDocType == LOK_DOCTYPE_TEXT || nDocType == LOK_DOCTYPE_PRESENTATION))
+    if (!(nDocType == LOK_DOCTYPE_TEXT || nDocType == LOK_DOCTYPE_PRESENTATION || nDocType == LOK_DOCTYPE_SPREADSHEET))
         return;
 
     SfxLokHelper::setAccessibilityState(nId, nEnabled);
@@ -7928,10 +7952,17 @@ static void preloadData()
     if(bAbort)
         std::cerr << "CheckExtensionDependencies failed" << std::endl;
 
+    std::cerr << "Preload textencodings"; // sal_textenc
+    // Use RTL_TEXTENCODING_MS_1250 to trigger Impl_getTextEncodingData
+    // to dlopen sal_textenclo
+    (void)OUStringToOString(u"arbitrary string", RTL_TEXTENCODING_MS_1250);
+    std::cerr << "\n";
+
     // setup LanguageTool config before spell checking init
     setLanguageToolConfig();
 
     // preload all available dictionaries
+    linguistic2::DictionaryList::create(comphelper::getProcessComponentContext());
     css::uno::Reference<css::linguistic2::XLinguServiceManager> xLngSvcMgr =
         css::linguistic2::LinguServiceManager::create(comphelper::getProcessComponentContext());
     css::uno::Reference<linguistic2::XSpellChecker> xSpellChecker(xLngSvcMgr->getSpellChecker());
@@ -8238,6 +8269,21 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
         }
     }
 
+#ifdef LINUX
+    {
+        const char *pAllowedPaths = getenv("SAL_ALLOWED_PATHS");
+        if (pAllowedPaths)
+            osl_setAllowedPaths(
+                OUString(pAllowedPaths, strlen(pAllowedPaths), RTL_TEXTENCODING_UTF8).pData);
+    }
+#endif
+
+    char* pAllowlist = ::getenv("LOK_HOST_ALLOWLIST");
+    if (pAllowlist)
+    {
+        HostFilter::setAllowedHostsRegex(pAllowlist);
+    }
+
     // What stage are we at ?
     if (pThis == nullptr)
     {
@@ -8463,6 +8509,14 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
             OUString aNewTemp;
             osl::FileBase::getTempDirURL(aNewTemp);
             aOptions.SetTempPath(aNewTemp);
+            {
+                const char *pWorkPath = getenv("LOK_WORKDIR");
+                if (pWorkPath)
+                {
+                    OString sWorkPath(pWorkPath);
+                    aOptions.SetWorkPath(OStringToOUString(sWorkPath, RTL_TEXTENCODING_UTF8));
+                }
+            }
             desktop::Desktop::CreateTemporaryDirectory();
 
             // The RequestHandler is specifically set to be ready when all the other

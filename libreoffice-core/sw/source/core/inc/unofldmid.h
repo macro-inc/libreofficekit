@@ -50,6 +50,8 @@
 #define FIELD_PROP_TITLE 35
 #define FIELD_PROP_PAR6             36
 
+#define FIELD_PROP_USHORT3          38
+
 #endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

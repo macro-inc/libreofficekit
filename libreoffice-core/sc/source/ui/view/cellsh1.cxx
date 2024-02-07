@@ -170,6 +170,49 @@ void SetTabNoAndCursor( const ScViewData& rViewData, std::u16string_view rCellId
     }
 }
 
+void HandleConditionalFormat(sal_uInt32 nIndex, bool bCondFormatDlg, bool bContainsCondFormat,
+                             const sal_uInt16 nSlot, SfxViewShell* pTabViewShell)
+{
+    condformat::dialog::ScCondFormatDialogType eType = condformat::dialog::NONE;
+    switch (nSlot)
+    {
+        case SID_OPENDLG_CONDFRMT:
+        case SID_OPENDLG_CURRENTCONDFRMT:
+            eType = condformat::dialog::CONDITION;
+            break;
+        case SID_OPENDLG_COLORSCALE:
+            eType = condformat::dialog::COLORSCALE;
+            break;
+        case SID_OPENDLG_DATABAR:
+            eType = condformat::dialog::DATABAR;
+            break;
+        case SID_OPENDLG_ICONSET:
+            eType = condformat::dialog::ICONSET;
+            break;
+        case SID_OPENDLG_CONDDATE:
+            eType = condformat::dialog::DATE;
+            break;
+        default:
+            assert(false);
+            break;
+    }
+
+    if (bCondFormatDlg || !bContainsCondFormat)
+    {
+        // Put the xml string parameter to initialize the
+        // Conditional Format Dialog.
+        ScCondFormatDlgItem aDlgItem(nullptr, nIndex, false); // Change here
+        aDlgItem.SetDialogType(eType);
+        pTabViewShell->GetPool().Put(aDlgItem);
+
+        sal_uInt16 nId = ScCondFormatDlgWrapper::GetChildWindowId();
+        SfxViewFrame* pViewFrm = pTabViewShell->GetViewFrame();
+        SfxChildWindow* pWnd = pViewFrm->GetChildWindow(nId);
+
+        SC_MOD()->SetRefDialog(nId, pWnd == nullptr);
+    }
+}
+
 void InsertCells(ScTabViewShell* pTabViewShell, SfxRequest &rReq, InsCellCmd eCmd)
 {
     if (eCmd!=INS_NONE)
@@ -2156,7 +2199,6 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                 }
 
                 // try to find an existing conditional format
-                const ScConditionalFormat* pCondFormat = nullptr;
                 const ScPatternAttr* pPattern = rDoc.GetPattern(aPos.Col(), aPos.Row(), aPos.Tab());
                 ScConditionalFormatList* pList = rDoc.GetCondFormList(aPos.Tab());
                 const ScCondFormatIndexes& rCondFormats = pPattern->GetItem(ATTR_CONDITIONAL).GetCondFormatData();
@@ -2168,7 +2210,7 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                     for (const auto& rCondFormat : rCondFormats)
                     {
                         // check if at least one existing conditional format has the same range
-                        pCondFormat = pList->GetFormat(rCondFormat);
+                        const ScConditionalFormat* pCondFormat = pList->GetFormat(rCondFormat);
                         if(!pCondFormat)
                             continue;
 
@@ -2186,27 +2228,154 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
 
                 // do we have a parameter with the conditional formatting type?
                 const SfxInt16Item* pParam = rReq.GetArg<SfxInt16Item>(FN_PARAM_1);
-                if (pParam && nSlot == SID_OPENDLG_ICONSET)
+                if (pParam)
                 {
                     auto pFormat = std::make_unique<ScConditionalFormat>(0, &rDoc);
                     pFormat->SetRange(aRangeList);
 
-                    ScIconSetType eIconSetType = limit_cast<ScIconSetType>(pParam->GetValue(), IconSet_3Arrows, IconSet_5Boxes);
-                    const int nSteps = ScIconSetFormat::getIconSetElements(eIconSetType);
+                    if (nSlot == SID_OPENDLG_ICONSET)
+                    {
+                        ScIconSetType eIconSetType = limit_cast<ScIconSetType>(pParam->GetValue(), IconSet_3Arrows, IconSet_5Boxes);
+                        const int nSteps = ScIconSetFormat::getIconSetElements(eIconSetType);
 
-                    ScIconSetFormat* pEntry = new ScIconSetFormat(&rDoc);
-                    ScIconSetFormatData* pIconSetFormatData = new ScIconSetFormatData(eIconSetType);
+                        ScIconSetFormat* pEntry = new ScIconSetFormat(&rDoc);
+                        ScIconSetFormatData* pIconSetFormatData = new ScIconSetFormatData(eIconSetType);
 
-                    pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(0, COL_RED, COLORSCALE_PERCENT));
-                    pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(100. / nSteps), COL_BROWN, COLORSCALE_PERCENT));
-                    pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(200. / nSteps), COL_YELLOW, COLORSCALE_PERCENT));
-                    if (nSteps > 3)
-                        pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(300. / nSteps), COL_WHITE, COLORSCALE_PERCENT));
-                    if (nSteps > 4)
-                        pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(400. / nSteps), COL_GREEN, COLORSCALE_PERCENT));
+                        pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(0, COL_RED, COLORSCALE_PERCENT));
+                        pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(100. / nSteps), COL_BROWN, COLORSCALE_PERCENT));
+                        pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(200. / nSteps), COL_YELLOW, COLORSCALE_PERCENT));
+                        if (nSteps > 3)
+                            pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(300. / nSteps), COL_WHITE, COLORSCALE_PERCENT));
+                        if (nSteps > 4)
+                            pIconSetFormatData->m_Entries.emplace_back(new ScColorScaleEntry(round(400. / nSteps), COL_GREEN, COLORSCALE_PERCENT));
 
-                    pEntry->SetIconSetData(pIconSetFormatData);
-                    pFormat->AddEntry(pEntry);
+                        pEntry->SetIconSetData(pIconSetFormatData);
+                        pFormat->AddEntry(pEntry);
+                    }
+                    else if (nSlot == SID_OPENDLG_COLORSCALE)
+                    {
+                        typedef std::tuple<double, Color, ScColorScaleEntryType> ScaleEntry;
+                        static std::vector<std::vector<ScaleEntry>> aScaleThemes =
+                            {
+                                {
+                                    { 0, Color(0xF8696B), COLORSCALE_MIN },
+                                    { 0, Color(0x63BE7B), COLORSCALE_MAX },
+                                    { 50, Color(0xFFEB84), COLORSCALE_PERCENTILE }
+                                },
+                                {
+                                    { 0, Color(0x63BE7B), COLORSCALE_MIN },
+                                    { 0, Color(0xF8696B), COLORSCALE_MAX },
+                                    { 50, Color(0xFFEB84), COLORSCALE_PERCENTILE }
+                                },
+                                {
+                                    { 0, Color(0xF8696B), COLORSCALE_MIN },
+                                    { 0, Color(0x63BE7B), COLORSCALE_MAX },
+                                    { 50, Color(0xFCFCFF), COLORSCALE_PERCENTILE }
+                                },
+                                {
+                                    { 0, Color(0x63BE7B), COLORSCALE_MIN },
+                                    { 0, Color(0xF8696B), COLORSCALE_MAX },
+                                    { 50, Color(0xFCFCFF), COLORSCALE_PERCENTILE }
+                                },
+                                {
+                                    { 0, Color(0xF8696B), COLORSCALE_MIN },
+                                    { 0, Color(0x5A8AC6), COLORSCALE_MAX },
+                                    { 50, Color(0xFCFCFF), COLORSCALE_PERCENTILE }
+                                },
+                                {
+                                    { 0, Color(0x5A8AC6), COLORSCALE_MIN },
+                                    { 0, Color(0xF8696B), COLORSCALE_MAX },
+                                    { 50, Color(0xFCFCFF), COLORSCALE_PERCENTILE }
+                                },
+                                {
+                                    { 0, Color(0xF8696B), COLORSCALE_MIN },
+                                    { 0, Color(0xFCFCFF), COLORSCALE_MAX }
+                                },
+                                {
+                                    { 0, Color(0xFCFCFF), COLORSCALE_MIN },
+                                    { 0, Color(0xF8696B), COLORSCALE_MAX }
+                                },
+                                {
+                                    { 0, Color(0x63BE7B), COLORSCALE_MIN },
+                                    { 0, Color(0xFCFCFF), COLORSCALE_MAX }
+                                },
+                                {
+                                    { 0, Color(0xFCFCFF), COLORSCALE_MIN },
+                                    { 0, Color(0x63BE7B), COLORSCALE_MAX }
+                                },
+                                {
+                                    { 0, Color(0x63BE7B), COLORSCALE_MIN },
+                                    { 0, Color(0xFFEF9C), COLORSCALE_MAX }
+                                },
+                                {
+                                    { 0, Color(0xFFEF9C), COLORSCALE_MIN },
+                                    { 0, Color(0x63BE7B), COLORSCALE_MAX }
+                                }
+                            };
+
+                        sal_uInt16 nTheme = pParam->GetValue();
+                        if (nTheme < aScaleThemes.size())
+                        {
+                            ScColorScaleFormat* pFormatEntry = new ScColorScaleFormat(&rDoc);
+
+                            auto& aTheme = aScaleThemes[nTheme];
+
+                            ScColorScaleEntry* pMin = new ScColorScaleEntry(std::get<0>(aTheme[0]), std::get<1>(aTheme[0]), std::get<2>(aTheme[0]));
+                            ScColorScaleEntry* pMax = new ScColorScaleEntry(std::get<0>(aTheme[1]), std::get<1>(aTheme[1]), std::get<2>(aTheme[1]));
+
+                            pFormatEntry->AddEntry(pMin);
+
+                            // COLORSCALE_PERCENTILE has to be in the middle
+                            if (aTheme.size() > 2)
+                            {
+                                ScColorScaleEntry* pPer = new ScColorScaleEntry(std::get<0>(aTheme[2]), std::get<1>(aTheme[2]), std::get<2>(aTheme[2]));
+                                pFormatEntry->AddEntry(pPer);
+                            }
+
+                            pFormatEntry->AddEntry(pMax);
+
+                            pFormat->AddEntry(pFormatEntry);
+                        }
+
+                    }
+                    else if (nSlot == SID_OPENDLG_DATABAR)
+                    {
+                        typedef std::tuple<Color, bool> DatabarEntry;
+                        static std::vector<DatabarEntry> aDatabarThemes =
+                            {
+                                { Color(0x638EC6), true },
+                                { Color(0x63C384), true },
+                                { Color(0xFF555A), true },
+                                { Color(0xFFB628), true },
+                                { Color(0x008AEF), true },
+                                { Color(0xD6007B), true },
+                                { Color(0x638EC6), false },
+                                { Color(0x63C384), false },
+                                { Color(0xFF555A), false },
+                                { Color(0xFFB628), false },
+                                { Color(0x008AEF), false },
+                                { Color(0xD6007B), false }
+                            };
+
+                        sal_uInt16 nTheme = pParam->GetValue();
+                        if (nTheme < aDatabarThemes.size())
+                        {
+                            ScDataBarFormat* pFormatEntry = new ScDataBarFormat(&rDoc);
+
+                            auto& aTheme = aDatabarThemes[nTheme];
+
+                            ScDataBarFormatData* pData = new ScDataBarFormatData();
+                            pData->maPositiveColor = std::get<0>(aTheme);
+                            pData->mbGradient = std::get<1>(aTheme);
+                            pData->mxNegativeColor = Color(0xFF0000);
+                            pData->mpLowerLimit.reset(new ScColorScaleEntry(0, 0, COLORSCALE_AUTO));
+                            pData->mpUpperLimit.reset(new ScColorScaleEntry(0, 0, COLORSCALE_AUTO));
+
+                            pFormatEntry->SetDataBarData(pData);
+
+                            pFormat->AddEntry(pFormatEntry);
+                        }
+                    }
 
                     // use the new conditional formatting
                     GetViewData().GetDocShell()->GetDocFunc().ReplaceConditionalFormat(nIndex, std::move(pFormat), aPos.Tab(), aRangeList);
@@ -2218,78 +2387,57 @@ void ScCellShell::ExecuteEdit( SfxRequest& rReq )
                 // or should create a new overlapping conditional format
                 if(bContainsCondFormat && !bCondFormatDlg && bContainsExistingCondFormat)
                 {
-                    std::unique_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(pTabViewShell->GetFrameWeld(),
+                    std::shared_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(pTabViewShell->GetFrameWeld(),
                                                                    VclMessageType::Question, VclButtonsType::YesNo,
-                                                                   ScResId(STR_EDIT_EXISTING_COND_FORMATS)));
+                                                                   ScResId(STR_EDIT_EXISTING_COND_FORMATS), pTabViewShell));
                     xQueryBox->set_default_response(RET_YES);
-                    bool bEditExisting = xQueryBox->run() == RET_YES;
-                    if (bEditExisting)
-                    {
-                        // differentiate between ranges where one conditional format is defined
-                        // and several formats are defined
-                        // if we have only one => open the cond format dlg to edit it
-                        // otherwise open the manage cond format dlg
-                        if (rCondFormats.size() == 1)
+                    xQueryBox->runAsync(xQueryBox, [this, nIndex, nSlot, aPos, pTabViewShell] (int nResult) {
+                        sal_uInt32 nNewIndex = nIndex;
+                        bool bNewCondFormatDlg = false;
+
+                        // use fresh data
+                        ScDocument& rInnerDoc = GetViewData().GetDocument();
+                        const ScPatternAttr* pInnerPattern = rInnerDoc.GetPattern(aPos.Col(), aPos.Row(), aPos.Tab());
+                        ScConditionalFormatList* pInnerList = rInnerDoc.GetCondFormList(aPos.Tab());
+                        const ScCondFormatIndexes& rInnerCondFormats = pInnerPattern->GetItem(ATTR_CONDITIONAL).GetCondFormatData();
+                        bool bInnerContainsCondFormat = !rInnerCondFormats.empty();
+
+                        bool bEditExisting = nResult == RET_YES;
+                        if (bEditExisting)
                         {
-                            pCondFormat = pList->GetFormat(rCondFormats[0]);
-                            assert(pCondFormat);
-                            nIndex = pCondFormat->GetKey();
-                            bCondFormatDlg = true;
+                            // differentiate between ranges where one conditional format is defined
+                            // and several formats are defined
+                            // if we have only one => open the cond format dlg to edit it
+                            // otherwise open the manage cond format dlg
+                            if (rInnerCondFormats.size() == 1)
+                            {
+                                const ScConditionalFormat* pCondFormat = pInnerList->GetFormat(rInnerCondFormats[0]);
+                                assert(pCondFormat);
+                                nNewIndex = pCondFormat->GetKey();
+                                bNewCondFormatDlg = true;
+                            }
+                            else
+                            {
+                                // Queue message to open Conditional Format Manager Dialog.
+                                GetViewData().GetDispatcher().Execute(
+                                    SID_OPENDLG_CONDFRMT_MANAGER, SfxCallMode::ASYNCHRON);
+                                return;
+                            }
                         }
                         else
                         {
-                            // Queue message to open Conditional Format Manager Dialog.
-                            GetViewData().GetDispatcher().Execute( SID_OPENDLG_CONDFRMT_MANAGER, SfxCallMode::ASYNCHRON );
-                            break;
+                            // define an overlapping conditional format
+                            assert(pInnerList->GetFormat(rInnerCondFormats[0]));
+                            bNewCondFormatDlg = true;
                         }
-                    }
-                    else
-                    {
-                        // define an overlapping conditional format
-                        pCondFormat = pList->GetFormat(rCondFormats[0]);
-                        assert(pCondFormat);
-                        bCondFormatDlg = true;
-                    }
+
+                        HandleConditionalFormat(nNewIndex, bNewCondFormatDlg, bInnerContainsCondFormat,
+                            nSlot, pTabViewShell);
+                    });
                 }
-
-                condformat::dialog::ScCondFormatDialogType eType = condformat::dialog::NONE;
-                switch(nSlot)
+                else
                 {
-                    case SID_OPENDLG_CONDFRMT:
-                    case SID_OPENDLG_CURRENTCONDFRMT:
-                        eType = condformat::dialog::CONDITION;
-                        break;
-                    case SID_OPENDLG_COLORSCALE:
-                        eType = condformat::dialog::COLORSCALE;
-                        break;
-                    case SID_OPENDLG_DATABAR:
-                        eType = condformat::dialog::DATABAR;
-                        break;
-                    case SID_OPENDLG_ICONSET:
-                        eType = condformat::dialog::ICONSET;
-                        break;
-                    case SID_OPENDLG_CONDDATE:
-                        eType = condformat::dialog::DATE;
-                        break;
-                    default:
-                        assert(false);
-                        break;
-                }
-
-
-                if(bCondFormatDlg || !bContainsCondFormat)
-                {
-                    // Put the xml string parameter to initialize the
-                    // Conditional Format Dialog.
-                    ScCondFormatDlgItem aDlgItem(nullptr, nIndex, false);
-                    aDlgItem.SetDialogType(eType);
-                    pTabViewShell->GetPool().Put(aDlgItem);
-
-                    sal_uInt16      nId      = ScCondFormatDlgWrapper::GetChildWindowId();
-                    SfxViewFrame*   pViewFrm = pTabViewShell->GetViewFrame();
-                    SfxChildWindow* pWnd     = pViewFrm->GetChildWindow( nId );
-
-                    pScMod->SetRefDialog( nId, pWnd == nullptr );
+                    HandleConditionalFormat(nIndex, bCondFormatDlg, bContainsCondFormat, nSlot, pTabViewShell);
                 }
             }
             break;
@@ -3149,10 +3297,10 @@ void ErrorOrRunPivotLayoutDialog(TranslateId pSrcErrorId,
     if (pSrcErrorId)
     {
         // Error occurred during data creation.  Launch an error and bail out.
-        std::unique_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(pTabViewShell->GetFrameWeld(),
+        std::shared_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(pTabViewShell->GetFrameWeld(),
                                                     VclMessageType::Info, VclButtonsType::Ok,
                                                     ScResId(pSrcErrorId)));
-        xInfoBox->run();
+        xInfoBox->runAsync(xInfoBox, [] (int) {});
         return;
     }
 

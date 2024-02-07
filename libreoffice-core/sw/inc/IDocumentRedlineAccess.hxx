@@ -148,7 +148,8 @@ public:
             MERGED if pNewRedl was deleted but has been merged with existing one
             IGNORED if pNewRedl was deleted and ignored/invalid
     */
-    virtual AppendResult AppendRedline(/*[in]*/SwRangeRedline* pNewRedl, /*[in]*/bool bCallDelete) = 0;
+    virtual AppendResult AppendRedline(/*[in]*/ SwRangeRedline* pNewRedl, /*[in]*/ bool bCallDelete,
+                                       /*[in]*/ sal_uInt32 nMoveIDToDelete = 0) = 0;
 
     virtual bool AppendTableRowRedline(/*[in]*/SwTableRowRedline* pPtr) = 0;
     virtual bool AppendTableCellRedline(/*[in]*/SwTableCellRedline* pPtr) = 0;
@@ -168,6 +169,11 @@ public:
     virtual SwRedlineTable::size_type GetRedlinePos(
         /*[in]*/const SwNode& rNode,
         /*[in]*/RedlineType nType) const = 0;
+
+    virtual SwRedlineTable::size_type GetRedlineEndPos(
+        /*[in]*/ SwRedlineTable::size_type nStartPos,
+        /*[in]*/ const SwNode& rNode,
+        /*[in]*/ RedlineType nType) const = 0;
 
     virtual bool HasRedline(
         /*[in]*/const SwPaM& rPam,
@@ -226,6 +232,10 @@ public:
 
     virtual void SetRedlinePassword(
         /*[in]*/const css::uno::Sequence <sal_Int8>& rNewPassword) = 0;
+
+    virtual void UpdateRedlineContentNode(/*[in]*/ SwRedlineTable::size_type nStartPos,
+                                          /*[in]*/ SwRedlineTable::size_type nEndPos) const = 0;
+
 
 protected:
      virtual ~IDocumentRedlineAccess() {};

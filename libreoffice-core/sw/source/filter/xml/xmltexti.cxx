@@ -826,7 +826,7 @@ uno::Reference< XPropertySet > SwXMLTextImportHelper::createAndInsertFloatingFra
                 OUString sHRef = URIHelper::SmartRel2Abs(
                             INetURLObject( GetXMLImport().GetBaseURL() ), rHRef );
 
-                if (INetURLObject(sHRef).GetProtocol() == INetProtocol::Macro)
+                if (INetURLObject(sHRef).IsExoticProtocol())
                     GetXMLImport().NotifyMacroEventRead();
 
                 xSet->setPropertyValue("FrameURL",
@@ -942,12 +942,13 @@ void SwXMLTextImportHelper::RedlineAdd(
     const OUString& rAuthor,
     const OUString& rComment,
     const util::DateTime& rDateTime,
+    const OUString& rMovedID,
     bool bMergeLastPara)
 {
     // create redline helper on demand
     OSL_ENSURE(nullptr != m_pRedlineHelper, "helper should have been created in constructor");
     if (nullptr != m_pRedlineHelper)
-        m_pRedlineHelper->Add(rType, rId, rAuthor, rComment, rDateTime,
+        m_pRedlineHelper->Add(rType, rId, rAuthor, rComment, rDateTime, rMovedID,
                             bMergeLastPara);
 }
 

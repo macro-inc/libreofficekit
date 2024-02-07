@@ -440,11 +440,16 @@ namespace
 
         ::sw::UndoGuard const undoGuard(rDestDoc.GetIDocumentUndoRedo());
 
+        // At this point, pDelPam points to the last of maybe several disjoint selections, organized
+        // in reverse order in document (so every GetNext() returns a PaM closer to document start,
+        // until wrap to pDelPam). Removal of the selections must be from last in document to first,
+        // to avoid situations when another PaM in chain points into the node that will be destroyed
+        // (joined to previous) by removal of the currently processed PaM.
         do {
-            rDestDoc.getIDocumentContentOperations().DeleteAndJoin( *pDelPam->GetNext() );
+            rDestDoc.getIDocumentContentOperations().DeleteAndJoin(*pDelPam);
             if( !pDelPam->IsMultiSelection() )
                 break;
-            delete pDelPam->GetNext();
+            pDelPam.reset(pDelPam->GetNext());
         } while( true );
 
         rDestDoc.getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld );
@@ -2005,9 +2010,9 @@ static bool IsEmptyRange(const SwPosition& rStart, const SwPosition& rEnd,
 }
 
 // Copy an area into this document or into another document
-bool
-DocumentContentOperationsManager::CopyRange( SwPaM& rPam, SwPosition& rPos,
-        SwCopyFlags const flags) const
+bool DocumentContentOperationsManager::CopyRange(SwPaM& rPam, SwPosition& rPos,
+                                                 SwCopyFlags const flags,
+                                                 sal_uInt32 nMovedID) const
 {
     const SwPosition *pStt = rPam.Start(), *pEnd = rPam.End();
 
@@ -2075,7 +2080,8 @@ DocumentContentOperationsManager::CopyRange( SwPaM& rPam, SwPosition& rPos,
     if( pRedlineRange )
     {
         if( rDoc.getIDocumentRedlineAccess().IsRedlineOn() )
-            rDoc.getIDocumentRedlineAccess().AppendRedline( new SwRangeRedline( RedlineType::Insert, *pRedlineRange ), true);
+            rDoc.getIDocumentRedlineAccess().AppendRedline(
+                new SwRangeRedline(RedlineType::Insert, *pRedlineRange, nMovedID), true);
         else
             rDoc.getIDocumentRedlineAccess().SplitRedline( *pRedlineRange );
         delete pRedlineRange;
@@ -2140,7 +2146,16 @@ void DocumentContentOperationsManager::DeleteDummyChar(
 
 void DocumentContentOperationsManager::DeleteRange( SwPaM & rPam )
 {
+    // Seek all redlines that are in that PaM to be deleted..
+    SwRedlineTable::size_type nRedlStart = m_rDoc.getIDocumentRedlineAccess().GetRedlinePos(
+        rPam.Start()->GetNode(), RedlineType::Any);
+    SwRedlineTable::size_type nRedlEnd = m_rDoc.getIDocumentRedlineAccess().GetRedlineEndPos(
+        nRedlStart, rPam.End()->GetNode(), RedlineType::Any);
+
     lcl_DoWithBreaks(*this, rPam, SwDeleteFlags::Default, &DocumentContentOperationsManager::DeleteRangeImpl);
+
+    // update all redlines was in the Pam that is
+    m_rDoc.getIDocumentRedlineAccess().UpdateRedlineContentNode(nRedlStart, nRedlEnd);
 
     if (!m_rDoc.getIDocumentRedlineAccess().IsIgnoreRedline()
         && !m_rDoc.getIDocumentRedlineAccess().GetRedlineTable().empty())

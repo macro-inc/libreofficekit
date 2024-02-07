@@ -87,7 +87,8 @@ AquaSalFrame::AquaSalFrame( SalFrame* pParent, SalFrameStyleFlags salFrameStyle 
     mnTrackingRectTag( 0 ),
     mrClippingPath( nullptr ),
     mnICOptions( InputContextFlags::NONE ),
-    mnBlinkCursorDelay ( nMinBlinkCursorDelay )
+    mnBlinkCursorDelay( nMinBlinkCursorDelay ),
+    mbForceFlush( false )
 {
     mpParent = dynamic_cast<AquaSalFrame*>(pParent);
 
@@ -465,8 +466,29 @@ void AquaSalFrame::Show(bool bVisible, bool bNoActivate)
     // Also, don't display tooltips when mousing over non-key windows even if
     // the application is active as the tooltip window will pull the non-key
     // window in front of the key window.
-    if (bVisible && (mnStyle & SalFrameStyleFlags::TOOLTIP) && (![NSApp isActive] || (mpParent && ![ mpParent->mpNSWindow isKeyWindow])))
-        return;
+    if (bVisible && (mnStyle & SalFrameStyleFlags::TOOLTIP))
+    {
+        if (![NSApp isActive])
+            return;
+
+        if (mpParent)
+        {
+            // tdf#157565 show tooltip if any parent window is the key window
+            bool bKeyWindowFound = false;
+            NSWindow *pParent = mpParent->mpNSWindow;
+            while (pParent)
+            {
+                if ([pParent isKeyWindow])
+                {
+                    bKeyWindowFound = true;
+                    break;
+                }
+                pParent = [pParent parentWindow];
+            }
+            if (!bKeyWindowFound)
+                return;
+        }
+    }
 
     mbShown = bVisible;
     if(bVisible)
@@ -994,8 +1016,9 @@ void AquaSalFrame::Flush()
     // outside of the application's event loop (e.g. IntroWindow)
     // nothing would trigger paint event handling
     // => fall back to synchronous painting
-    if( ImplGetSVData()->maAppData.mnDispatchLevel <= 0 )
+    if( mbForceFlush || ImplGetSVData()->maAppData.mnDispatchLevel <= 0 )
     {
+        mbForceFlush = false;
         mpGraphics->Flush();
         [mpNSView display];
     }
@@ -1015,8 +1038,9 @@ void AquaSalFrame::Flush( const tools::Rectangle& rRect )
     // outside of the application's event loop (e.g. IntroWindow)
     // nothing would trigger paint event handling
     // => fall back to synchronous painting
-    if( ImplGetSVData()->maAppData.mnDispatchLevel <= 0 )
+    if( mbForceFlush || ImplGetSVData()->maAppData.mnDispatchLevel <= 0 )
     {
+        mbForceFlush = false;
         mpGraphics->Flush( rRect );
         [mpNSView display];
     }

@@ -33,6 +33,7 @@
 #include "document.hxx"
 #include "drwlayer.hxx"
 #include "SparklineList.hxx"
+#include "markdata.hxx"
 
 #include <algorithm>
 #include <atomic>
@@ -508,6 +509,7 @@ public:
     SCROW GetNotePosition( SCCOL nCol, size_t nIndex ) const;
     void CreateAllNoteCaptions();
     void ForgetNoteCaptions( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2, bool bPreserveData );
+    void CommentNotifyAddressChange(SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2);
 
     void GetAllNoteEntries( std::vector<sc::NoteEntry>& rNotes ) const;
     void GetNotesInRange( const ScRange& rRange, std::vector<sc::NoteEntry>& rNotes ) const;
@@ -626,6 +628,9 @@ public:
 
     void        GetDataArea( SCCOL& rStartCol, SCROW& rStartRow, SCCOL& rEndCol, SCROW& rEndRow,
                              bool bIncludeOld, bool bOnlyDown ) const;
+
+    void        GetBackColorArea( SCCOL& rStartCol, SCROW& rStartRow,
+                                  SCCOL& rEndCol, SCROW& rEndRow ) const;
 
     bool        GetDataAreaSubrange( ScRange& rRange ) const;
 
@@ -1406,6 +1411,40 @@ private:
         SCROW mnUBound;
     };
 
+    // Applies a function to the selected ranges; makes sure to only allocate
+    // as few columns as needed, and applies the rest to default column data.
+    // The function looks like
+    //     ApplyDataFunc(ScColumnData& applyTo, SCROW nTop, SCROW nBottom)
+    template <typename ApplyDataFunc>
+    void ApplyWithAllocation(const ScMarkData&, ApplyDataFunc);
 };
+
+template <typename ApplyDataFunc>
+void ScTable::ApplyWithAllocation(const ScMarkData& rMark, ApplyDataFunc apply)
+{
+    if (!rMark.GetTableSelect(nTab) || !(rMark.IsMultiMarked() || rMark.IsMarked()))
+        return;
+    SCCOL lastChangeCol;
+    if (rMark.GetArea().aEnd.Col() == GetDoc().MaxCol())
+    {
+        // For the same unallocated columns until the end we can change just the default.
+        lastChangeCol = rMark.GetStartOfEqualColumns(GetDoc().MaxCol(), aCol.size()) - 1;
+        // Allocate needed different columns before changing the default.
+        if (lastChangeCol >= 0)
+            CreateColumnIfNotExists(lastChangeCol);
+
+        aDefaultColData.Apply(rMark, GetDoc().MaxCol(), apply);
+    }
+    else // need to allocate all columns affected
+    {
+        lastChangeCol = rMark.GetArea().aEnd.Col();
+        CreateColumnIfNotExists(lastChangeCol);
+    }
+
+    // The loop should go not to lastChangeCol, but over all columns, to apply to already allocated
+    // in the "StartOfEqualColumns" range
+    for (SCCOL i = 0; i < aCol.size(); i++)
+        aCol[i].Apply(rMark, i, apply);
+}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

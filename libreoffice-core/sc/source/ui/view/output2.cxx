@@ -407,7 +407,9 @@ void ScDrawStringsVars::SetPattern(
 
     // There is no cell attribute for kerning, default is kerning OFF, all
     // kerning is stored at an EditText object that is drawn using EditEngine.
-    aFont.SetKerning( FontKerning::NONE);
+    // See also matching kerning cases in ScColumn::GetNeededSize and
+    // ScColumn::GetOptimalColWidth.
+    aFont.SetKerning(FontKerning::NONE);
 
     pDev->SetFont( aFont );
     if ( pFmtDevice != pDev )
@@ -1517,8 +1519,11 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
 
     SCCOL nLastContentCol = mpDoc->MaxCol();
     if ( nX2 < mpDoc->MaxCol() )
-        nLastContentCol = sal::static_int_cast<SCCOL>(
-            nLastContentCol - mpDoc->GetEmptyLinesInBlock( nX2+1, nY1, nTab, mpDoc->MaxCol(), nY2, nTab, DIR_RIGHT ) );
+    {
+        SCROW nEndRow;
+        mpDoc->GetCellArea(nTab, nLastContentCol, nEndRow);
+    }
+
     SCCOL nLoopStartX = nX1;
     if ( nX1 > 0 )
         --nLoopStartX;          // start before nX1 for rest of long text to the left
@@ -4319,11 +4324,12 @@ void ScOutputData::DrawEdit(bool bPixelToLogic)
     }
     tools::Long nLayoutSign = bLayoutRTL ? -1 : 1;
 
-    //! store nLastContentCol as member!
     SCCOL nLastContentCol = mpDoc->MaxCol();
     if ( nX2 < mpDoc->MaxCol() )
-        nLastContentCol = sal::static_int_cast<SCCOL>(
-            nLastContentCol - mpDoc->GetEmptyLinesInBlock( nX2+1, nY1, nTab, mpDoc->MaxCol(), nY2, nTab, DIR_RIGHT ) );
+    {
+        SCROW nEndRow;
+        mpDoc->GetCellArea(nTab, nLastContentCol, nEndRow);
+    }
 
     tools::Long nRowPosY = nScrY;
     for (SCSIZE nArrY=0; nArrY+1<nArrCount; nArrY++)            // 0 of the rest of the merged

@@ -21,9 +21,43 @@
 #include <cstddef>
 #include <rtl/strbuf.hxx>
 #include <rtl/string.hxx>
+#include <list>
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 #include <sfx2/app.hxx>
+
+#define LOK_NOTIFY_LOG_TO_CLIENT 1
+
+#define LOK_LOG_STREAM(level, area, stream) \
+    do { \
+            ::std::ostringstream lok_detail_stream; \
+            lok_detail_stream << level << ":"; \
+            if (std::strcmp(level, "debug") != 0) \
+                lok_detail_stream << area << ":"; \
+            lok_detail_stream << SAL_WHERE << stream; \
+            SfxLokHelper::notifyLog(lok_detail_stream); \
+        } while (false)
+
+#if LOK_NOTIFY_LOG_TO_CLIENT > 0
+#define LOK_INFO(area, stream) \
+    LOK_LOG_STREAM("info", area, stream) \
+
+#define LOK_WARN(area, stream) \
+    LOK_LOG_STREAM("warn", area, stream)
+
+#define LOK_DBG(stream) \
+    LOK_LOG_STREAM("debug", "", stream)
+#else
+#define LOK_INFO(area, stream) \
+    SAL_INFO(area, stream) \
+
+#define LOK_WARN(area, stream) \
+    SAL_WARN(area, stream)
+
+#define LOK_DBG(stream) \
+    SAL_DEBUG(stream)
+#endif
 
 struct SFX2_DLLPUBLIC LokMouseEventData
 {
@@ -63,6 +97,8 @@ public:
     static void destroyView(int nId);
     /// Set a view shell as current one.
     static void setView(int nId);
+    /// Determines if a call to setView() is in progress or not.
+    static bool isSettingView();
     /// Set the edit mode for a document with callbacks disabled.
     static void setEditMode(int nMode, vcl::ITiledRenderable* pDoc);
     /// Get view shell with id
@@ -194,6 +230,11 @@ public:
 
     static VclPtr<vcl::Window> getInPlaceDocWindow(SfxViewShell* pViewShell);
 
+    /// Sends Network Access error to LOK
+    static void sendNetworkAccessError(std::string_view rAction);
+
+    static void notifyLog(const std::ostringstream& stream);
+
 private:
     static int createView(SfxViewFrame* pViewFrame, ViewShellDocId docId);
 };
@@ -212,6 +253,34 @@ void SfxLokHelper::forEachOtherView(ViewShellType* pThisViewShell, FunctionType 
         pViewShell = SfxViewShell::GetNext(*pViewShell);
     }
 }
+
+/// If LOK is active, switch to the language/locale of the provided shell and back on delete.
+class SfxLokLanguageGuard
+{
+    bool m_bSetLanguage;
+    const SfxViewShell* m_pOldShell;
+    const SfxViewShell* m_pNewShell;
+
+public:
+    SfxLokLanguageGuard(SfxViewShell* pNewShell);
+    ~SfxLokLanguageGuard();
+};
+
+typedef std::list<SfxViewShell*> ViewShellList;
+
+/// Used to keep track of the last N views that text edited a document through an EditView
+class SFX2_DLLPUBLIC LOKEditViewHistory
+{
+public:
+    typedef std::list<SfxViewShell*> ViewShellList;
+    typedef std::unordered_map<int, ViewShellList> EditViewHistoryMap;
+
+    static void Update(bool bRemove = false);
+    static ViewShellList GetHistoryForDoc(ViewShellDocId aDocId);
+    static ViewShellList GetSortedViewsForDoc(ViewShellDocId aDocId);
+private:
+    static EditViewHistoryMap maEditViewHistory;
+};
 
 #endif
 

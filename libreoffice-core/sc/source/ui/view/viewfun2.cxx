@@ -20,6 +20,7 @@
 #include <scitems.hxx>
 
 #include <sfx2/app.hxx>
+#include <sfx2/request.hxx>
 #include <editeng/borderline.hxx>
 #include <editeng/boxitem.hxx>
 #include <editeng/fontitem.hxx>
@@ -1178,7 +1179,8 @@ bool ScViewFunc::TestMergeCells()           // pre-test (for menu)
         return false;
 }
 
-bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
+void ScViewFunc::MergeCells( bool bApi, bool bDoContents, bool bCenter,
+                             const sal_uInt16 nSlot )
 {
     //  Editable- and Being-Nested- test must be at the beginning (in DocFunc too),
     //  so that the Contents-QueryBox won't appear
@@ -1186,7 +1188,7 @@ bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
     if (!aTester.IsEditable())
     {
         ErrorMessage(aTester.GetMessageId());
-        return false;
+        return;
     }
 
     ScMarkData& rMark = GetViewData().GetMarkData();
@@ -1194,7 +1196,7 @@ bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
     if (!rMark.IsMarked())
     {
         ErrorMessage(STR_NOMULTISELECT);
-        return false;
+        return;
     }
 
     ScDocShell* pDocSh = GetViewData().GetDocShell();
@@ -1210,14 +1212,14 @@ bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
     if ( nStartCol == nEndCol && nStartRow == nEndRow )
     {
         // nothing to do
-        return true;
+        return;
     }
 
     if ( rDoc.HasAttrib( nStartCol, nStartRow, nStartTab, nEndCol, nEndRow, nEndTab,
                             HasAttrFlags::Merged | HasAttrFlags::Overlapped ) )
     {       // "Don't nest merging  !"
         ErrorMessage(STR_MSSG_MERGECELLS_0);
-        return false;
+        return;
     }
 
     // Check for the contents of all selected tables.
@@ -1240,7 +1242,7 @@ bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
             {
                 // this range contains only one data cell.
                 if (nStartCol != aState.mnCol1 || nStartRow != aState.mnRow1)
-                    rDoContents = true; // move the value to the top-left.
+                    bDoContents = true; // move the value to the top-left.
                 break;
             }
             default:
@@ -1248,48 +1250,16 @@ bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
         }
     }
 
-    bool bOk = true;
     bool bEmptyMergedCells = officecfg::Office::Calc::Compatibility::MergeCells::EmptyMergedCells::get();
 
-    if (bAskDialog)
+    auto doMerge = [this, pDocSh, aMergeOption, bApi, nStartCol, nStartRow, aMarkRange]
+        (bool bNowDoContents, bool bNowEmptyMergedCells)
     {
-        bool bShowDialog = officecfg::Office::Calc::Compatibility::MergeCells::ShowDialog::get();
-        if (!bApi && bShowDialog)
-        {
-            ScMergeCellsDialog aBox(GetViewData().GetDialogParent());
-            sal_uInt16 nRetVal = aBox.run();
-
-            if ( nRetVal == RET_OK )
-            {
-                switch (aBox.GetMergeCellsOption())
-                {
-                    case MoveContentHiddenCells:
-                        rDoContents = true;
-                        break;
-                    case KeepContentHiddenCells:
-                        bEmptyMergedCells = false;
-                        break;
-                    case EmptyContentHiddenCells:
-                        bEmptyMergedCells = true;
-                        break;
-                    default:
-                        assert(!"Unknown option for merge cells.");
-                        break;
-                }
-            }
-            else if ( nRetVal == RET_CANCEL )
-                bOk = false;
-        }
-    }
-
-    if (bOk)
-    {
-        bOk = pDocSh->GetDocFunc().MergeCells( aMergeOption, rDoContents, true/*bRecord*/, bApi, bEmptyMergedCells );
-
-        if (bOk)
+        if (pDocSh->GetDocFunc().MergeCells(aMergeOption, bNowDoContents, true/*bRecord*/,
+                                             bApi, bNowEmptyMergedCells))
         {
             SetCursor( nStartCol, nStartRow );
-            //DoneBlockMode( sal_False);
+            // DoneBlockMode( sal_False);
             Unmark();
 
             pDocSh->UpdateOle(GetViewData());
@@ -1300,9 +1270,55 @@ bool ScViewFunc::MergeCells( bool bApi, bool& rDoContents, bool bCenter )
 
             collectUIInformation({{"RANGE", aStartAddress + ":" + aEndAddress}}, "MERGE_CELLS");
         }
-    }
+    };
 
-    return bOk;
+    if (bAskDialog)
+    {
+        bool bShowDialog = officecfg::Office::Calc::Compatibility::MergeCells::ShowDialog::get();
+        if (!bApi && bShowDialog)
+        {
+            auto pBox = std::make_shared<ScMergeCellsDialog>(GetViewData().GetDialogParent());
+
+            SfxViewShell* pViewShell = GetViewData().GetViewShell();
+
+            pBox->runAsync(pBox, [=](sal_Int32 nRetVal) {
+                if (nRetVal == RET_OK)
+                {
+                    bool bRealDoContents = bDoContents;
+                    bool bRealEmptyMergedCells = bEmptyMergedCells;
+                    switch (pBox->GetMergeCellsOption())
+                    {
+                    case MoveContentHiddenCells:
+                        bRealDoContents = true;
+                        break;
+                    case KeepContentHiddenCells:
+                        bRealEmptyMergedCells = false;
+                        break;
+                    case EmptyContentHiddenCells:
+                        bRealEmptyMergedCells = true;
+                        break;
+                    default:
+                        assert(!"Unknown option for merge cells.");
+                        break;
+                    }
+
+                    doMerge(bRealDoContents, bRealEmptyMergedCells);
+
+                    if (nSlot != 0)
+                    {
+                        SfxRequest aReq(pViewShell->GetViewFrame(), nSlot);
+                        if (!bApi && bRealDoContents)
+                            aReq.AppendItem(SfxBoolItem(nSlot, bDoContents));
+                        SfxBindings& rBindings = pViewShell->GetViewFrame()->GetBindings();
+                        rBindings.Invalidate(nSlot);
+                        aReq.Done();
+                    }
+                }
+                // else cancelled
+            });
+        }
+    } else
+        doMerge(bDoContents, bEmptyMergedCells);
 }
 
 bool ScViewFunc::TestRemoveMerge()
@@ -2845,8 +2861,9 @@ void ScViewFunc::ImportTables( ScDocShell* pSrcShell,
 
 //  Move/Copy table to another document
 
-void ScViewFunc::MoveTable(
-    sal_uInt16 nDestDocNo, SCTAB nDestTab, bool bCopy, const OUString* pNewTabName )
+void ScViewFunc::MoveTable(sal_uInt16 nDestDocNo, SCTAB nDestTab, bool bCopy,
+                           const OUString* pNewTabName, bool bContextMenu,
+                           SCTAB nContextMenuSourceTab)
 {
     ScDocument& rDoc       = GetViewData().GetDocument();
     ScDocShell* pDocShell  = GetViewData().GetDocShell();
@@ -3075,23 +3092,32 @@ void ScViewFunc::MoveTable(
         pTabNames->reserve(nTabCount);
         OUString aDestName;
 
-        for(SCTAB i=0;i<nTabCount;i++)
+        if (bContextMenu)
         {
-            if(rMark.GetTableSelect(i))
+            OUString aTabName;
+            rDoc.GetName(nContextMenuSourceTab, aTabName);
+            pTabNames->push_back(aTabName);
+        }
+        else
+        {
+            for(SCTAB i=0;i<nTabCount;i++)
             {
-                OUString aTabName;
-                rDoc.GetName( i, aTabName);
-                pTabNames->push_back(aTabName);
-
-                for(SCTAB j=i+1;j<nTabCount;j++)
+                if(rMark.GetTableSelect(i))
                 {
-                    if((!rDoc.IsVisible(j)) && rDoc.IsScenario(j))
+                    OUString aTabName;
+                    rDoc.GetName( i, aTabName);
+                    pTabNames->push_back(aTabName);
+
+                    for(SCTAB j=i+1;j<nTabCount;j++)
                     {
-                        rDoc.GetName( j, aTabName);
-                        pTabNames->push_back(aTabName);
-                        i=j;
+                        if((!rDoc.IsVisible(j)) && rDoc.IsScenario(j))
+                        {
+                            rDoc.GetName( j, aTabName);
+                            pTabNames->push_back(aTabName);
+                            i=j;
+                        }
+                        else break;
                     }
-                    else break;
                 }
             }
         }
@@ -3191,13 +3217,24 @@ void ScViewFunc::MoveTable(
             }
         }
 
-        SCTAB nNewTab = nDestTab;
-        if (nNewTab == SC_TAB_APPEND)
-            nNewTab = rDoc.GetTableCount()-1;
-        else if (!bCopy && nTab<nDestTab)
-            nNewTab--;
+        if (bContextMenu)
+        {
+            for (SCTAB i = 0; i < nTabCount; i++)
+            {
+                if (rMark.GetTableSelect(i))
+                    SetTabNo(i, true);
+            }
+        }
+        else
+        {
+            SCTAB nNewTab = nDestTab;
+            if (nNewTab == SC_TAB_APPEND)
+                nNewTab = rDoc.GetTableCount() - 1;
+            else if (!bCopy && nTab < nDestTab)
+                nNewTab--;
 
-        SetTabNo( nNewTab, true );
+            SetTabNo(nNewTab, true);
+        }
     }
 }
 

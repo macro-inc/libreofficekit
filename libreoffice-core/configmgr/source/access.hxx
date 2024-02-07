@@ -111,7 +111,7 @@ public:
     virtual std::vector<OUString> getRelativePath() = 0;
 
     virtual OUString getRelativePathRepresentation() = 0;
-    virtual rtl::Reference< Node > getNode() = 0;
+    virtual const rtl::Reference< Node > & getNode() = 0;
 
     virtual bool isFinalized() = 0;
 
@@ -323,7 +323,8 @@ protected:
 
     rtl::Reference< Node > getParentNode();
     rtl::Reference< ChildAccess > getChild(OUString const & name);
-    std::vector< rtl::Reference< ChildAccess > > getAllChildren();
+    void forAllChildren(const std::function<bool(ChildAccess&)> & f);
+    bool isAllChildrenEmpty();
 
     void checkValue(
         css::uno::Any const & value, Type type, bool nillable);

@@ -88,7 +88,10 @@ namespace sfx2
 {
     class SvLinkSource;
     class StyleManager;
+    class IXmlIdRegistry;
 }
+
+namespace sfx { class IDocumentModelAccessor; }
 
 namespace com::sun::star::awt { class XWindow; }
 namespace com::sun::star::beans { struct PropertyValue; }
@@ -105,8 +108,6 @@ namespace com::sun::star::security { struct DocumentSignatureInformation; }
 namespace com::sun::star::task { class XInteractionHandler; }
 namespace com::sun::star::lang { class XComponent; }
 namespace com::sun::star::text { class XTextRange; }
-
-namespace sfx2 { class IXmlIdRegistry; }
 
 #define SFX_TITLE_TITLE    0
 #define SFX_TITLE_FILENAME 1
@@ -200,6 +201,9 @@ private:
         css::document::XDocumentProperties> & i_xDocProps);
 
     SAL_DLLPRIVATE bool SaveTo_Impl(SfxMedium &rMedium, const SfxItemSet* pSet );
+
+    // true if the document had macros (or similar) on load to trigger warning user
+    SAL_DLLPRIVATE bool  GetHadCheckedMacrosOnLoad() const;
 
 protected:
                                 SfxObjectShell(SfxObjectCreateMode);
@@ -428,6 +432,9 @@ public:
     void                        SetMacroCallsSeenWhileLoading();
     bool                        GetMacroCallsSeenWhileLoading() const;
 
+    // true if this type of link, from a document, is allowed by the user to be passed to uno:OpenDoc
+    static bool                 AllowedLinkProtocolFromDocument(const OUString& rUrl, SfxObjectShell* pObjShell, weld::Window* pDialogParent);
+
     const css::uno::Sequence< css::beans::PropertyValue >& GetModifyPasswordInfo() const;
     bool                        SetModifyPasswordInfo( const css::uno::Sequence< css::beans::PropertyValue >& aInfo );
 
@@ -558,7 +565,8 @@ public:
                                 GetDialogContainer();
     StarBASIC*                  GetBasic() const;
 
-    virtual std::set<Color>     GetDocColors();
+    virtual std::shared_ptr<sfx::IDocumentModelAccessor> GetDocumentModelAccessor() const;
+    virtual std::set<Color> GetDocColors();
     virtual std::shared_ptr<model::ColorSet> GetThemeColors();
 
     // Accessibility Check
@@ -651,9 +659,10 @@ public:
     void            DoDraw( OutputDevice *, const Point & rObjPos,
                             const Size & rSize,
                             const JobSetup & rSetup,
-                            sal_uInt16 nAspect = ASPECT_CONTENT );
+                            sal_uInt16 nAspect = ASPECT_CONTENT,
+                            bool bOutputForScreen = false );
     virtual void    Draw( OutputDevice *, const JobSetup & rSetup,
-                          sal_uInt16 nAspect ) = 0;
+                          sal_uInt16 nAspect, bool bOutputForScreen ) = 0;
 
 
     virtual void    FillClass( SvGlobalName * pClassName,
@@ -718,7 +727,8 @@ public:
                                             const Fraction & rScaleX,
                                             const Fraction & rScaleY,
                                             const JobSetup & rSetup,
-                                            sal_uInt16 nAspect );
+                                            sal_uInt16 nAspect,
+                                            bool bOutputForScreen );
 
     // Shell Interface
     SAL_DLLPRIVATE void ExecFile_Impl(SfxRequest &);

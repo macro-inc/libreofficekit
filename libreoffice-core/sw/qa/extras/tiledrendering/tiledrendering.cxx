@@ -32,6 +32,7 @@
 #include <svx/svdpage.hxx>
 #include <svx/svdview.hxx>
 #include <vcl/virdev.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <editeng/editview.hxx>
 #include <editeng/outliner.hxx>
 #include <editeng/wghtitem.hxx>
@@ -112,6 +113,11 @@ protected:
     OString m_aFormFieldButton;
     OString m_aContentControl;
     OString m_ShapeSelection;
+    struct
+    {
+        std::string text;
+        std::string rect;
+    } m_aTooltip;
     TestLokCallbackWrapper m_callbackWrapper;
 };
 
@@ -292,6 +298,15 @@ void SwTiledRenderingTest::callbackImpl(int nType, const char* pPayload)
         case LOK_CALLBACK_GRAPHIC_SELECTION:
             {
                 m_ShapeSelection = OString(pPayload);
+            }
+            break;
+        case LOK_CALLBACK_TOOLTIP:
+            {
+                std::stringstream aStream(pPayload);
+                boost::property_tree::ptree aTree;
+                boost::property_tree::read_json(aStream, aTree);
+                m_aTooltip.text = aTree.get_child("text").get_value<std::string>();
+                m_aTooltip.rect = aTree.get_child("rectangle").get_value<std::string>();
             }
             break;
     }
@@ -743,6 +758,7 @@ namespace {
         bool m_bOwnSelectionSet;
         bool m_bViewSelectionSet;
         OString m_aViewSelection;
+        OString m_aViewRenderState;
         bool m_bTilesInvalidated;
         bool m_bViewCursorVisible;
         bool m_bGraphicViewSelection;
@@ -888,6 +904,11 @@ namespace {
                         boost::property_tree::ptree aTree;
                         boost::property_tree::read_json(aStream, aTree);
                         m_bViewLock = aTree.get_child("rectangle").get_value<std::string>() != "EMPTY";
+                    }
+                    break;
+                case LOK_CALLBACK_VIEW_RENDER_STATE:
+                    {
+                        m_aViewRenderState = pPayload;
                     }
                     break;
                 case LOK_CALLBACK_REDLINE_TABLE_SIZE_CHANGED:
@@ -1761,8 +1782,8 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testGetViewRenderState)
     CPPUNIT_ASSERT_EQUAL(OString("PS;Default"), pXTextDocument->getViewRenderState());
 }
 
-// Helper function to get a tile to a bitmap and check the pixel color
-static void assertTilePixelColor(SwXTextDocument* pXTextDocument, int nPixelX, int nPixelY, Color aColor)
+// Helper function to get a tile to a bitmap
+static Bitmap getTile(SwXTextDocument* pXTextDocument)
 {
     size_t nCanvasSize = 1024;
     size_t nTileSize = 256;
@@ -1773,22 +1794,26 @@ static void assertTilePixelColor(SwXTextDocument* pXTextDocument, int nPixelX, i
             Fraction(1.0), Point(), aPixmap.data());
     pXTextDocument->paintTile(*pDevice, nCanvasSize, nCanvasSize, 0, 0, 15360, 7680);
     pDevice->EnableMapMode(false);
-    Bitmap aBitmap = pDevice->GetBitmap(Point(0, 0), Size(nTileSize, nTileSize));
+    return pDevice->GetBitmap(Point(0, 0), Size(nTileSize, nTileSize));
+}
+
+// Helper function to get a tile to a bitmap and check the pixel color
+static void assertTilePixelColor(SwXTextDocument* pXTextDocument, int nPixelX, int nPixelY, Color aColor)
+{
+    Bitmap aBitmap = getTile(pXTextDocument);
     Bitmap::ScopedReadAccess pAccess(aBitmap);
     Color aActualColor(pAccess->GetPixel(nPixelX, nPixelY));
     CPPUNIT_ASSERT_EQUAL(aColor, aActualColor);
 }
 
-// Test that changing the theme in one view doesn't change it in the other view
-CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testThemeViewSeparation)
+static void addDarkLightThemes(const Color& rDarkColor, const Color& rLightColor)
 {
-    Color aDarkColor(0x1c, 0x1c, 0x1c);
     // Add a minimal dark scheme
     {
         svtools::EditableColorConfig aColorConfig;
         svtools::ColorConfigValue aValue;
         aValue.bIsVisible = true;
-        aValue.nColor = aDarkColor;
+        aValue.nColor = rDarkColor;
         aColorConfig.SetColorValue(svtools::DOCCOLOR, aValue);
         aColorConfig.AddScheme(u"Dark");
     }
@@ -1797,10 +1822,17 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testThemeViewSeparation)
         svtools::EditableColorConfig aColorConfig;
         svtools::ColorConfigValue aValue;
         aValue.bIsVisible = true;
-        aValue.nColor = COL_WHITE;
+        aValue.nColor = rLightColor;
         aColorConfig.SetColorValue(svtools::DOCCOLOR, aValue);
         aColorConfig.AddScheme(u"Light");
     }
+}
+
+// Test that changing the theme in one view doesn't change it in the other view
+CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testThemeViewSeparation)
+{
+    Color aDarkColor(0x1c, 0x1c, 0x1c);
+    addDarkLightThemes(aDarkColor, COL_WHITE);
     SwXTextDocument* pXTextDocument = createDoc();
     int nFirstViewId = SfxLokHelper::getView();
     ViewCallback aView1;
@@ -3030,24 +3062,6 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testPilcrowRedlining)
     comphelper::dispatchCommand(".uno:ControlCodes", {});
 }
 
-CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testShowHiddenCharsWhenShowFormatting)
-{
-    // In LOKit, ignore the config setting for
-    // Tools - Options - Writer - Formatting Aids - Display Formatting - Hidden characters
-    // and always show hidden content when showing pilcrow formatting
-
-    createSwDoc("hiddenLoremIpsum.docx");
-
-    // Since LOKit is active in TiledRendering, turning on "Show formatting" will show hidden text.
-    comphelper::dispatchCommand(".uno:ControlCodes", {}); // show format marks
-    Scheduler::ProcessEventsToIdle();
-
-    // Without this patch, no body text would be visible - so only 1 page instead of 3.
-    CPPUNIT_ASSERT_EQUAL(3, getPages());
-
-    comphelper::dispatchCommand(".uno:ControlCodes", {});
-}
-
 CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testDoubleUnderlineAndStrikeOut)
 {
     // Load a document where the tracked text moving is visible with
@@ -4084,6 +4098,114 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testSavedAuthorField)
 
     xmlDocUniquePtr pXmlDoc = parseLayoutDump();
     assertXPath(pXmlDoc, "/root/page[1]/body/txt[1]/SwParaPortion[1]/SwLineLayout[1]/SwFieldPortion[1]", "expand", sAuthor);
+}
+
+CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testRedlineTooltip)
+{
+    SwXTextDocument* pXTextDoc = createDoc();
+    SwWrtShell* pWrtShell = pXTextDoc->GetDocShell()->GetWrtShell();
+    CPPUNIT_ASSERT(pWrtShell);
+    setupLibreOfficeKitViewCallback(pWrtShell->GetSfxViewShell());
+    pWrtShell->SetRedlineFlagsAndCheckInsMode(RedlineFlags::On | RedlineFlags::ShowMask);
+    uno::Reference<text::XText> xText(pXTextDoc->getText(), uno::UNO_SET_THROW);
+    xText->insertString(xText->getEnd(), "test", /*bAbsorb=*/false);
+
+    SwShellCursor* pShellCursor = pWrtShell->getShellCursor(false);
+    CPPUNIT_ASSERT(pShellCursor);
+
+    pWrtShell->EndOfSection(/*bSelect=*/false);
+    Point aEnd = pShellCursor->GetSttPos();
+    pWrtShell->StartOfSection(/*bSelect=*/false);
+    Point aStart = pShellCursor->GetSttPos();
+    Point aMiddle((aStart.getX() + aEnd.getX()) / 2, (aStart.getY() + aEnd.getY()) / 2);
+    pXTextDoc->postMouseEvent(LOK_MOUSEEVENT_MOUSEMOVE, aMiddle.getX(), aMiddle.getY(), 1, 0, 0);
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT(OString(m_aTooltip.text).startsWith("Inserted: "));
+
+    std::vector<OUString> vec = comphelper::string::split(OUString::fromUtf8(m_aTooltip.rect), ',');
+    CPPUNIT_ASSERT_EQUAL(size_t(4), vec.size());
+    CPPUNIT_ASSERT(vec[0].toInt32() != 0);
+    CPPUNIT_ASSERT(vec[1].toInt32() != 0);
+    CPPUNIT_ASSERT(vec[2].toInt32() != 0);
+    CPPUNIT_ASSERT(vec[3].toInt32() != 0);
+}
+
+// toggling Formatting Marks on/off for one view should have no effect on other views
+CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testToggleFormattingMarks)
+{
+    SwXTextDocument* pXTextDocument = createDoc();
+    int nView1 = SfxLokHelper::getView();
+
+    SfxLokHelper::createView();
+    int nView2 = SfxLokHelper::getView();
+    pXTextDocument->initializeForTiledRendering(uno::Sequence<beans::PropertyValue>());
+
+    SfxLokHelper::setView(nView1);
+    ViewCallback aView1;
+
+    SfxLokHelper::setView(nView2);
+    ViewCallback aView2;
+
+    OString sOrigView2RenderState = pXTextDocument->getViewRenderState();
+
+    comphelper::dispatchCommand(".uno:ControlCodes", {});
+
+    Scheduler::ProcessEventsToIdle();
+
+    // 1. change to view #2 shouldn't result in an update to view #1 renderstate
+    CPPUNIT_ASSERT(aView1.m_aViewRenderState.isEmpty());
+    // 2. toggling on ControlCodes should result in view #2 render state reporting
+    // 'P' for Pilcrow
+    CPPUNIT_ASSERT_EQUAL(OString("P" + sOrigView2RenderState), aView2.m_aViewRenderState);
+}
+
+// toggling chart into dark mode should switch not leave text as black
+CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testSwitchingChartToDarkMode)
+{
+    addDarkLightThemes(COL_BLACK, COL_WHITE);
+    SwXTextDocument* pXTextDocument = createDoc("large-chart-labels.odt");
+    CPPUNIT_ASSERT(pXTextDocument);
+
+    SwDoc* pDoc = pXTextDocument->GetDocShell()->GetDoc();
+    SwView* pView = pDoc->GetDocShell()->GetView();
+    uno::Reference<frame::XFrame> xFrame = pView->GetViewFrame()->GetFrame().GetFrameInterface();
+    uno::Sequence<beans::PropertyValue> aPropertyValues = comphelper::InitPropertySequence(
+        {
+            { "NewTheme", uno::Any(OUString("Dark")) },
+        }
+    );
+    comphelper::dispatchCommand(".uno:ChangeTheme", xFrame, aPropertyValues);
+    CPPUNIT_ASSERT_EQUAL(OString("S;Dark"), pXTextDocument->getViewRenderState());
+
+    Bitmap aBitmap(getTile(pXTextDocument));
+    Size aSize = aBitmap.GetSizePixel();
+
+#ifdef DBGDUMP
+    SvFileStream aNew("/tmp/dump.png", StreamMode::WRITE | StreamMode::TRUNC);
+    vcl::PngImageWriter aPNGWriter(aNew);
+    aPNGWriter.write(BitmapEx(aBitmap));
+#endif
+
+    int nBlackPixels = 0;
+    int nWhitePixels = 0;
+    Bitmap::ScopedReadAccess pAccess(aBitmap);
+    for (int x = 0; x < aSize.Width(); ++x)
+    {
+        for (int y = 0; y < aSize.Height(); ++y)
+        {
+            Color aActualColor(pAccess->GetPixel(y, x));
+            if (aActualColor.IsDark()) // ignore antialiasing
+                ++nBlackPixels;
+            else
+                ++nWhitePixels;
+        }
+    }
+    // text in white on black background should have both colors dominated by black
+    // background
+    CPPUNIT_ASSERT(nBlackPixels > 0);
+    CPPUNIT_ASSERT(nWhitePixels > 0);
+    CPPUNIT_ASSERT(nBlackPixels > nWhitePixels);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

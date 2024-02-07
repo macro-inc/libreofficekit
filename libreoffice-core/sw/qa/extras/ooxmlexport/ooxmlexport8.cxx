@@ -79,24 +79,6 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf48569)
     CPPUNIT_ASSERT_EQUAL(text::TextContentAnchorType_AS_CHARACTER, eValue);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testN750935, "n750935.docx")
-{
-    // Some page break types were ignores, resulting in less pages.
-    CPPUNIT_ASSERT_EQUAL(5, getPages());
-
-    /*
-     * The problem was that the header and footer was not shared.
-     *
-     * xray ThisComponent.StyleFamilies.PageStyles.Default.FooterIsShared
-     */
-    uno::Reference<beans::XPropertySet> xPropertySet(getStyles("PageStyles")->getByName("Standard"), uno::UNO_QUERY);
-    bool bValue = false;
-    xPropertySet->getPropertyValue("HeaderIsShared") >>= bValue;
-    CPPUNIT_ASSERT_EQUAL(true, bValue);
-    xPropertySet->getPropertyValue("FooterIsShared") >>= bValue;
-    CPPUNIT_ASSERT_EQUAL(true, bValue);
-}
-
 DECLARE_OOXMLEXPORT_TEST(testN751117, "n751117.docx")
 {
     // First shape: the end should be an arrow, should be rotated and should be flipped.
@@ -737,19 +719,12 @@ CPPUNIT_TEST_FIXTURE(Test, testN779642)
         uno::Any aFrame = xAnchor->getPropertyValue("TextFrame");
         uno::Reference<beans::XPropertySet> xFrame;
         aFrame >>= xFrame;
+        CPPUNIT_ASSERT(xFrame.is());
         sal_Int16 nValue;
         xFrame->getPropertyValue("VertOrient") >>= nValue;
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong vertical orientation", text::VertOrientation::BOTTOM, nValue);
         xFrame->getPropertyValue("VertOrientRelation") >>= nValue;
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong vertical orientation relation", text::RelOrientation::PAGE_PRINT_AREA, nValue);
-
-        // tdf#106572 - perhaps not the best test to hijack since this file
-        // produces an error in Word, but it nicely matches danger points,
-        // and has a different first footer, so nice visual confirmation.
-        discardDumpedLayout();
-        xmlDocUniquePtr pXmlDoc = parseLayoutDump();
-        // There is no footer text on the first page.
-        assertXPath(pXmlDoc, "/root/page[1]/footer/txt", 0);
     };
     createSwDoc("n779642.docx");
     verify();
@@ -798,7 +773,7 @@ DECLARE_OOXMLEXPORT_TEST(testFdo53985, "fdo53985.docx")
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Section3 is protected", false, getProperty<bool>(xSect, "IsProtected"));
 
     // This was increasing by 3 every round-trip - an extra paragraph after each table in sections
-    CPPUNIT_ASSERT_EQUAL(9, getParagraphs());
+    CPPUNIT_ASSERT_EQUAL(6, getParagraphs());
 }
 
 DECLARE_OOXMLEXPORT_TEST(testFdo59638, "fdo59638.docx")

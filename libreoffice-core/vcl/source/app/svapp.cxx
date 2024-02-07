@@ -1860,6 +1860,12 @@ void dumpState(rtl::OStringBuffer &rState)
     if (!pSVData)
         return;
 
+#ifndef NDEBUG
+    // lo_dumpState deliberately doesn't take SolarMutexGuard
+    // so disable these checks during dumpState
+    DbgGUIDeInitSolarMutexCheck();
+#endif
+
     rState.append("\nWindows:\t");
     rState.append(static_cast<sal_Int32>(Application::GetTopWindowCount()));
 
@@ -1878,6 +1884,10 @@ void dumpState(rtl::OStringBuffer &rState)
     vcl::graphic::Manager::get().dumpState(rState);
 
     pSVData->dumpState(rState);
+
+#ifndef NDEBUG
+    DbgGUIInitSolarMutexCheck();
+#endif
 }
 
 void trimMemory(int nTarget)

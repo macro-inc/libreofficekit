@@ -1427,36 +1427,37 @@ SCROW ScViewData::GetPosY( ScVSplitPos eWhich, SCTAB nForTab ) const
     return maTabData[nForTab]->nPosY[eWhich];
 }
 
+ScViewDataTable* ScViewData::FetchTableData(SCTAB nTabIndex) const
+{
+    if (!ValidTab(nTabIndex) || (nTabIndex >= static_cast<SCTAB>(maTabData.size())))
+        return nullptr;
+    ScViewDataTable* pRet = maTabData[nTabIndex].get();
+    SAL_WARN_IF(!pRet, "sc.viewdata", "ScViewData::FetchTableData: hidden sheet = " << nTabIndex);
+    return pRet;
+}
+
 SCCOL ScViewData::GetCurXForTab( SCTAB nTabIndex ) const
 {
-    if (!ValidTab(nTabIndex) || (nTabIndex >= static_cast<SCTAB>(maTabData.size())) || !maTabData[nTabIndex])
-        return -1;
-
-    return maTabData[nTabIndex]->nCurX;
+    ScViewDataTable* pTabData = FetchTableData(nTabIndex);
+    return pTabData ? pTabData->nCurX : -1;
 }
 
 SCROW ScViewData::GetCurYForTab( SCTAB nTabIndex ) const
 {
-    if (!ValidTab(nTabIndex) || (nTabIndex >= static_cast<SCTAB>(maTabData.size())))
-            return -1;
-
-    return maTabData[nTabIndex]->nCurY;
+    ScViewDataTable* pTabData = FetchTableData(nTabIndex);
+    return pTabData ? pTabData->nCurY : -1;
 }
 
 void ScViewData::SetCurXForTab( SCCOL nNewCurX, SCTAB nTabIndex )
 {
-    if (!ValidTab(nTabIndex) || (nTabIndex >= static_cast<SCTAB>(maTabData.size())))
-            return;
-
-    maTabData[nTabIndex]->nCurX = nNewCurX;
+    if (ScViewDataTable* pTabData = FetchTableData(nTabIndex))
+        pTabData->nCurX = nNewCurX;
 }
 
 void ScViewData::SetCurYForTab( SCCOL nNewCurY, SCTAB nTabIndex )
 {
-    if (!ValidTab(nTabIndex) || (nTabIndex >= static_cast<SCTAB>(maTabData.size())))
-            return;
-
-    maTabData[nTabIndex]->nCurY = nNewCurY;
+    if (ScViewDataTable* pTabData = FetchTableData(nTabIndex))
+        pTabData->nCurY = nNewCurY;
 }
 
 void ScViewData::SetMaxTiledCol( SCCOL nNewMaxCol )
@@ -2246,6 +2247,7 @@ void ScViewData::EditGrowY( bool bInitial )
 
 void ScViewData::ResetEditView()
 {
+    LOKEditViewHistory::Update(/*bRemove: */ true);
     EditEngine* pEngine = nullptr;
     for (sal_uInt16 i=0; i<4; i++)
         if (pEditView[i])
@@ -2266,6 +2268,7 @@ void ScViewData::ResetEditView()
 
 void ScViewData::KillEditView()
 {
+    LOKEditViewHistory::Update(/*bRemove: */ true);
     EditEngine* pEngine = nullptr;
     for (sal_uInt16 i=0; i<4; i++)
         if (pEditView[i])
@@ -2849,14 +2852,14 @@ void ScViewData::GetPosFromPixel( tools::Long nClickX, tools::Long nClickY, ScSp
     }
 
     //  cells too big?
-    if ( rPosX == nStartPosX && nClickX > 0 )
+    if (rPosX == nStartPosX && nClickX > 0)
     {
          if (pView)
             aScrSize.setWidth( pView->GetGridWidth(eHWhich) );
          if ( nClickX > aScrSize.Width() )
             ++rPosX;
     }
-    if ( rPosY == nStartPosY && nClickY > 0 )
+    if (rPosY == nStartPosY && nClickY > 0)
     {
         if (pView)
             aScrSize.setHeight( pView->GetGridHeight(eVWhich) );

@@ -127,6 +127,7 @@
 #include <sfx2/LokControlHandler.hxx>
 #include <tools/gen.hxx>
 #include <tools/debug.hxx>
+#include <tools/urlobj.hxx>
 #include <comphelper/diagnose_ex.hxx>
 #include <tools/json_writer.hxx>
 #include <tools/UnitConversion.hxx>
@@ -2699,6 +2700,31 @@ void SdXImpressDocument::setTextSelection(int nType, int nX, int nY)
         assert(false);
         break;
     }
+}
+
+OUString SdXImpressDocument::hyperlinkInfoAtPosition(int x, int y)
+{
+    ::sd::ViewShell* viewSh = GetViewShell();
+
+    if (viewSh)
+    {
+        Point point(x, y);
+        point = o3tl::convert(point, o3tl::Length::twip, o3tl::Length::mm100);
+        SdrView* pSdrView = SfxViewShell::Current()->GetDrawView();
+
+        if (pSdrView)
+        {
+            SdrViewEvent aVEvt;
+            pSdrView->PickAnything(point, aVEvt);
+            if (aVEvt.mpURLField)
+            {
+                OUString aURL = INetURLObject::decode(aVEvt.mpURLField->GetURL(), INetURLObject::DecodeMechanism::WithCharset);
+                return aURL;
+            }
+        }
+    }
+
+    return OUString();
 }
 
 uno::Reference<datatransfer::XTransferable> SdXImpressDocument::getSelection()

@@ -1324,6 +1324,13 @@ void ScTable::CopyToTable(
     const bool bToUndoDoc = pDestTab->rDocument.IsUndo();
     const bool bFromUndoDoc = rDocument.IsUndo();
 
+    if (bToUndoDoc && (nFlags & InsertDeleteFlags::ATTRIB) && nCol2 >= aCol.size())
+    {
+        // tdf#154044: Copy also the default column data
+        aDefaultColData.AttrArray().CopyArea(nRow1, nRow2, 0,
+                                             pDestTab->aDefaultColData.AttrArray());
+    }
+
     if ((bToUndoDoc || bFromUndoDoc) && (nFlags & InsertDeleteFlags::CONTENTS) && mpRangeName)
     {
         // Copying formulas may create sheet-local named expressions on the
@@ -1349,6 +1356,16 @@ void ScTable::CopyToTable(
         for (SCCOL i = nCol1; i <= ClampToAllocatedColumns(nCol2); i++)
             aCol[i].CopyToColumn(rCxt, nRow1, nRow2, bToUndoDoc ? nFlags : nTempFlags, bMarked,
                                  pDestTab->CreateColumnIfNotExists(i), pMarkData, bAsLink, bGlobalNamesToLocal);
+        // tdf#154044: Restore from the default column data
+        if (bFromUndoDoc && (nFlags & InsertDeleteFlags::ATTRIB) && nCol2 >= aCol.size())
+        {
+            aDefaultColData.AttrArray().CopyArea(nRow1, nRow2, 0,
+                                                 pDestTab->aDefaultColData.AttrArray());
+            SCCOL nMaxSetDefault = pDestTab->ClampToAllocatedColumns(nCol2);
+            for (SCCOL i = aCol.size(); i <= nMaxSetDefault; i++)
+                aDefaultColData.AttrArray().CopyArea(nRow1, nRow2, 0,
+                                                     pDestTab->aCol[i].AttrArray());
+        }
     }
 
     if (!bColRowFlags)      // Column widths/Row heights/Flags
@@ -1496,7 +1513,7 @@ void ScTable::CopyCaptionsToTable( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW 
     for (SCCOL i = nCol1; i <= nCol2; i++)
     {
         aCol[i].CopyCellNotesToDocument(nRow1, nRow2, pDestTab->CreateColumnIfNotExists(i), bCloneCaption);
-        pDestTab->aCol[i].UpdateNoteCaptions(nRow1, nRow2);
+        pDestTab->aCol[i].UpdateNoteCaptions(nRow1, nRow2, false /* address unchanged from initial create */);
     }
 }
 
@@ -1944,6 +1961,21 @@ void ScTable::ForgetNoteCaptions( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW n
     if ( nCol2 >= aCol.size() ) nCol2 = aCol.size() - 1;
     for (SCCOL i = nCol1; i <= nCol2; ++i)
         aCol[i].ForgetNoteCaptions(nRow1, nRow2, bPreserveData);
+}
+
+void ScTable::CommentNotifyAddressChange( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 )
+{
+    // Only in use in kit mode for now, but looks to me a good idea to revisit why (since OOo times)
+    // on deleting/inserting a column that we generate all the captions, while on deleting/inserting
+    // a row we do not. Presumably we should skip generating captions if we don't have to.
+    if (!comphelper::LibreOfficeKit::isActive())
+        return;
+
+    if (!ValidCol(nCol1) || !ValidCol(nCol2))
+        return;
+    if ( nCol2 >= aCol.size() ) nCol2 = aCol.size() - 1;
+    for (SCCOL i = nCol1; i <= nCol2; ++i)
+        aCol[i].CommentNotifyAddressChange(nRow1, nRow2);
 }
 
 void ScTable::GetAllNoteEntries( std::vector<sc::NoteEntry>& rNotes ) const
@@ -3048,8 +3080,8 @@ void ScTable::ApplyStyleArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, S
 
 void ScTable::ApplySelectionStyle(const ScStyleSheet& rStyle, const ScMarkData& rMark)
 {
-    for (SCCOL i=0; i < aCol.size(); i++)
-        aCol[i].ApplySelectionStyle( rStyle, rMark );
+    ApplyWithAllocation(rMark, [&rStyle](ScColumnData& applyTo, SCROW nTop, SCROW nBottom)
+                        { applyTo.ApplySelectionStyle(rStyle, nTop, nBottom); });
 }
 
 void ScTable::ApplySelectionLineStyle( const ScMarkData& rMark,
@@ -3212,71 +3244,21 @@ void ScTable::ApplyAttr( SCCOL nCol, SCROW nRow, const SfxPoolItem& rAttr )
 void ScTable::ApplySelectionCache( SfxItemPoolCache* pCache, const ScMarkData& rMark,
                                    ScEditDataArray* pDataArray, bool* const pIsChanged )
 {
-    if(!rMark.GetTableSelect(nTab))
-        return;
-    SCCOL lastChangeCol;
-    if( rMark.GetArea().aEnd.Col() == GetDoc().MaxCol())
-    {
-        // For the same unallocated columns until the end we can change just the default.
-        lastChangeCol = rMark.GetStartOfEqualColumns( GetDoc().MaxCol(), aCol.size()) - 1;
-        if( lastChangeCol >= 0 )
-            CreateColumnIfNotExists(lastChangeCol); // Allocate needed different columns before changing the default.
-        aDefaultColData.ApplySelectionCache( pCache, rMark, pDataArray, pIsChanged, GetDoc().MaxCol());
-    }
-    else // need to allocate all columns affected
-    {
-        lastChangeCol = rMark.GetArea().aEnd.Col();
-        CreateColumnIfNotExists(lastChangeCol);
-    }
-
-    for (SCCOL i=0; i <= lastChangeCol; i++)
-        aCol[i].ApplySelectionCache( pCache, rMark, pDataArray, pIsChanged );
+    ApplyWithAllocation(
+        rMark, [pCache, pDataArray, pIsChanged](ScColumnData& applyTo, SCROW nTop, SCROW nBottom)
+        { applyTo.ApplySelectionCache(pCache, nTop, nBottom, pDataArray, pIsChanged); });
 }
 
 void ScTable::ChangeSelectionIndent( bool bIncrement, const ScMarkData& rMark )
 {
-    if(!rMark.GetTableSelect(nTab))
-        return;
-    SCCOL lastChangeCol;
-    if( rMark.GetArea().aEnd.Col() == GetDoc().MaxCol())
-    {
-        // For the same unallocated columns until the end we can change just the default.
-        lastChangeCol = rMark.GetStartOfEqualColumns( GetDoc().MaxCol(), aCol.size()) - 1;
-        if( lastChangeCol >= 0 )
-            CreateColumnIfNotExists(lastChangeCol); // Allocate needed different columns before changing the default.
-        aDefaultColData.ChangeSelectionIndent( bIncrement, rMark, GetDoc().MaxCol());
-    }
-    else
-    {
-        lastChangeCol = rMark.GetArea().aEnd.Col();
-        CreateColumnIfNotExists(lastChangeCol);
-    }
-
-    for (SCCOL i=0; i <= lastChangeCol; i++)
-        aCol[i].ChangeSelectionIndent( bIncrement, rMark );
+    ApplyWithAllocation(rMark, [&bIncrement](ScColumnData& applyTo, SCROW nTop, SCROW nBottom)
+                        { applyTo.ChangeSelectionIndent(bIncrement, nTop, nBottom); });
 }
 
 void ScTable::ClearSelectionItems( const sal_uInt16* pWhich, const ScMarkData& rMark )
 {
-    if(!rMark.GetTableSelect(nTab))
-        return;
-    SCCOL lastChangeCol;
-    if( rMark.GetArea().aEnd.Col() == GetDoc().MaxCol())
-    {
-        // For the same unallocated columns until the end we can change just the default.
-        lastChangeCol = rMark.GetStartOfEqualColumns( GetDoc().MaxCol(), aCol.size()) - 1;
-        if( lastChangeCol >= 0 )
-            CreateColumnIfNotExists(lastChangeCol); // Allocate needed different columns before changing the default.
-        aDefaultColData.ClearSelectionItems( pWhich, rMark, GetDoc().MaxCol());
-    }
-    else
-    {
-        lastChangeCol = rMark.GetArea().aEnd.Col();
-        CreateColumnIfNotExists(lastChangeCol);
-    }
-
-    for (SCCOL i=0; i <= lastChangeCol; i++)
-        aCol[i].ClearSelectionItems( pWhich, rMark );
+    ApplyWithAllocation(rMark, [pWhich](ScColumnData& applyTo, SCROW nTop, SCROW nBottom)
+                        { applyTo.ClearSelectionItems(pWhich, nTop, nBottom); });
 }
 
 //  Column widths / Row heights

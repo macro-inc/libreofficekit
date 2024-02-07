@@ -29,6 +29,7 @@
 #include "TagLogger.hxx"
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/graphic/XGraphic.hpp>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/beans/XPropertyState.hpp>
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/document/PrinterIndependentLayout.hpp>
@@ -67,6 +68,7 @@
 #include <com/sun/star/text/XRedline.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextFrame.hpp>
+#include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/text/RubyPosition.hpp>
 #include <com/sun/star/text/XTextRangeCompare.hpp>
 #include <com/sun/star/style/DropCapFormat.hpp>
@@ -125,6 +127,9 @@
 
 #include <unicode/errorcode.h>
 #include <unicode/regex.h>
+
+#define REFFLDFLAG_STYLE_FROM_BOTTOM 0xc100
+#define REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL 0xc200
 
 using namespace ::com::sun::star;
 using namespace oox;
@@ -349,6 +354,7 @@ DomainMapper_Impl::DomainMapper_Impl(
         m_bStartBibliography(false),
         m_nStartGenericField(0),
         m_bTextInserted(false),
+        m_nLastRedlineMovedID(1),
         m_sCurrentPermId(0),
         m_bFrameDirectionSet(false),
         m_bInDocDefaultsImport(false),
@@ -375,7 +381,6 @@ DomainMapper_Impl::DomainMapper_Impl(
         m_bIsFirstParaInSection( true ),
         m_bIsFirstParaInSectionAfterRedline( true ),
         m_bDummyParaAddedForTableInSection( false ),
-        m_bDummyParaAddedForTableInSectionPage( false ),
         m_bTextFrameInserted(false),
         m_bIsPreviousParagraphFramed( false ),
         m_bIsLastParaInSection( false ),
@@ -758,6 +763,7 @@ void DomainMapper_Impl::RemoveLastParagraph( )
 
     if (m_aTextAppendStack.empty())
         return;
+
     uno::Reference< text::XTextAppend > xTextAppend = m_aTextAppendStack.top().xTextAppend;
     if (!xTextAppend.is())
         return;
@@ -934,12 +940,6 @@ void DomainMapper_Impl::SetIsFirstParagraphInShape(bool bIsFirst)
 void DomainMapper_Impl::SetIsDummyParaAddedForTableInSection( bool bIsAdded )
 {
     m_bDummyParaAddedForTableInSection = bIsAdded;
-    m_bDummyParaAddedForTableInSectionPage = bIsAdded;
-}
-
-void DomainMapper_Impl::SetIsDummyParaAddedForTableInSectionPage( bool bIsAdded )
-{
-    m_bDummyParaAddedForTableInSectionPage = bIsAdded;
 }
 
 
@@ -977,8 +977,19 @@ void DomainMapper_Impl::PushSdt()
     }
 
     uno::Reference<text::XTextAppend> xTextAppend = m_aTextAppendStack.top().xTextAppend;
+    if (!xTextAppend.is())
+    {
+        return;
+    }
+
+    uno::Reference<text::XText> xText = xTextAppend->getText();
+    if (!xText.is())
+    {
+        return;
+    }
+
     uno::Reference<text::XTextCursor> xCursor
-        = xTextAppend->getText()->createTextCursorByRange(xTextAppend->getEnd());
+        = xText->createTextCursorByRange(xTextAppend->getEnd());
     // Offset so the cursor is not adjusted as we import the SDT's content.
     bool bStart = !xCursor->goLeft(1, /*bExpand=*/false);
     m_xSdtStarts.push({bStart, OUString(), xCursor->getStart()});
@@ -3174,6 +3185,102 @@ void DomainMapper_Impl::adjustLastPara(sal_Int8 nAlign)
     pLastPara->Insert(PROP_PARA_ADJUST, uno::Any(nAlign), true);
 }
 
+static void checkAndAddPropVal(const OUString& prop, const css::uno::Any& val,
+                               std::vector<OUString>& props, std::vector<css::uno::Any>& values)
+{
+    // Avoid well-known reasons for exceptions when setting property values
+    if (!val.hasValue())
+        return;
+    if (prop == "CharStyleName" || prop == "DropCapCharStyleName")
+        if (OUString val_string; (val >>= val_string) && val_string.isEmpty())
+            return;
+
+    props.push_back(prop);
+    values.push_back(val);
+}
+
+static uno::Reference<lang::XComponent>
+getParagraphOfRange(const css::uno::Reference<css::text::XTextRange>& xRange)
+{
+    uno::Reference<container::XEnumerationAccess> xEA{ xRange, uno::UNO_QUERY_THROW };
+    return { xEA->createEnumeration()->nextElement(), uno::UNO_QUERY_THROW };
+}
+
+static void copyAllProps(const css::uno::Reference<css::uno::XInterface>& from,
+                         const css::uno::Reference<css::uno::XInterface>& to)
+{
+    css::uno::Reference<css::beans::XPropertySet> xFromProps(from, css::uno::UNO_QUERY_THROW);
+    css::uno::Reference<css::beans::XPropertySetInfo> xFromInfo(xFromProps->getPropertySetInfo(),
+                                                                css::uno::UNO_SET_THROW);
+    css::uno::Sequence<css::beans::Property> rawProps(xFromInfo->getProperties());
+    std::vector<OUString> props;
+    props.reserve(rawProps.getLength());
+    for (const auto& prop : rawProps)
+        if ((prop.Attributes & css::beans::PropertyAttribute::READONLY) == 0)
+            props.push_back(prop.Name);
+
+    if (css::uno::Reference<css::beans::XPropertyState> xFromState{ from, css::uno::UNO_QUERY })
+    {
+        const auto propsSeq = comphelper::containerToSequence(props);
+        const auto statesSeq = xFromState->getPropertyStates(propsSeq);
+        assert(propsSeq.getLength() == statesSeq.getLength());
+        for (sal_Int32 i = 0; i < propsSeq.getLength(); ++i)
+            if (statesSeq[i] != css::beans::PropertyState_DIRECT_VALUE)
+                props.erase(std::remove(props.begin(), props.end(), propsSeq[i]), props.end());
+    }
+
+    std::vector<css::uno::Any> values;
+    values.reserve(props.size());
+    if (css::uno::Reference<css::beans::XMultiPropertySet> xFromMulti{ xFromProps,
+                                                                       css::uno::UNO_QUERY })
+    {
+        const auto propsSeq = comphelper::containerToSequence(props);
+        const auto valuesSeq = xFromMulti->getPropertyValues(propsSeq);
+        assert(propsSeq.getLength() == valuesSeq.getLength());
+        props.clear();
+        for (size_t i = 0; i < propsSeq.size(); ++i)
+            checkAndAddPropVal(propsSeq[i], valuesSeq[i], props, values);
+    }
+    else
+    {
+        std::vector<OUString> filtered_props;
+        filtered_props.reserve(props.size());
+        for (const auto& prop : props)
+            checkAndAddPropVal(prop, xFromProps->getPropertyValue(prop), filtered_props, values);
+        filtered_props.swap(props);
+    }
+    assert(props.size() == values.size());
+
+    css::uno::Reference<css::beans::XPropertySet> xToProps(to, css::uno::UNO_QUERY_THROW);
+    if (css::uno::Reference<css::beans::XMultiPropertySet> xToMulti{ xToProps,
+                                                                     css::uno::UNO_QUERY })
+    {
+        try
+        {
+            xToMulti->setPropertyValues(comphelper::containerToSequence(props),
+                                        comphelper::containerToSequence(values));
+            return;
+        }
+        catch (css::uno::Exception&)
+        {
+            DBG_UNHANDLED_EXCEPTION("writerfilter.dmapper");
+        }
+        // Fallback to property-by-property iteration
+    }
+
+    for (size_t i = 0; i < props.size(); ++i)
+    {
+        try
+        {
+            xToProps->setPropertyValue(props[i], values[i]);
+        }
+        catch (css::uno::Exception&)
+        {
+            DBG_UNHANDLED_EXCEPTION("writerfilter.dmapper");
+        }
+    }
+}
+
 uno::Reference< beans::XPropertySet > DomainMapper_Impl::appendTextSectionAfter(
                                     uno::Reference< text::XTextRange > const & xBefore )
 {
@@ -3193,40 +3300,25 @@ uno::Reference< beans::XPropertySet > DomainMapper_Impl::appendTextSectionAfter(
                 xCursor->gotoRange( m_aTextAppendStack.top().xInsertPosition, true );
             else
                 xCursor->gotoEnd( true );
-            //the paragraph after this new section is already inserted
-            xCursor->goLeft(1, true);
-            css::uno::Reference<css::text::XTextRange> xTextRange(xCursor, css::uno::UNO_QUERY_THROW);
-
-            if (css::uno::Reference<css::text::XDocumentIndexesSupplier> xIndexSupplier{
-                    GetTextDocument(), css::uno::UNO_QUERY })
-            {
-                css::uno::Reference<css::text::XTextRangeCompare> xCompare(
-                    xTextAppend, css::uno::UNO_QUERY);
-                const auto xIndexAccess = xIndexSupplier->getDocumentIndexes();
-                for (sal_Int32 i = xIndexAccess->getCount(); i > 0; --i)
-                {
-                    if (css::uno::Reference<css::text::XDocumentIndex> xIndex{
-                            xIndexAccess->getByIndex(i - 1), css::uno::UNO_QUERY })
-                    {
-                        const auto xIndexTextRange = xIndex->getAnchor();
-                        if (xCompare->compareRegionStarts(xTextRange, xIndexTextRange) == 0
-                            && xCompare->compareRegionEnds(xTextRange, xIndexTextRange) == 0)
-                        {
-                            // The boundaries coincide with an index: trying to attach a section
-                            // to the range will insert the section inside the index. goRight will
-                            // extend the range outside of the index, so that created section will
-                            // be around it. Alternatively we could return index section itself
-                            // instead : xRet.set(xIndex, uno::UNO_QUERY) - to set its properties,
-                            // like columns/fill.
-                            xCursor->goRight(1, true);
-                            break;
-                        }
-                    }
-                }
-            }
+            // The paragraph after this new section is already inserted. The previous node may be a
+            // table; then trying to go left would skip the whole table. Split the trailing
+            // paragraph; let the section span over the first of the two resulting paragraphs;
+            // destroy the last section's paragraph afterwards.
+            xTextAppend->insertControlCharacter(
+                xCursor->getEnd(), css::text::ControlCharacter::PARAGRAPH_BREAK, false);
+            auto xNewPara = getParagraphOfRange(xCursor->getEnd());
+            xCursor->gotoPreviousParagraph(true);
+            auto xEndPara = getParagraphOfRange(xCursor->getEnd());
+            // xEndPara may already have properties (like page break); make sure to apply them
+            // to the newly appended paragraph, which will be kept in the end.
+            copyAllProps(xEndPara, xNewPara);
 
             uno::Reference< text::XTextContent > xSection( m_xTextFactory->createInstance("com.sun.star.text.TextSection"), uno::UNO_QUERY_THROW );
-            xSection->attach( xTextRange );
+            xSection->attach(xCursor);
+
+            // Remove the extra paragraph (last inside the section)
+            xEndPara->dispose();
+
             xRet.set(xSection, uno::UNO_QUERY );
         }
         catch(const uno::Exception&)
@@ -3275,10 +3367,10 @@ void DomainMapper_Impl::ConvertHeaderFooterToTextFrame(bool bDynamicHeightTop, b
 {
     while (!m_aHeaderFooterTextAppendStack.empty())
     {
-        auto aFooterHeader = m_aHeaderFooterTextAppendStack.top();
-        if ((aFooterHeader.second && !bDynamicHeightTop) || (!aFooterHeader.second && !bDynamicHeightBottom))
+        auto& [aTextAppendContext, ePagePartType] = m_aHeaderFooterTextAppendStack.top();
+        if ((ePagePartType == PagePartType::Header && !bDynamicHeightTop) || (ePagePartType == PagePartType::Footer && !bDynamicHeightBottom))
         {
-            uno::Reference< text::XTextAppend > xTextAppend = aFooterHeader.first.xTextAppend;
+            uno::Reference< text::XTextAppend > xTextAppend = aTextAppendContext.xTextAppend;
             uno::Reference< text::XTextCursor > xCursor = xTextAppend->createTextCursor();
             uno::Reference< text::XTextRange > xRangeStart, xRangeEnd;
 
@@ -3304,108 +3396,129 @@ void DomainMapper_Impl::ConvertHeaderFooterToTextFrame(bool bDynamicHeightTop, b
             fillEmptyFrameProperties(aFrameProperties, false);
 
             // If it is a footer, then orient the frame to the bottom
-            if (!aFooterHeader.second)
+            if (ePagePartType == PagePartType::Footer)
+            {
                 aFrameProperties.push_back(comphelper::makePropertyValue(getPropertyName(PROP_VERT_ORIENT), text::VertOrientation::BOTTOM));
-
-            uno::Reference<text::XTextAppendAndConvert> xBodyText(
-                xRangeStart->getText(), uno::UNO_QUERY);
-            xBodyText->convertToTextFrame(xTextAppend, xRangeEnd,
-                comphelper::containerToSequence(aFrameProperties));
+            }
+            uno::Reference<text::XTextAppendAndConvert> xBodyText(xRangeStart->getText(), uno::UNO_QUERY);
+            xBodyText->convertToTextFrame(xTextAppend, xRangeEnd, comphelper::containerToSequence(aFrameProperties));
         }
         m_aHeaderFooterTextAppendStack.pop();
     }
 }
 
-void DomainMapper_Impl::PushPageHeaderFooter(bool bHeader, SectionPropertyMap::PageType eType)
+namespace
+{
+// Determines if the XText content is empty (no text, no shapes, no tables)
+bool isContentEmpty(uno::Reference<text::XText> const& xText, uno::Reference<text::XTextDocument> const& xTextDocument)
+{
+    if (!xText.is())
+        return true; // no XText means it's empty
+
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xTextDocument, uno::UNO_QUERY);
+    auto xDrawPage = xDrawPageSupplier->getDrawPage();
+    if (xDrawPage && xDrawPage->hasElements())
+    {
+        for (sal_Int32 i = 0; i < xDrawPage->getCount(); ++i)
+        {
+            uno::Reference<text::XTextContent> xShape(xDrawPage->getByIndex(i), uno::UNO_QUERY);
+            if (xShape.is())
+            {
+                uno::Reference<text::XTextRange> xAnchor = xShape->getAnchor();
+                if (xAnchor.is() && xAnchor->getText() == xText)
+                    return false;
+            }
+        }
+    }
+
+    uno::Reference<container::XEnumerationAccess> xEnumAccess(xText->getText(), uno::UNO_QUERY);
+    uno::Reference<container::XEnumeration> xEnum = xEnumAccess->createEnumeration();
+    while (xEnum->hasMoreElements())
+    {
+        auto xObject = xEnum->nextElement();
+        uno::Reference<text::XTextTable> const xTextTable(xObject, uno::UNO_QUERY);
+        if (xTextTable.is())
+            return false;
+
+        uno::Reference<text::XTextRange> const xParagraph(xObject, uno::UNO_QUERY);
+        if (xParagraph.is() && !xParagraph->getString().isEmpty())
+            return false;
+    }
+    return true;
+}
+
+} // end anonymous namespace
+
+void DomainMapper_Impl::PushPageHeaderFooter(PagePartType ePagePartType, PageType eType)
 {
     m_bSaveParaHadField = m_bParaHadField;
     m_aHeaderFooterStack.push(HeaderFooterContext(m_bTextInserted, m_nTableDepth));
     m_bTextInserted = false;
     m_nTableDepth = 0;
 
-    const PropertyIds ePropIsOn = bHeader? PROP_HEADER_IS_ON: PROP_FOOTER_IS_ON;
-    const PropertyIds ePropShared = bHeader? PROP_HEADER_IS_SHARED: PROP_FOOTER_IS_SHARED;
-    const PropertyIds ePropTextLeft = bHeader? PROP_HEADER_TEXT_LEFT: PROP_FOOTER_TEXT_LEFT;
-    const PropertyIds ePropText = bHeader? PROP_HEADER_TEXT: PROP_FOOTER_TEXT;
+    bool bHeader = ePagePartType == PagePartType::Header;
+
+    const PropertyIds ePropIsOn = bHeader ? PROP_HEADER_IS_ON: PROP_FOOTER_IS_ON;
+    const PropertyIds ePropShared = bHeader ? PROP_HEADER_IS_SHARED: PROP_FOOTER_IS_SHARED;
+    const PropertyIds ePropTextLeft = bHeader ? PROP_HEADER_TEXT_LEFT: PROP_FOOTER_TEXT_LEFT;
+    const PropertyIds ePropTextFirst = bHeader ? PROP_HEADER_TEXT_FIRST: PROP_FOOTER_TEXT_FIRST;
+    const PropertyIds ePropTextRight = bHeader ? PROP_HEADER_TEXT: PROP_FOOTER_TEXT;
 
     m_bDiscardHeaderFooter = true;
-    m_eInHeaderFooterImport
-        = bHeader ? HeaderFooterImportState::header : HeaderFooterImportState::footer;
+    m_eInHeaderFooterImport = bHeader ? HeaderFooterImportState::header : HeaderFooterImportState::footer;
 
     //get the section context
-    PropertyMapPtr pContext = DomainMapper_Impl::GetTopContextOfType(CONTEXT_SECTION);
-    //ask for the header/footer name of the given type
-    SectionPropertyMap* pSectionContext = dynamic_cast< SectionPropertyMap* >( pContext.get() );
-    if(!pSectionContext)
+    SectionPropertyMap* pSectionContext = GetSectionContext();;
+    if (!pSectionContext)
         return;
-
-    // clear the "Link To Previous" flag so that the header/footer
-    // content is not copied from the previous section
-    pSectionContext->ClearHeaderFooterLinkToPrevious(bHeader, eType);
 
     if (!m_bIsNewDoc)
-    {
         return; // TODO sw cannot Undo insert header/footer without crashing
-    }
 
-    uno::Reference< beans::XPropertySet > xPageStyle =
-        pSectionContext->GetPageStyle(
-            *this,
-            eType == SectionPropertyMap::PAGE_FIRST );
+    uno::Reference<beans::XPropertySet> xPageStyle = pSectionContext->GetPageStyle(*this);
     if (!xPageStyle.is())
         return;
+
+    bool bEvenAndOdd = GetSettingsTable()->GetEvenAndOddHeaders();
+
     try
     {
-        bool bLeft = eType == SectionPropertyMap::PAGE_LEFT;
-        bool bFirst = eType == SectionPropertyMap::PAGE_FIRST;
-        if (!bLeft || GetSettingsTable()->GetEvenAndOddHeaders())
+        // Turn on the headers
+        xPageStyle->setPropertyValue(getPropertyName(ePropIsOn), uno::Any(true));
+
+        // Set both sharing left and first to off so we can import the content regardless tha what value
+        // the "titlePage" or "evenAndOdd" flags are set (which decide what the sharing is set to in the document).
+        xPageStyle->setPropertyValue(getPropertyName(ePropShared), uno::Any(false));
+        xPageStyle->setPropertyValue(getPropertyName(PROP_FIRST_IS_SHARED), uno::Any(false));
+
+        if (eType == PageType::LEFT)
         {
-            //switch on header/footer use
-            xPageStyle->setPropertyValue(
-                    getPropertyName(ePropIsOn),
-                    uno::Any(true));
+            if (bHeader)
+                pSectionContext->m_bLeftHeader = true;
+            else
+                pSectionContext->m_bLeftFooter = true;
 
-            // If the 'Different Even & Odd Pages' flag is turned on - do not ignore it
-            // Even if the 'Even' header/footer is blank - the flag should be imported (so it would look in LO like in Word)
-            if (!bFirst && GetSettingsTable()->GetEvenAndOddHeaders())
-                xPageStyle->setPropertyValue(getPropertyName(ePropShared), uno::Any(false));
-
-            //set the interface
-            uno::Reference< text::XText > xText;
-            xPageStyle->getPropertyValue(getPropertyName(bLeft? ePropTextLeft: ePropText)) >>= xText;
-
-            m_aTextAppendStack.push(TextAppendContext(uno::Reference< text::XTextAppend >(xText, uno::UNO_QUERY_THROW),
-                m_bIsNewDoc
-                    ? uno::Reference<text::XTextCursor>()
-                    : xText->createTextCursorByRange(xText->getStart())));
-            m_aHeaderFooterTextAppendStack.push(std::make_pair(TextAppendContext(uno::Reference< text::XTextAppend >(xText, uno::UNO_QUERY_THROW),
-                m_bIsNewDoc
-                    ? uno::Reference<text::XTextCursor>()
-                    : xText->createTextCursorByRange(xText->getStart())),
-                bHeader));
+            prepareHeaderFooterContent(xPageStyle, ePagePartType, ePropTextLeft, bEvenAndOdd);
         }
-        // If we have *hidden* header footer
+        else if (eType == PageType::FIRST)
+        {
+            if (bHeader)
+                pSectionContext->m_bFirstHeader = true;
+            else
+                pSectionContext->m_bFirstFooter = true;
+
+            prepareHeaderFooterContent(xPageStyle, ePagePartType, ePropTextFirst, true);
+        }
         else
         {
-            bool bIsShared = false;
-            // Turn on the headers
-            xPageStyle->setPropertyValue(getPropertyName(ePropIsOn), uno::Any(true));
-            // Store the state of the previous state of shared prop
-            xPageStyle->getPropertyValue(getPropertyName(ePropShared)) >>= bIsShared;
-            // Turn on the shared prop in order to save the headers/footers in time
-            xPageStyle->setPropertyValue(getPropertyName(ePropShared), uno::Any(false));
-            // Add the content of the headers footers to the doc
-            uno::Reference<text::XText> xText;
-            xPageStyle->getPropertyValue(getPropertyName(bLeft ? ePropTextLeft : ePropText))
-                >>= xText;
+            if (bHeader)
+                pSectionContext->m_bRightHeader = true;
+            else
+                pSectionContext->m_bRightFooter = true;
 
-            m_aTextAppendStack.push(
-                TextAppendContext(uno::Reference<text::XTextAppend>(xText, uno::UNO_QUERY_THROW),
-                                  m_bIsNewDoc ? uno::Reference<text::XTextCursor>()
-                                              : xText->createTextCursorByRange(xText->getStart())));
-            // Restore the original state of the shared prop after we stored the necessary values.
-            xPageStyle->setPropertyValue(getPropertyName(ePropShared), uno::Any(bIsShared));
+            prepareHeaderFooterContent(xPageStyle, ePagePartType, ePropTextRight, true);
         }
+
         m_bDiscardHeaderFooter = false; // set only on success!
     }
     catch( const uno::Exception& )
@@ -3414,21 +3527,84 @@ void DomainMapper_Impl::PushPageHeaderFooter(bool bHeader, SectionPropertyMap::P
     }
 }
 
-void DomainMapper_Impl::PushPageHeader(SectionPropertyMap::PageType eType)
+/** Prepares the header/footer text content by first removing the existing
+ *  content and adding it to the text append stack. */
+void DomainMapper_Impl::prepareHeaderFooterContent(uno::Reference<beans::XPropertySet> const& xPageStyle,
+                                                   PagePartType ePagePartType, PropertyIds ePropertyID,
+                                                   bool bAppendToHeaderAndFooterTextStack)
 {
-    PushPageHeaderFooter(/* bHeader = */ true, eType);
+    uno::Reference<text::XText> xText;
+    xPageStyle->getPropertyValue(getPropertyName(ePropertyID)) >>= xText;
+
+    //remove the existing content first
+    SectionPropertyMap::removeXTextContent(xText);
+
+    auto xTextCursor = m_bIsNewDoc ? uno::Reference<text::XTextCursor>() : xText->createTextCursorByRange(xText->getStart());
+    uno::Reference<text::XTextAppend> xTextAppend(xText, uno::UNO_QUERY_THROW);
+    m_aTextAppendStack.push(TextAppendContext(xTextAppend, xTextCursor));
+    if (bAppendToHeaderAndFooterTextStack)
+        m_aHeaderFooterTextAppendStack.push(std::make_pair(TextAppendContext(xTextAppend, xTextCursor), ePagePartType));
 }
 
-void DomainMapper_Impl::PushPageFooter(SectionPropertyMap::PageType eType)
+/** Checks if the header and footer content on the text appennd stack is empty.
+ */
+void DomainMapper_Impl::checkIfHeaderFooterIsEmpty(PagePartType ePagePartType, PageType eType)
 {
-    PushPageHeaderFooter(/* bHeader = */ false, eType);
+    if (m_bDiscardHeaderFooter)
+        return;
+
+    if (m_aTextAppendStack.empty())
+        return;
+
+    SectionPropertyMap* pSectionContext = GetSectionContext();
+    if (!pSectionContext)
+        return;
+
+    bool bHeader = ePagePartType == PagePartType::Header;
+
+    uno::Reference<beans::XPropertySet> xPageStyle(pSectionContext->GetPageStyle(*this));
+
+    if (!xPageStyle.is())
+        return;
+
+    bool bEmpty = isContentEmpty(m_aTextAppendStack.top().xTextAppend, GetTextDocument());
+
+    if (eType == PageType::FIRST && bEmpty)
+    {
+        if (bHeader)
+            pSectionContext->m_bFirstHeader = false;
+        else
+            pSectionContext->m_bFirstFooter = false;
+    }
+    else if (eType == PageType::LEFT && bEmpty)
+    {
+        if (bHeader)
+            pSectionContext->m_bLeftHeader = false;
+        else
+            pSectionContext->m_bLeftFooter = false;
+    }
+    else if (eType == PageType::RIGHT && bEmpty)
+    {
+        if (bHeader)
+            pSectionContext->m_bRightHeader = false;
+        else
+            pSectionContext->m_bRightFooter = false;
+    }
 }
 
-void DomainMapper_Impl::PopPageHeaderFooter()
+void DomainMapper_Impl::PopPageHeaderFooter(PagePartType ePagePartType, PageType eType)
 {
     //header and footer always have an empty paragraph at the end
     //this has to be removed
-    RemoveLastParagraph( );
+    RemoveLastParagraph();
+
+    checkIfHeaderFooterIsEmpty(ePagePartType, eType);
+
+    // clear the "Link To Previous" flag so that the header/footer
+    // content is not copied from the previous section
+    SectionPropertyMap* pSectionContext = GetSectionContext();
+    if (pSectionContext)
+        pSectionContext->clearHeaderFooterLinkToPrevious(ePagePartType, eType);
 
     if (!m_aTextAppendStack.empty())
     {
@@ -3560,8 +3736,42 @@ void DomainMapper_Impl::CreateRedline(uno::Reference<text::XTextRange> const& xR
         pRedlineProperties[1].Value <<= aDateTime;
         pRedlineProperties[2].Name = getPropertyName( PROP_REDLINE_REVERT_PROPERTIES );
         pRedlineProperties[2].Value <<= pRedline->m_aRevertProperties;
+
+        sal_uInt32 nRedlineMovedID = 0;
+        if (bRedlineMoved)
+        {
+            if (!m_sCurrentBkmkId.isEmpty())
+            {
+                nRedlineMovedID = 1;
+                BookmarkMap_t::iterator aBookmarkIter = m_aBookmarkMap.find(m_sCurrentBkmkId);
+                if (aBookmarkIter != m_aBookmarkMap.end())
+                {
+                    OUString sMoveID = aBookmarkIter->second.m_sBookmarkName;
+                    auto aIter = m_aRedlineMoveIDs.end();
+
+                    if (sMoveID.indexOf("__RefMoveFrom__") >= 0)
+                    {
+                        aIter = std::find(m_aRedlineMoveIDs.begin(), m_aRedlineMoveIDs.end(),
+                                          sMoveID.subView(15));
+                    }
+                    else if (sMoveID.indexOf("__RefMoveTo__") >= 0)
+                    {
+                        aIter = std::find(m_aRedlineMoveIDs.begin(), m_aRedlineMoveIDs.end(),
+                                          sMoveID.subView(13));
+                    };
+
+                    if (aIter != m_aRedlineMoveIDs.end())
+                    {
+                        nRedlineMovedID = aIter - m_aRedlineMoveIDs.begin() + 2;
+                        m_nLastRedlineMovedID = nRedlineMovedID;
+                    }
+                }
+            }
+            else
+                nRedlineMovedID = m_nLastRedlineMovedID;
+        }
         pRedlineProperties[3].Name = "RedlineMoved";
-        pRedlineProperties[3].Value <<= bRedlineMoved;
+        pRedlineProperties[3].Value <<= nRedlineMovedID;
 
         if (!m_bIsActualParagraphFramed)
         {
@@ -7419,6 +7629,21 @@ void DomainMapper_Impl::CloseFieldCommand()
 
                             xFieldProperties->setPropertyValue(
                                 getPropertyName(PROP_SOURCE_NAME), aStyleDisplayName);
+
+                            sal_uInt16 nFlags = 0;
+                            OUString sValue;
+                            if( lcl_FindInCommand( pContext->GetCommand(), 'l', sValue ))
+                            {
+                                //search-below-first
+                                nFlags |= REFFLDFLAG_STYLE_FROM_BOTTOM;
+                            }
+                            if( lcl_FindInCommand( pContext->GetCommand(), 't', sValue ))
+                            {
+                                //suppress-nondelimiter
+                                nFlags |= REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL;
+                            }
+                            xFieldProperties->setPropertyValue(
+                                    getPropertyName( PROP_REFERENCE_FIELD_FLAGS ), uno::Any(nFlags) );
                         }
                         else
                         {
@@ -8258,6 +8483,14 @@ void DomainMapper_Impl::SetBookmarkName( const OUString& rBookmarkName )
                 m_aBookmarkMap.erase(aBookmarkIter);
                 return;
             }
+        }
+
+        if ((m_sCurrentBkmkPrefix.equals("__RefMoveFrom__")
+             || m_sCurrentBkmkPrefix.equals("__RefMoveTo__"))
+            && std::find(m_aRedlineMoveIDs.begin(), m_aRedlineMoveIDs.end(), rBookmarkName)
+                   == m_aRedlineMoveIDs.end())
+        {
+            m_aRedlineMoveIDs.push_back(rBookmarkName);
         }
 
         aBookmarkIter->second.m_sBookmarkName = m_sCurrentBkmkPrefix + rBookmarkName;
@@ -9158,22 +9391,22 @@ void DomainMapper_Impl::substream(Id rName,
     switch( rName )
     {
     case NS_ooxml::LN_headerl:
-            PushPageHeader(SectionPropertyMap::PAGE_LEFT);
+            PushPageHeaderFooter(PagePartType::Header, PageType::LEFT);
         break;
     case NS_ooxml::LN_headerr:
-            PushPageHeader(SectionPropertyMap::PAGE_RIGHT);
+            PushPageHeaderFooter(PagePartType::Header, PageType::RIGHT);
         break;
     case NS_ooxml::LN_headerf:
-            PushPageHeader(SectionPropertyMap::PAGE_FIRST);
+            PushPageHeaderFooter(PagePartType::Header, PageType::FIRST);
         break;
     case NS_ooxml::LN_footerl:
-            PushPageFooter(SectionPropertyMap::PAGE_LEFT);
+            PushPageHeaderFooter(PagePartType::Footer, PageType::LEFT);
         break;
     case NS_ooxml::LN_footerr:
-            PushPageFooter(SectionPropertyMap::PAGE_RIGHT);
+            PushPageHeaderFooter(PagePartType::Footer, PageType::RIGHT);
         break;
     case NS_ooxml::LN_footerf:
-            PushPageFooter(SectionPropertyMap::PAGE_FIRST);
+            PushPageHeaderFooter(PagePartType::Footer, PageType::FIRST);
         break;
     case NS_ooxml::LN_footnote:
     case NS_ooxml::LN_endnote:
@@ -9197,12 +9430,22 @@ void DomainMapper_Impl::substream(Id rName,
     switch( rName )
     {
     case NS_ooxml::LN_headerl:
-    case NS_ooxml::LN_headerr:
-    case NS_ooxml::LN_headerf:
+        PopPageHeaderFooter(PagePartType::Header, PageType::LEFT);
+    break;
     case NS_ooxml::LN_footerl:
+        PopPageHeaderFooter(PagePartType::Footer, PageType::LEFT);
+    break;
+    case NS_ooxml::LN_headerr:
+        PopPageHeaderFooter(PagePartType::Header, PageType::RIGHT);
+    break;
     case NS_ooxml::LN_footerr:
+        PopPageHeaderFooter(PagePartType::Footer, PageType::RIGHT);
+    break;
+    case NS_ooxml::LN_headerf:
+        PopPageHeaderFooter(PagePartType::Header, PageType::FIRST);
+    break;
     case NS_ooxml::LN_footerf:
-        PopPageHeaderFooter();
+        PopPageHeaderFooter(PagePartType::Footer, PageType::FIRST);
     break;
     case NS_ooxml::LN_footnote:
     case NS_ooxml::LN_endnote:
