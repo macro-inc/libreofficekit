@@ -36,6 +36,10 @@
 #include <algorithm>
 #include <string_view>
 #include <svtools/languagetoolcfg.hxx>
+
+#include <systools/curlinit.hxx>
+
+#include <sal/log.hxx>
 #include <tools/color.hxx>
 #include <tools/long.hxx>
 #include <com/sun/star/uno/Any.hxx>
@@ -433,6 +437,8 @@ std::string LanguageToolGrammarChecker::makeDudenHttpRequest(std::string_view aU
     if (!curl)
         return {}; // empty string
 
+    ::InitCurl_easy(curl.get());
+
     std::string sResponseBody;
     struct curl_slist* pList = nullptr;
     SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
@@ -483,6 +489,8 @@ std::string LanguageToolGrammarChecker::makeHttpRequest(std::string_view aURL, H
                                                            [](CURL* p) { curl_easy_cleanup(p); });
     if (!curl)
         return {}; // empty string
+
+    ::InitCurl_easy(curl.get());
 
     bool isPremium = false;
     SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();

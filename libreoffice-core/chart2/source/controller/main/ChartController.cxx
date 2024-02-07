@@ -54,6 +54,7 @@
 #include <ViewElementListProvider.hxx>
 
 #include <cppuhelper/supportsservice.hxx>
+#include <comphelper/dispatchcommand.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <BaseCoordinateSystem.hxx>
 
@@ -1325,6 +1326,8 @@ void SAL_CALL ChartController::dispatch(
             }
         }
     }
+    else if( aCommand == "ChangeTheme" )
+        comphelper::dispatchCommand(".uno:ChangeTheme", getFrame(), rArgs);
 }
 
 void SAL_CALL ChartController::addStatusListener(
@@ -1359,17 +1362,19 @@ void SAL_CALL ChartController::releaseContextMenuInterceptor(
 
 void ChartController::executeDispatch_ChartType()
 {
-    UndoLiveUpdateGuard aUndoGuard(
-        SchResId( STR_ACTION_EDIT_CHARTTYPE ), m_xUndoManager );
+    auto aUndoGuard = std::make_shared<UndoLiveUpdateGuard>(SchResId(STR_ACTION_EDIT_CHARTTYPE),
+                                                            m_xUndoManager);
 
     SolarMutexGuard aSolarGuard;
     //prepare and open dialog
-    ChartTypeDialog aDlg(GetChartFrame(), getChartModel());
-    if (aDlg.run() == RET_OK)
-    {
-        impl_adaptDataSeriesAutoResize();
-        aUndoGuard.commit();
-    }
+    auto aDlg =  std::make_shared<ChartTypeDialog>(GetChartFrame(), getChartModel());
+    aDlg->runAsync(aDlg, [this, aUndoGuard](int nResult) {
+        if (nResult == RET_OK)
+        {
+            impl_adaptDataSeriesAutoResize();
+            aUndoGuard->commit();
+        }
+    });
 }
 
 void ChartController::executeDispatch_SourceData()

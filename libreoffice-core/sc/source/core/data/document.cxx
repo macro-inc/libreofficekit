@@ -507,6 +507,11 @@ void ScDocument::InvalidateStreamOnSave()
 bool ScDocument::InsertTab(
     SCTAB nPos, const OUString& rName, bool bExternalDocument, bool bUndoDeleteTab )
 {
+    // auto-accept any in-process input to prevent move the cell into next sheet in online.
+    if (comphelper::LibreOfficeKit::isActive())
+        if (!SC_MOD()->IsFormulaMode())
+            SC_MOD()->InputEnterHandler();
+
     SCTAB   nTabCount = static_cast<SCTAB>(maTabs.size());
     bool    bValid = ValidTab(nTabCount);
     if ( !bExternalDocument )   // else test rName == "'Doc'!Tab" first
@@ -1104,6 +1109,13 @@ void ScDocument::GetDataArea( SCTAB nTab, SCCOL& rStartCol, SCROW& rStartRow,
         maTabs[nTab]->GetDataArea( rStartCol, rStartRow, rEndCol, rEndRow, bIncludeOld, bOnlyDown );
 }
 
+void ScDocument::GetBackColorArea( SCTAB nTab, SCCOL& rStartCol, SCROW& rStartRow,
+                                   SCCOL& rEndCol, SCROW& rEndRow ) const
+{
+    if (ValidTab(nTab) && nTab < static_cast<SCTAB> (maTabs.size()) && maTabs[nTab])
+        maTabs[nTab]->GetBackColorArea( rStartCol, rStartRow, rEndCol, rEndRow );
+}
+
 bool ScDocument::GetDataAreaSubrange(ScRange& rRange) const
 {
     SCTAB nTab = rRange.aStart.Tab();
@@ -1321,8 +1333,13 @@ bool ScDocument::InsertRow( SCCOL nStartCol, SCTAB nStartTab,
         SetNeedsListeningGroups(aGroupPos);
 
         for (i=nStartTab; i<=nEndTab && i < static_cast<SCTAB>(maTabs.size()); i++)
+        {
             if (maTabs[i] && (!pTabMark || pTabMark->GetTableSelect(i)))
+            {
                 maTabs[i]->InsertRow( nStartCol, nEndCol, nStartRow, nSize );
+                maTabs[i]->CommentNotifyAddressChange(nStartCol, nStartRow, nEndCol, MaxRow());
+            }
+        }
 
         //  UpdateRef for drawing layer must be after inserting,
         //  when the new row heights are known.
@@ -1442,8 +1459,13 @@ void ScDocument::DeleteRow( SCCOL nStartCol, SCTAB nStartTab,
     std::vector<ScAddress> aGroupPos;
 
     for ( i = nStartTab; i <= nEndTab && i < static_cast<SCTAB>(maTabs.size()); i++)
+    {
         if (maTabs[i] && (!pTabMark || pTabMark->GetTableSelect(i)))
+        {
             maTabs[i]->DeleteRow(aCxt.maRegroupCols, nStartCol, nEndCol, nStartRow, nSize, pUndoOutline, &aGroupPos);
+            maTabs[i]->CommentNotifyAddressChange(nStartCol, nStartRow, nEndCol, MaxRow());
+        }
+    }
 
     // Newly joined groups have some of their members still listening.  We
     // need to make sure none of them are listening.

@@ -787,7 +787,7 @@ SfxVoidItem CurrentConditionalFormatDialog SID_OPENDLG_CURRENTCONDFRMT
 
 
 SfxVoidItem ColorScaleFormatDialog SID_OPENDLG_COLORSCALE
-()
+(SfxInt16Item IconSet FN_PARAM_1)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -805,7 +805,7 @@ SfxVoidItem ColorScaleFormatDialog SID_OPENDLG_COLORSCALE
 
 
 SfxVoidItem DataBarFormatDialog SID_OPENDLG_DATABAR
-()
+(SfxInt16Item IconSet FN_PARAM_1)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -3598,7 +3598,7 @@ SfxVoidItem Mirror SID_OBJECT_MIRROR
 
 
 SfxVoidItem Move FID_TAB_MOVE
-(SfxStringItem DocName FID_TAB_MOVE,SfxUInt16Item Index FN_PARAM_1,SfxBoolItem Copy FN_PARAM_2,SfxBoolItem UseCurrentDocument FN_PARAM_3)
+(SfxStringItem DocName FID_TAB_MOVE,SfxUInt16Item Index FN_PARAM_1,SfxBoolItem Copy FN_PARAM_2,SfxBoolItem UseCurrentDocument FN_PARAM_3,SfxBoolItem FromContextMenu FN_PARAM_4,SfxUInt16Item ContextMenuIndex FN_PARAM_5,SfxBoolItem MoveOrCopySheetDialog FN_PARAM_6)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -6666,4 +6666,19 @@ SfxVoidItem AutoSum SID_AUTO_SUM
     MenuConfig = FALSE,
     ToolBoxConfig = TRUE,
     GroupId = SfxGroupId::Intern;
+]
+
+
+SfxVoidItem MoveKeepInsertMode FID_MOVE_KEEP_INSERT_MODE
+(SfxBoolItem Enable FID_MOVE_KEEP_INSERT_MODE)
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    GroupId = SfxGroupId::Application;
 ]

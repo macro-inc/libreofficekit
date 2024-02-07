@@ -35,6 +35,8 @@
 #include <rtl/uri.hxx>
 #include <rtl/strbuf.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <systools/curlinit.hxx>
+#include <tools/hostfilter.hxx>
 #include <config_version.h>
 
 #include <map>
@@ -611,33 +613,9 @@ CurlSession::CurlSession(uno::Reference<uno::XComponentContext> xContext,
         throw DAVException(DAVException::DAV_SESSION_CREATE,
                            ConnectionEndPointString(m_URI.GetHost(), m_URI.GetPort()));
     }
-    curl_version_info_data const* const pVersion(curl_version_info(CURLVERSION_NOW));
-    assert(pVersion);
-    SAL_INFO("ucb.ucp.webdav.curl",
-             "curl version: " << pVersion->version << " " << pVersion->host
-                              << " features: " << ::std::hex << pVersion->features << " ssl: "
-                              << pVersion->ssl_version << " libz: " << pVersion->libz_version);
-    // Make sure a User-Agent header is always included, as at least
-    // en.wikipedia.org:80 forces back 403 "Scripts should use an informative
-    // User-Agent string with contact information, or they may be IP-blocked
-    // without notice" otherwise:
-    OString const useragent(
-        OString::Concat("LibreOffice " LIBO_VERSION_DOTTED " denylistedbackend/")
-        + ::std::string_view(pVersion->version, strlen(pVersion->version)) + " "
-        + pVersion->ssl_version);
-    // looks like an explicit "User-Agent" header in CURLOPT_HTTPHEADER
-    // will override CURLOPT_USERAGENT, see Curl_http_useragent(), so no need
-    // to check anything here
-    auto rc = curl_easy_setopt(m_pCurl.get(), CURLOPT_USERAGENT, useragent.getStr());
-    if (rc != CURLE_OK)
-    {
-        SAL_WARN("ucb.ucp.webdav.curl", "CURLOPT_USERAGENT failed: " << GetErrorString(rc));
-        throw DAVException(DAVException::DAV_SESSION_CREATE,
-                           ConnectionEndPointString(m_URI.GetHost(), m_URI.GetPort()));
-    }
     m_ErrorBuffer[0] = '\0';
     // this supposedly gives the highest quality error reporting
-    rc = curl_easy_setopt(m_pCurl.get(), CURLOPT_ERRORBUFFER, m_ErrorBuffer);
+    auto rc = curl_easy_setopt(m_pCurl.get(), CURLOPT_ERRORBUFFER, m_ErrorBuffer);
     assert(rc == CURLE_OK);
 #if 1
     // just for debugging...
@@ -680,6 +658,7 @@ CurlSession::CurlSession(uno::Reference<uno::XComponentContext> xContext,
     assert(rc == CURLE_OK);
     rc = curl_easy_setopt(m_pCurl.get(), CURLOPT_HEADERFUNCTION, &header_callback);
     assert(rc == CURLE_OK);
+    ::InitCurl_easy(m_pCurl.get());
     // tdf#149921 by default, with schannel (WNT) connection fails if revocation
     // lists cannot be checked; try to limit the checking to when revocation
     // lists can actually be retrieved (usually not the case for self-signed CA)
@@ -1138,6 +1117,12 @@ auto CurlProcessor::ProcessRequest(
     ::std::pair<::std::vector<OUString> const&, DAVResource&> const* const pRequestedHeaders)
     -> void
 {
+    if (HostFilter::isForbidden(rURI.GetHost()))
+    {
+        SAL_WARN("ucb.ucp.webdav.curl", "Access denied to host: " << rURI.GetHost());
+        throw uno::RuntimeException("access to host denied");
+    }
+
     if (pEnv)
     { // add custom request headers passed by caller
         for (auto const& rHeader : pEnv->m_aRequestHeaders)

@@ -53,7 +53,10 @@ public:
 
     virtual bool IsInRedlines(const SwNode& rNode) const override;
 
-    virtual AppendResult AppendRedline(/*[in]*/SwRangeRedline* pPtr, /*[in]*/bool bCallDelete) override;
+    virtual AppendResult AppendRedline(
+        /*[in]*/ SwRangeRedline* pPtr,
+        /*[in]*/ bool bCallDelete,
+        /*[in]*/ sal_uInt32 nMoveIDToDelete = 0) override;
 
     virtual bool AppendTableRowRedline(/*[in]*/SwTableRowRedline* pPtr) override;
     virtual bool AppendTableCellRedline(/*[in]*/SwTableCellRedline* pPtr) override;
@@ -73,6 +76,11 @@ public:
     virtual SwRedlineTable::size_type GetRedlinePos(
         /*[in]*/const SwNode& rNode,
         /*[in]*/RedlineType nType) const override;
+
+    virtual SwRedlineTable::size_type GetRedlineEndPos(
+        /*[in]*/ SwRedlineTable::size_type nStartPos,
+        /*[in]*/ const SwNode& rNode,
+        /*[in]*/ RedlineType nType) const override;
 
     virtual bool HasRedline(
         /*[in]*/const SwPaM& rPam,
@@ -124,6 +132,11 @@ public:
     virtual void SetRedlinePassword(
         /*[in]*/const css::uno::Sequence <sal_Int8>& rNewPassword) override;
 
+    // After nodes are removed, m_pContentNode's may not updated
+    virtual void UpdateRedlineContentNode(
+        /*[in]*/ SwRedlineTable::size_type nStartPos,
+        /*[in]*/ SwRedlineTable::size_type nEndPos) const override;
+
     //Non Interface methods;
 
     /** Set comment-text for Redline. It then comes in via AppendRedLine.
@@ -141,12 +154,14 @@ public:
 
 private:
 
-    void FindRangeToAcceptReject(SwRedlineTable::size_type nPos, SwPosition** pPamStart,
-                                 SwPosition** pPamEnd, SwRedlineTable::size_type& nPosEnd) const;
-    bool RejectRedlineRange(SwRedlineTable::size_type nPos, bool bCallDelete, SwPosition* pPamStart,
-                            SwPosition* pPamEnd, SwRedlineTable::size_type& nPosEnd);
-    bool AcceptRedlineRange(SwRedlineTable::size_type nPos, bool bCallDelete, SwPosition* pPamStart,
-                            SwPosition* pPamEnd, SwRedlineTable::size_type& nPosEnd);
+    bool RejectRedlineRange(SwRedlineTable::size_type nPosOrigin,
+                            SwRedlineTable::size_type& nPosStart,
+                            SwRedlineTable::size_type& nPosEnd, bool bCallDelete);
+    bool AcceptRedlineRange(SwRedlineTable::size_type nPosOrigin,
+                            SwRedlineTable::size_type& nPosStart,
+                            SwRedlineTable::size_type& nPosEnd, bool bCallDelete);
+    bool AcceptMovedRedlines(sal_uInt32 nMovedID, bool bCallDelete);
+    bool RejectMovedRedlines(sal_uInt32 nMovedID, bool bCallDelete);
 
     DocumentRedlineManager(DocumentRedlineManager const&) = delete;
     DocumentRedlineManager& operator=(DocumentRedlineManager const&) = delete;

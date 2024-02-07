@@ -849,9 +849,9 @@ EditSelection EditEngine::InsertText(const EditTextObject& rTextObject, const Ed
 
 EditSelection EditEngine::InsertText(
     uno::Reference<datatransfer::XTransferable > const & rxDataObj,
-    const OUString& rBaseURL, const EditPaM& rPaM, bool bUseSpecial)
+    const OUString& rBaseURL, const EditPaM& rPaM, bool bUseSpecial, SotClipboardFormatId format)
 {
-    return pImpEditEngine->PasteText(rxDataObj, rBaseURL, rPaM, bUseSpecial);
+    return pImpEditEngine->PasteText(rxDataObj, rBaseURL, rPaM, bUseSpecial, format);
 }
 
 EditPaM EditEngine::EndOfWord(const EditPaM& rPaM)
@@ -2801,6 +2801,13 @@ bool EditEngine::HasValidData( const css::uno::Reference< css::datatransfer::XTr
         datatransfer::DataFlavor aFlavor;
         SotExchange::GetFormatDataFlavor( SotClipboardFormatId::STRING, aFlavor );
         bValidData = rTransferable->isDataFlavorSupported( aFlavor );
+
+        if (!bValidData)
+        {
+            // Allow HTML-only clipboard, i.e. without plain text.
+            SotExchange::GetFormatDataFlavor(SotClipboardFormatId::HTML, aFlavor);
+            bValidData = rTransferable->isDataFlavorSupported(aFlavor);
+        }
     }
 
     return bValidData;

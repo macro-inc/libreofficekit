@@ -287,7 +287,6 @@ bool handleConditionalFormat(ScConditionalFormatList& rCondFormList, const ScCon
         ScCellInfo* pInfo, ScTableInfo* pTableInfo, ScStyleSheetPool* pStlPool,
         const ScAddress& rAddr, bool& bHidden, bool& bHideFormula, bool bTabProtect)
 {
-    bool bFound = false;
     bool bAnyCondition = false;
     for(const auto& rCondFormat : rCondFormats)
     {
@@ -317,33 +316,28 @@ bool handleConditionalFormat(ScConditionalFormatList& rCondFormList, const ScCon
                     bHideFormula = pProtAttr->GetHideFormula();
 
                 }
-                bFound = true;
-
             }
             // if style is not there, treat like no condition
         }
 
-        if(aData.mxColorScale)
+        if(aData.mxColorScale && !pInfo->mxColorScale)
         {
             pInfo->mxColorScale = aData.mxColorScale;
-            bFound = true;
         }
 
-        if(aData.pDataBar)
+        if(aData.pDataBar && !pInfo->pDataBar)
         {
             pInfo->pDataBar = aData.pDataBar.get();
             pTableInfo->addDataBarInfo(std::move(aData.pDataBar));
-            bFound = true;
         }
 
-        if(aData.pIconSet)
+        if(aData.pIconSet && !pInfo->pIconSet)
         {
             pInfo->pIconSet = aData.pIconSet.get();
             pTableInfo->addIconSetInfo(std::move(aData.pIconSet));
-            bFound = true;
         }
 
-        if (bFound)
+        if (pInfo->mxColorScale && pInfo->pIconSet && pInfo->pDataBar)
             break;
     }
 
@@ -1055,13 +1049,21 @@ void ScDocument::FillInfo(
         rArray.MirrorSelfX();
 }
 
-ScTableInfo::ScTableInfo(const SCSIZE capacity)
-    : mpRowInfo(new RowInfo[capacity])
-    , mnArrCount(0)
-    , mnArrCapacity(capacity)
+/// We seem to need to allocate three extra rows here, not sure why
+///
+ScTableInfo::ScTableInfo(SCROW nStartRow, SCROW nEndRow, bool bHintOnly)
+    : mnArrCount(0)
+    , mnArrCapacity(nEndRow - nStartRow + 4)
     , mbPageMode(false)
 {
-    memset(static_cast<void*>(mpRowInfo.get()), 0, mnArrCapacity * sizeof(RowInfo));
+    assert(nStartRow >= 0);
+    assert(nEndRow >= nStartRow);
+    if (bHintOnly && mnArrCapacity > 1024)
+    {
+        SAL_WARN("sc.core", "ScTableInfo excessive capacity: " << mnArrCapacity << " start: " << nStartRow << " end: " << nEndRow);
+        mnArrCapacity = 1024;
+    }
+    mpRowInfo.reset(new RowInfo[mnArrCapacity] {});
 }
 
 ScTableInfo::~ScTableInfo()

@@ -20,6 +20,7 @@
 #include <scitems.hxx>
 #include <sfx2/childwin.hxx>
 #include <sfx2/dispatch.hxx>
+#include <svx/theme/ThemeColorChangerCommon.hxx>
 #include <editeng/editview.hxx>
 #include <inputhdl.hxx>
 
@@ -336,6 +337,7 @@ std::shared_ptr<SfxModelessDialogController> ScTabViewShell::CreateRefDialogCont
 
             ScDBData* pDBData = GetDBData(false, SC_DB_MAKE, ScGetDBSelection::RowDown);
             pDBData->ExtendDataArea(rDoc);
+            pDBData->ExtendBackColorArea(rDoc);
             pDBData->GetQueryParam( aQueryParam );
 
             ScRange aArea;
@@ -473,6 +475,14 @@ void ScTabViewShell::afterCallbackRegistered()
             pInputWindow->NotifyLOKClient();
         }
     }
+
+    SfxObjectShell* pDocShell = GetObjectShell();
+    if (pDocShell)
+    {
+        std::shared_ptr<model::ColorSet> pThemeColors = pDocShell->GetThemeColors();
+        std::set<Color> aDocumentColors = pDocShell->GetDocColors();
+        svx::theme::notifyLOK(pThemeColors, aDocumentColors);
+    }
 }
 
 void ScTabViewShell::NotifyCursor(SfxViewShell* pOtherShell) const
@@ -504,13 +514,12 @@ void ScTabViewShell::NotifyCursor(SfxViewShell* pOtherShell) const
 
 ::Color ScTabViewShell::GetColorConfigColor(svtools::ColorConfigEntry nColorType) const
 {
-    const ScViewOptions& rViewOptions = GetViewData().GetOptions();
-
     switch (nColorType)
     {
         case svtools::ColorConfigEntry::DOCCOLOR:
         {
-            return rViewOptions.GetDocColor();
+            const ScViewRenderingOptions& rViewRenderingOptions = GetViewRenderingData();
+            return rViewRenderingOptions.GetDocColor();
         }
         // Should never be called for an unimplemented color type
         default:

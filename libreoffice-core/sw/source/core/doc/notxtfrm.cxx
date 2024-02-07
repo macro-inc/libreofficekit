@@ -75,7 +75,10 @@
 
 // MM02 needed for VOC mechanism and getting the OC - may be moved to an own file
 #include <svx/sdrpagewindow.hxx>
+#include <svx/svdoutl.hxx>
+#include <svx/svdpage.hxx>
 #include <svx/svdpagv.hxx>
+#include <svx/unopage.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
 #include <svx/sdr/contact/viewobjectcontact.hxx>
 #include <svx/sdr/contact/objectcontact.hxx>
@@ -1267,7 +1270,7 @@ void SwNoTextFrame::ImplPaintPictureGraphic( vcl::RenderContext* pOut,
             ? pImp->GetPageView()
             : nullptr);
         // tdf#130951 caution - target may be Window, use the correct OutputDevice
-        OutputDevice* pTarget(pShell->isOutputToWindow()
+        OutputDevice* pTarget((pShell->isOutputToWindow() && pShell->GetWin())
             ? pShell->GetWin()->GetOutDev()
             : pShell->GetOut());
         SdrPageWindow* pPageWindow(nullptr != pPageView && nullptr != pTarget
@@ -1381,11 +1384,25 @@ void SwNoTextFrame::ImplPaintPictureBitmap( vcl::RenderContext* pOut,
                 rAlignedGrfArea.Left(), rAlignedGrfArea.Top(),
                 rAlignedGrfArea.Right(), rAlignedGrfArea.Bottom());
 
+            Color aOldBackColor;
+            SvxDrawPage* pDrawPage = pOLENd->GetOLEObj().tryToGetChartDrawPage();
+            SdrPage* pPage = pDrawPage ? pDrawPage->GetSdrPage() : nullptr;
+            if (pPage)
+            {
+                SdrModel& rModel = pPage->getSdrModelFromSdrPage();
+                SdrOutliner& rOutl = rModel.GetDrawOutliner();
+                aOldBackColor = rOutl.GetBackgroundColor();
+                rOutl.SetBackgroundColor(pPage->GetPageBackgroundColor());
+            }
+
             bDone = paintUsingPrimitivesHelper(
                 *pOut,
                 aSequence,
                 aSourceRange,
                 aTargetRange);
+
+            if (pPage)
+                pPage->getSdrModelFromSdrPage().GetDrawOutliner().SetBackgroundColor(aOldBackColor);
         }
     }
 

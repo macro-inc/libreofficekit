@@ -72,6 +72,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <tools/UnitConversion.hxx>
+#include <comphelper/dumpxmltostring.hxx>
 #include <fmtanchr.hxx>
 
 using namespace ::com::sun::star;
@@ -139,6 +140,7 @@ Sequence< uno::Type > SAL_CALL SwXTextView::getTypes(  )
             cppu::UnoType<XPropertySet>::get(),
             cppu::UnoType<datatransfer::XTransferableSupplier>::get(),
             cppu::UnoType<datatransfer::XTransferableTextSupplier>::get(),
+            cppu::UnoType<qa::XDumper>::get(),
             SfxBaseController::getTypes()
         ).getTypes();
 }
@@ -219,6 +221,10 @@ uno::Any SAL_CALL SwXTextView::queryInterface( const uno::Type& aType )
     else if(aType == cppu::UnoType<text::XTextViewLayoutSupplier>::get())
     {
         uno::Reference<text::XTextViewLayoutSupplier> xRet = this;
+    }
+    else if(aType == cppu::UnoType<qa::XDumper>::get())
+    {
+        uno::Reference<qa::XDumper> xRet = this;
         aRet <<= xRet;
     }
     else
@@ -1760,6 +1766,18 @@ SwXTextView::getTransferableForTextRange(uno::Reference<text::XTextRange> const&
     pTransfer->PrepareForCopyTextRange(aPam);
     rSh.LockView( bLockedView );
     return pTransfer;
+}
+
+OUString SAL_CALL SwXTextView::dump(const OUString& rKind)
+{
+    if (rKind == "layout")
+    {
+        SwRootFrame* pLayout = GetView()->GetWrtShell().GetLayout();
+        return comphelper::dumpXmlToString([pLayout](xmlTextWriterPtr pWriter)
+                                           { pLayout->dumpAsXml(pWriter); });
+    }
+
+    return OUString();
 }
 
 uno::Reference< datatransfer::XTransferable > SAL_CALL SwXTextView::getTransferable()

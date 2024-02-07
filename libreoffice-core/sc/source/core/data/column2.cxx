@@ -283,6 +283,7 @@ tools::Long ScColumn::GetNeededSize(
     {
         Fraction aFontZoom = ( eOrient == SvxCellOrientation::Standard ) ? rZoomX : rZoomY;
         vcl::Font aFont;
+        aFont.SetKerning(FontKerning::NONE); // like ScDrawStringsVars::SetPattern
         // font color doesn't matter here
         pPattern->fillFontOnly(aFont, pDev, &aFontZoom, pCondSet, nScript);
         pDev->SetFont(aFont);
@@ -754,6 +755,7 @@ sal_uInt16 ScColumn::GetOptimalColWidth(
         SCROW nRow = 0;
         const ScPatternAttr* pPattern = GetPattern( nRow );
         vcl::Font aFont;
+        aFont.SetKerning(FontKerning::NONE); // like ScDrawStringsVars::SetPattern
         // font color doesn't matter here
         pPattern->fillFontOnly(aFont, pDev, &rZoomX);
         pDev->SetFont(aFont);
@@ -1318,6 +1320,10 @@ bool ScColumn::HasVisibleDataAt(SCROW nRow) const
 
 bool ScColumn::IsEmptyData(SCROW nStartRow, SCROW nEndRow) const
 {
+    // simple case
+    if (maCells.block_size() == 1 && maCells.begin()->type == sc::element_type_empty)
+        return true;
+
     std::pair<sc::CellStoreType::const_iterator,size_t> aPos = maCells.position(nStartRow);
     sc::CellStoreType::const_iterator it = aPos.first;
     if (it == maCells.end())

@@ -291,9 +291,6 @@ class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::DocWindow, public DropTarget
     void            DrawHiddenIndicator( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, vcl::RenderContext& rRenderContext);
     void            DrawPagePreview( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, vcl::RenderContext& rRenderContext);
 
-    bool            GetEditUrl( const Point& rPos,
-                                OUString* pName=nullptr, OUString* pUrl=nullptr, OUString* pTarget=nullptr );
-
     bool            HitRangeFinder( const Point& rMouse, RfCorner& rCorner, sal_uInt16* pIndex,
                                     SCCOL* pAddX, SCROW* pAddY );
 
@@ -319,6 +316,8 @@ class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::DocWindow, public DropTarget
 
     void            SetupInitialPageBreaks(const ScDocument& rDoc, SCTAB nTab);
     DECL_DLLPRIVATE_LINK(InitiatePageBreaksTimer, Timer*, void);
+
+    void            UpdateFormulaRange(SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2);
 
 protected:
     virtual void    PrePaint(vcl::RenderContext& rRenderContext) override;
@@ -380,12 +379,15 @@ public:
     void LogicInvalidate(const tools::Rectangle* pRectangle) override;
     void LogicInvalidatePart(const tools::Rectangle* pRectangle, int nPart);
 
+    bool InvalidateByForeignEditView(EditView* pEditView) override;
     /// Update the cell selection according to what handles have been dragged.
     /// @see vcl::ITiledRenderable::setTextSelection() for the values of nType.
     /// Coordinates are in pixels.
     void SetCellSelectionPixel(int nType, int nPixelX, int nPixelY);
     /// Get the cell selection, coordinates are in logic units.
     void GetCellSelection(std::vector<tools::Rectangle>& rLogicRects);
+
+    bool GetEditUrl( const Point& rPos, OUString* pName=nullptr, OUString* pUrl=nullptr, OUString* pTarget=nullptr );
 
     virtual css::uno::Reference< css::accessibility::XAccessible > CreateAccessible() override;
 

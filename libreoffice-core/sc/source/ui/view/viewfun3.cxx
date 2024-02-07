@@ -244,9 +244,6 @@ bool ScViewFunc::CopyToClipSingleRange( ScDocument* pClipDoc, const ScRangeList&
     if ( bSysClip && bIncludeObjects )
     {
         bool bAnyOle = rDoc.HasOLEObjectsInArea( aRange );
-        // There are optional paths (e.g. bAnyOle and InputOptions().GetTextWysiwyg true)
-        // which dereference pSysClipDoc->mxPoolHelper so ensure that is set here.
-        pSysClipDoc->SharePooledResources(&rDoc);
         // Update ScGlobal::xDrawClipDocShellRef.
         ScDrawLayer::SetGlobalDrawPersist( ScTransferObj::SetDrawClipDoc( bAnyOle, pSysClipDoc ) );
     }
@@ -762,8 +759,11 @@ bool ScViewFunc::PasteFromSystem( SotClipboardFormatId nFormatId, bool bApi )
         }
         else if (comphelper::LibreOfficeKit::isActive())
         {
-            SfxViewShell* pViewShell = rViewData.GetViewShell();
-            ScTabViewShell::notifyAllViewsSheetGeomInvalidation(pViewShell, true /* bColumns */, true /* bRows */,
+            ScTabViewShell* pTabViewShell = rViewData.GetViewShell();
+            pTabViewShell->OnLOKSetWidthOrHeight(rViewData.GetCurX(), true);
+            pTabViewShell->OnLOKSetWidthOrHeight(rViewData.GetCurY(), false);
+
+            ScTabViewShell::notifyAllViewsSheetGeomInvalidation(pTabViewShell, true /* bColumns */, true /* bRows */,
                 true /* bSizes */, false /* bHidden */, false /* bFiltered */, false /* bGroups */, rViewData.GetTabNo());
         }
     }
@@ -1269,6 +1269,11 @@ bool ScViewFunc::PasteFromClip( InsertDeleteFlags nFlags, ScDocument* pClipDoc,
         }
     }
 
+    const bool bSingleCellBefore = nStartCol == nEndCol &&
+                                   nStartRow == nEndRow &&
+                                   nStartTab == nEndTab;
+    tools::Long nBeforeHint(bSingleCellBefore ? pDocSh->GetPixelWidthHint(ScAddress(nStartCol, nStartRow, nStartTab)) : -1);
+
     sal_uInt16 nExtFlags = 0;
     pDocSh->UpdatePaintExt( nExtFlags, nStartCol, nStartRow, nStartTab,
                                        nEndCol,   nEndRow,   nEndTab );     // content before the change
@@ -1444,9 +1449,20 @@ bool ScViewFunc::PasteFromClip( InsertDeleteFlags nFlags, ScDocument* pClipDoc,
         nPaint |= PaintPartFlags::Left;
         nUndoEndRow = rDoc.MaxRow();               // just for drawing !
     }
+
+    tools::Long nMaxWidthAffectedHint = -1;
+    const bool bSingleCellAfter = nStartCol == nUndoEndCol &&
+                                  nStartRow == nUndoEndRow &&
+                                  nStartTab == nEndTab;
+    if (bSingleCellBefore && bSingleCellAfter)
+    {
+        tools::Long nAfterHint(pDocSh->GetPixelWidthHint(ScAddress(nStartCol, nStartRow, nStartTab)));
+        nMaxWidthAffectedHint = std::max(nBeforeHint, nAfterHint);
+    }
+
     pDocSh->PostPaint(
         ScRange(nStartCol, nStartRow, nStartTab, nUndoEndCol, nUndoEndRow, nEndTab),
-        nPaint, nExtFlags);
+        nPaint, nExtFlags, nMaxWidthAffectedHint);
     // AdjustBlockHeight has already been called above
 
     aModificator.SetDocumentModified();

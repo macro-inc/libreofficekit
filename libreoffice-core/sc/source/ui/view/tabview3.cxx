@@ -418,8 +418,21 @@ void ScTabView::SetCursor( SCCOL nPosX, SCROW nPosY, bool bNew )
     if (pModelObj)
         aNewSize = pModelObj->getDocumentSize();
 
+    if (aOldSize == aNewSize)
+        return;
+
     if (!pDocSh)
         return;
+
+    if (pModelObj)
+    {
+        ScGridWindow* pGridWindow = aViewData.GetActiveWin();
+        if (pGridWindow)
+        {
+            Size aNewSizePx(aNewSize.Width() * aViewData.GetPPTX(), aNewSize.Height() * aViewData.GetPPTY());
+            pGridWindow->SetOutputSizePixel(aNewSizePx);
+        }
+    }
 
     // New area extended to the right of the sheet after last column
     // including overlapping area with aNewRowArea
@@ -2017,11 +2030,7 @@ void ScTabView::SetTabNo( SCTAB nTab, bool bNew, bool bExtendSelection, bool bSa
 
     // Form Layer must know the visible area of the new sheet
     // that is why MapMode must already be correct here
-    for (VclPtr<ScGridWindow> & pWin : pGridWin)
-    {
-        if (pWin)
-            pWin->SetMapMode(pWin->GetDrawMapMode());
-    }
+    SyncGridWindowMapModeFromDrawMapMode();
     SetNewVisArea();
 
     PaintGrid();
@@ -2330,7 +2339,7 @@ void ScTabView::UpdateFormulas(SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, 
 //  PaintArea - repaint block
 
 void ScTabView::PaintArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW nEndRow,
-                            ScUpdateMode eMode )
+                            ScUpdateMode eMode, tools::Long nMaxWidthAffectedHint )
 {
     SCCOL nCol1;
     SCROW nRow1;
@@ -2408,20 +2417,32 @@ void ScTabView::PaintArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCRO
 
         if ( eMode == ScUpdateMode::All )
         {
-            if (bIsTiledRendering)
+            if (nMaxWidthAffectedHint != -1)
             {
-                // When a cell content is deleted we have no clue about
-                // the width of the embedded text.
-                // Anyway, clients will ask only for tiles that overlaps
-                // the visible area.
-                // Remember that wsd expects int and that aEnd.X() is
-                // in pixels and will be converted in twips, before performing
-                // the lok callback, so we need to avoid that an overflow occurs.
-                aEnd.setX( std::numeric_limits<int>::max() / 1000 );
+                // If we know the max text width affected then just invalidate
+                // the max of the cell width and hint of affected cell width
+                // (where affected with is in terms of max width of optimal cell
+                // width for before/after change)
+                tools::Long nCellWidth = std::abs(aEnd.X() - aStart.X());
+                aEnd.setX(aStart.getX() + std::max(nCellWidth, nMaxWidthAffectedHint) * nLayoutSign);
             }
             else
             {
-                aEnd.setX( bLayoutRTL ? 0 : pGridWin[i]->GetOutputSizePixel().Width() );
+                if (bIsTiledRendering)
+                {
+                    // When a cell content is deleted we have no clue about
+                    // the width of the embedded text.
+                    // Anyway, clients will ask only for tiles that overlaps
+                    // the visible area.
+                    // Remember that wsd expects int and that aEnd.X() is
+                    // in pixels and will be converted in twips, before performing
+                    // the lok callback, so we need to avoid that an overflow occurs.
+                    aEnd.setX( std::numeric_limits<int>::max() / 1000 );
+                }
+                else
+                {
+                    aEnd.setX( bLayoutRTL ? 0 : pGridWin[i]->GetOutputSizePixel().Width() );
+                }
             }
         }
         aEnd.AdjustX( -nLayoutSign );
@@ -3062,6 +3083,20 @@ void ScTabView::UpdateInputLine()
     SC_MOD()->InputEnterHandler();
 }
 
+void ScTabView::SyncGridWindowMapModeFromDrawMapMode()
+{
+    // AW: Discussed with NN if there is a reason that new map mode was only set for one window,
+    // but is not. Setting only on one window causes the first repaint to have the old mapMode
+    // in three of four views, so the overlay will save the wrong content e.g. when zooming out.
+    // Changing to setting map mode at all windows.
+    for (VclPtr<ScGridWindow> & pWin : pGridWin)
+    {
+        if (!pWin)
+            continue;
+        pWin->SetMapMode(pWin->GetDrawMapMode());
+    }
+}
+
 void ScTabView::ZoomChanged()
 {
     ScInputHandler* pHdl = SC_MOD()->GetInputHdl(aViewData.GetViewShell());
@@ -3072,18 +3107,9 @@ void ScTabView::ZoomChanged()
 
     UpdateScrollBars();
 
+    SyncGridWindowMapModeFromDrawMapMode();
+
     // VisArea...
-    // AW: Discussed with NN if there is a reason that new map mode was only set for one window,
-    // but is not. Setting only on one window causes the first repaint to have the old mapMode
-    // in three of four views, so the overlay will save the wrong content e.g. when zooming out.
-    // Changing to setting map mode at all windows.
-
-    for (sal_uInt32 i = 0; i < 4; i++)
-    {
-        if (pGridWin[i])
-            pGridWin[i]->SetMapMode(pGridWin[i]->GetDrawMapMode());
-    }
-
     SetNewVisArea();
 
     InterpretVisible();     // have everything calculated before painting

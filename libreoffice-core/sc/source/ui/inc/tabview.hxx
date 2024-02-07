@@ -120,6 +120,7 @@ private:
 
     VclPtr<vcl::Window>             pFrameWin;              // First !!!
     ScViewData          aViewData;              // must be at the front !
+    ScViewRenderingOptions aViewRenderingData;
 
     std::unique_ptr<ScViewSelectionEngine> pSelEngine;
     ScViewFunctionSet       aFunctionSet;
@@ -344,6 +345,9 @@ public:
     ScViewData&         GetViewData()       { return aViewData; }
     const ScViewData&   GetViewData() const { return aViewData; }
 
+    const ScViewRenderingOptions& GetViewRenderingData() const { return aViewRenderingData; }
+    void SetViewRenderingData(const ScViewRenderingOptions& rViewRenderingData) { aViewRenderingData = rViewRenderingData; }
+
     ScViewFunctionSet&      GetFunctionSet()    { return aFunctionSet; }
     ScViewSelectionEngine*  GetSelEngine()      { return pSelEngine.get(); }
 
@@ -474,7 +478,8 @@ public:
                                     // Drawing
 
     void            PaintArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW nEndRow,
-                                        ScUpdateMode eMode = ScUpdateMode::All );
+                               ScUpdateMode eMode = ScUpdateMode::All,
+                               tools::Long nMaxWidthAffectedHint = -1 );
 
     void            PaintGrid();
 
@@ -620,6 +625,8 @@ public:
     SCROW GetLOKEndHeaderRow() const { return mnLOKEndHeaderRow; }
     SCCOL GetLOKStartHeaderCol() const { return mnLOKStartHeaderCol; }
     SCCOL GetLOKEndHeaderCol() const { return mnLOKEndHeaderCol; }
+
+    void SyncGridWindowMapModeFromDrawMapMode();
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

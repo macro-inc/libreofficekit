@@ -132,7 +132,7 @@ void Access::releaseNondeleting() {
 }
 
 bool Access::isValue() {
-    rtl::Reference< Node > p(getNode());
+    const rtl::Reference< Node > & p(getNode());
     switch (p->kind()) {
     case Node::KIND_PROPERTY:
     case Node::KIND_LOCALIZED_VALUE:
@@ -331,7 +331,7 @@ css::uno::Type Access::getElementType() {
     assert(thisIs(IS_ANY));
     osl::MutexGuard g(*lock_);
     checkLocalizedPropertyAccess();
-    rtl::Reference< Node > p(getNode());
+    const rtl::Reference< Node > & p(getNode());
     switch (p->kind()) {
     case Node::KIND_LOCALIZED_PROPERTY:
         return mapType(
@@ -354,7 +354,7 @@ sal_Bool Access::hasElements() {
     assert(thisIs(IS_ANY));
     osl::MutexGuard g(*lock_);
     checkLocalizedPropertyAccess();
-    return !getAllChildren().empty(); //TODO: optimize
+    return !isAllChildrenEmpty();
 }
 
 bool Access::getByNameFast(const OUString & name, css::uno::Any & value)
@@ -410,14 +410,13 @@ css::uno::Sequence< OUString > Access::getElementNames()
     assert(thisIs(IS_ANY));
     osl::MutexGuard g(*lock_);
     checkLocalizedPropertyAccess();
-    std::vector< rtl::Reference< ChildAccess > > children(getAllChildren());
-    css::uno::Sequence<OUString> names(children.size());
-    OUString* pArray = names.getArray();
-    for (auto const& child : children)
+    std::vector<OUString> childNames;
+    forAllChildren([&childNames] (ChildAccess& rChild)
     {
-        *pArray++ = child->getNameInternal();
-    }
-    return names;
+        childNames.push_back(rChild.getNameInternal());
+        return true;
+    });
+    return comphelper::containerToSequence(childNames);
 }
 
 sal_Bool Access::hasByName(OUString const & aName)
@@ -537,13 +536,12 @@ css::uno::Sequence< css::beans::Property > Access::getProperties()
 {
     assert(thisIs(IS_GROUP));
     osl::MutexGuard g(*lock_);
-    std::vector< rtl::Reference< ChildAccess > > children(getAllChildren());
     std::vector< css::beans::Property > properties;
-    properties.reserve(children.size());
-    for (auto const& child : children)
+    forAllChildren([&properties] (ChildAccess& rChild)
     {
-        properties.push_back(child->asProperty());
-    }
+        properties.push_back(rChild.asProperty());
+        return true;
+    });
     return comphelper::containerToSequence(properties);
 }
 
@@ -627,7 +625,7 @@ void Access::setName(OUString const & aName)
             {
                 rtl::Reference< Access > parent(getParentAccess());
                 if (parent.is()) {
-                    rtl::Reference< Node > node(getNode());
+                    const rtl::Reference< Node > & node(getNode());
                     if (! node->getTemplateName().isEmpty()) {
                         rtl::Reference< ChildAccess > other(
                             parent->getChild(aName));
@@ -1166,7 +1164,7 @@ void Access::removeByName(OUString const & aName)
                 aName, static_cast< cppu::OWeakObject * >(this));
         }
         if (getNode()->kind() == Node::KIND_GROUP) {
-            rtl::Reference< Node > p(child->getNode());
+            const rtl::Reference< Node >& p(child->getNode());
             if (p->kind() != Node::KIND_PROPERTY ||
                 !static_cast< PropertyNode * >(p.get())->isExtension())
             {
@@ -1413,19 +1411,22 @@ rtl::Reference< ChildAccess > Access::getChild(OUString const & name) {
                 locale = locale.copy(0, i);
             }
             assert(!locale.isEmpty());
-            std::vector< rtl::Reference< ChildAccess > > children(
-                getAllChildren());
-            for (auto const& child : children)
+            rtl::Reference< ChildAccess > foundChild;
+            forAllChildren([&foundChild, &locale] (ChildAccess& rChild)
             {
-                const OUString & name2(child->getNameInternal());
+                const OUString & name2(rChild.getNameInternal());
                 if (name2.startsWith(locale) &&
                     (name2.getLength() == locale.getLength() ||
                      name2[locale.getLength()] == '-' ||
                      name2[locale.getLength()] == '_'))
                 {
-                    return child;
+                    foundChild = &rChild;
+                    return false;
                 }
-            }
+                return true;
+            });
+            if (foundChild)
+                return foundChild;
         }
         // Defaults are the "en-US" locale, the "en" locale, the empty string locale, the first child (if
         // any, and if the property is non-nillable), or a null ChildAccess, in that order:
@@ -1442,9 +1443,15 @@ rtl::Reference< ChildAccess > Access::getChild(OUString const & name) {
             return child;
         }
         if (!static_cast<LocalizedPropertyNode *>(getNode().get())->isNillable()) {
-            std::vector< rtl::Reference< ChildAccess > > children(getAllChildren());
-            if (!children.empty()) {
-                return children.front();
+            // look for first child in list
+            rtl::Reference< ChildAccess > foundChild;
+            forAllChildren([&foundChild] (ChildAccess& rChild)
+            {
+                foundChild = &rChild;
+                return false;
+            });
+            if (foundChild) {
+                return foundChild;
             }
         }
         return rtl::Reference< ChildAccess >();
@@ -1454,14 +1461,14 @@ rtl::Reference< ChildAccess > Access::getChild(OUString const & name) {
         ? getUnmodifiedChild(name) : getModifiedChild(i);
 }
 
-std::vector< rtl::Reference< ChildAccess > > Access::getAllChildren() {
-    std::vector< rtl::Reference< ChildAccess > > vec;
+void Access::forAllChildren(const std::function<bool(ChildAccess&)> & func) {
     NodeMap const & members = getNode()->getMembers();
     for (auto const& member : members)
     {
         if (modifiedChildren_.find(member.first) == modifiedChildren_.end()) {
-            vec.push_back(getUnmodifiedChild(member.first));
-            assert(vec.back().is());
+            bool bContinue = func(*getUnmodifiedChild(member.first));
+            if (!bContinue)
+                return;
         }
     }
     for (ModifiedChildren::iterator i(modifiedChildren_.begin());
@@ -1469,10 +1476,28 @@ std::vector< rtl::Reference< ChildAccess > > Access::getAllChildren() {
     {
         rtl::Reference< ChildAccess > child(getModifiedChild(i));
         if (child.is()) {
-            vec.push_back(child);
+            bool bContinue = func(*child);
+            if (!bContinue)
+                return;
         }
     }
-    return vec;
+}
+
+bool Access::isAllChildrenEmpty() {
+    NodeMap const & members = getNode()->getMembers();
+    for (auto const& member : members)
+    {
+        if (modifiedChildren_.find(member.first) == modifiedChildren_.end())
+            return false;
+    }
+    for (ModifiedChildren::iterator i(modifiedChildren_.begin());
+         i != modifiedChildren_.end(); ++i)
+    {
+        rtl::Reference< ChildAccess > child(getModifiedChild(i));
+        if (child.is())
+            return false;
+    }
+    return true;
 }
 
 void Access::checkValue(css::uno::Any const & value, Type type, bool nillable) {
@@ -2017,7 +2042,7 @@ rtl::Reference< ChildAccess > Access::getSubChild(OUString const & path) {
             return rtl::Reference< ChildAccess >();
         }
         if (setElement) {
-            rtl::Reference< Node > p(parent->getNode());
+            const rtl::Reference< Node >& p(parent->getNode());
             switch (p->kind()) {
             case Node::KIND_LOCALIZED_PROPERTY:
                 if (!Components::allLocales(getRootAccess()->getLocale()) ||
@@ -2069,7 +2094,7 @@ css::beans::Property Access::asProperty() {
     css::uno::Type type;
     bool nillable;
     bool removable;
-    rtl::Reference< Node > p(getNode());
+    const rtl::Reference< Node >& p(getNode());
     switch (p->kind()) {
     case Node::KIND_PROPERTY:
         {
@@ -2192,7 +2217,7 @@ rtl::Reference< Access > Access::getNotificationRoot() {
 #if !defined NDEBUG
 bool Access::thisIs(int what) {
     osl::MutexGuard g(*lock_);
-    rtl::Reference< Node > p(getNode());
+    const rtl::Reference< Node >& p(getNode());
     Node::Kind k(p->kind());
     return (k != Node::KIND_PROPERTY && k != Node::KIND_LOCALIZED_VALUE &&
         ((what & IS_GROUP) == 0 || k == Node::KIND_GROUP) &&

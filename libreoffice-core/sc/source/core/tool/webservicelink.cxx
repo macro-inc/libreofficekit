@@ -15,6 +15,9 @@
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 #include <com/sun/star/io/XInputStream.hpp>
 
+#include <tools/hostfilter.hxx>
+#include <tools/urlobj.hxx>
+
 #include <utility>
 #include <webservicelink.hxx>
 #include <brdcst.hxx>
@@ -35,6 +38,15 @@ sfx2::SvBaseLink::UpdateResult ScWebServiceLink::DataChanged(const OUString&, co
 {
     aResult.clear();
     bHasResult = false;
+
+    INetURLObject aURLObject(aURL);
+    const OUString sHost = aURLObject.GetHost();
+    if (HostFilter::isForbidden(sHost))
+    {
+        SAL_WARN("sc.ui", "ScWebServiceLink::DataChanged: blocked access to external file: \""
+                              << aURL << "\"");
+        return ERROR_GENERAL;
+    }
 
     css::uno::Reference<css::ucb::XSimpleFileAccess3> xFileAccess
         = css::ucb::SimpleFileAccess::create(comphelper::getProcessComponentContext());

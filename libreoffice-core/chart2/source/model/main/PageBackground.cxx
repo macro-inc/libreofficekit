@@ -18,11 +18,14 @@
  */
 
 #include "PageBackground.hxx"
+#include <comphelper/lok.hxx>
 #include <LinePropertiesHelper.hxx>
 #include <FillProperties.hxx>
 #include <UserDefinedProperties.hxx>
 #include <PropertyHelper.hxx>
 #include <ModifyListenerHelper.hxx>
+#include <svtools/colorcfg.hxx>
+#include <sfx2/viewsh.hxx>
 
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <cppuhelper/supportsservice.hxx>
@@ -54,7 +57,20 @@ private:
         ::chart::FillProperties::AddDefaultsToMap( rOutMap );
 
         // override other defaults
-        ::chart::PropertyHelper::setPropertyValue< sal_Int32 >( rOutMap, ::chart::FillProperties::PROP_FILL_COLOR, 0xffffff );
+        Color aDocColor = COL_WHITE;
+        if (comphelper::LibreOfficeKit::isActive())
+        {
+            aDocColor = COL_AUTO;
+        }
+        else
+        {
+            if (SfxViewShell::Current()) {
+                aDocColor = SfxViewShell::Current()->GetColorConfigColor(svtools::DOCCOLOR);
+            } else {
+                SAL_WARN("chart2", "SfxViewShell::Current() returned nullptr");
+            }
+        }
+        ::chart::PropertyHelper::setPropertyValue( rOutMap, ::chart::FillProperties::PROP_FILL_COLOR, aDocColor );
         ::chart::PropertyHelper::setPropertyValue( rOutMap, ::chart::LinePropertiesHelper::PROP_LINE_STYLE, drawing::LineStyle_NONE );
     }
 };

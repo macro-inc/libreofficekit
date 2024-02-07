@@ -1268,7 +1268,8 @@ Behaviour of Delete-Redline:
                                           the Delete
 */
 IDocumentRedlineAccess::AppendResult
-DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCallDelete)
+DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCallDelete,
+                                      sal_uInt32 nMoveIDToDelete)
 {
     CHECK_REDLINE( *this )
 
@@ -1295,6 +1296,9 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         CHECK_REDLINE( *this )
         return AppendResult::IGNORED;
     }
+    // Collect MoveID's of the redlines we delete.
+    // If there is only 1, then we should use its ID. (continuing the move)
+    std::set<sal_uInt32> deletedMoveIDs;
 
     bool bMerged = false;
 
@@ -1772,6 +1776,16 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                     // and anonymized insertion, i.e. with the same dummy timestamp
                     !pRedl->GetRedlineData(0).IsAnonymized() )
                 {
+                    // Collect MoveID's of the redlines we delete.
+                    if (nMoveIDToDelete > 1 && maRedlineTable[n]->GetMoved() > 0
+                        && (eCmpPos == SwComparePosition::Equal
+                            || eCmpPos == SwComparePosition::Inside
+                            || eCmpPos == SwComparePosition::Outside
+                            || eCmpPos == SwComparePosition::OverlapBefore
+                            || eCmpPos == SwComparePosition::OverlapBehind))
+                    {
+                        deletedMoveIDs.insert(maRedlineTable[n]->GetMoved());
+                    }
 
                     // Set to NONE, so that the Delete::Redo merges the Redline data correctly!
                     // The ShowMode needs to be retained!
@@ -1896,6 +1910,12 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                                 pRedl->Hide(0, maRedlineTable.GetPos(pRedl));
                             }
                             bCompress = true;
+
+                            // set IsMoved checking nearby redlines
+                            SwRedlineTable::size_type nRIdx = maRedlineTable.GetPos(pRedl);
+                            if (nRIdx < maRedlineTable.size()) // in case above 're-insert' failed
+                                maRedlineTable.isMoved(nRIdx);
+
                         }
                         break;
 
@@ -2381,6 +2401,23 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         }
     }
 
+    // If we deleted moved redlines, and there was only 1 MoveID, then we should use that
+    // We overwrite those that was given right now, so it cannot be deeper under other redline
+    if (nMoveIDToDelete > 1 && deletedMoveIDs.size() == 1)
+    {
+        sal_uInt32 nNewMoveID = *(deletedMoveIDs.begin());
+        if (nNewMoveID > 1)     // MoveID==1 is for old, unrecognised moves, leave them alone
+        {
+            for (n = 0; n < maRedlineTable.size(); ++n)
+            {
+                if (maRedlineTable[n]->GetMoved() == nMoveIDToDelete)
+                {
+                    maRedlineTable[n]->SetMoved(nNewMoveID);
+                }
+            }
+        }
+    }
+
     if( bCompress )
         CompressRedlines(nStartPos);
 
@@ -2760,6 +2797,54 @@ SwRedlineTable::size_type DocumentRedlineManager::GetRedlinePos( const SwNode& r
     // #TODO - add 'SwExtraRedlineTable' also ?
 }
 
+SwRedlineTable::size_type
+DocumentRedlineManager::GetRedlineEndPos(SwRedlineTable::size_type nStartPos, const SwNode& rNd,
+                                         RedlineType nType) const
+{
+    //if the start is already invalid
+    if (nStartPos >= maRedlineTable.size())
+        return nStartPos;
+
+    const SwNodeOffset nNdIdx = rNd.GetIndex();
+    SwRedlineTable::size_type nEndPos = nStartPos;
+    SwRedlineTable::size_type nEndPosTry = nEndPos + 1;
+
+    while (nEndPosTry < maRedlineTable.size()
+           && maRedlineTable[nEndPosTry]->Start()->GetNodeIndex() <= nNdIdx)
+    {
+        if (RedlineType::Any == nType || nType == maRedlineTable[nEndPosTry]->GetType())
+        {
+            nEndPos = nEndPosTry;
+        }
+        nEndPosTry++;
+    }
+    return nEndPos;
+}
+
+void DocumentRedlineManager::UpdateRedlineContentNode(SwRedlineTable::size_type nStartPos,
+                                                      SwRedlineTable::size_type nEndPos) const
+{
+    for (SwRedlineTable::size_type n = nStartPos; n <= nEndPos; ++n)
+    {
+        //just in case we got wrong input
+        if (n >= maRedlineTable.size())
+            return;
+
+        SwPosition* pStart = maRedlineTable[n]->Start();
+        SwPosition* pEnd = maRedlineTable[n]->End();
+        SwContentNode* pCont = pStart->GetNode().GetContentNode();
+        if (pCont)
+        {
+            pStart->nContent.Assign(pCont, pStart->nContent.GetIndex());
+        }
+        pCont = pEnd->GetNode().GetContentNode();
+        if (pCont)
+        {
+            pEnd->nContent.Assign(pCont, pEnd->nContent.GetIndex());
+        }
+    }
+}
+
 bool DocumentRedlineManager::HasRedline( const SwPaM& rPam, RedlineType nType, bool bStartOrEndInRange ) const
 {
     SwPosition currentStart(*rPam.Start());
@@ -2856,69 +2941,21 @@ const SwRangeRedline* DocumentRedlineManager::GetRedline( const SwPosition& rPos
     // #TODO - add 'SwExtraRedlineTable' also ?
 }
 
-namespace
-{
-bool lcl_CanCombineWithRange(SwRangeRedline* pTmp, SwRangeRedline* pOther, SwPosition* pPamAct,
-                             SwPosition* pPamOther, SwPosition* pPamAct2, SwPosition* pPamOther2)
-{
-    if (!pOther->IsVisible())
-        return false;
-
-    if (*pPamAct != *pPamOther)
-        return false;
-
-    if (!pTmp->GetRedlineData(0).CanCombineForAcceptReject(pOther->GetRedlineData(0)))
-    {
-        if (pOther->GetStackCount() <= 1
-            || !pTmp->GetRedlineData(0).CanCombineForAcceptReject(pOther->GetRedlineData(1)))
-            return false;
-    }
-    if (pPamAct2->GetNode().StartOfSectionNode() != pPamOther2->GetNode().StartOfSectionNode())
-        return false;
-
-    return true;
-}
-}
-
-void DocumentRedlineManager::FindRangeToAcceptReject(SwRedlineTable::size_type nPos,
-                                                     SwPosition** pPamStart, SwPosition** pPamEnd,
-                                                     SwRedlineTable::size_type& nPosEnd) const
-{
-    SwRangeRedline* pTmp = maRedlineTable[nPos];
-    nPosEnd = nPos;
-    SwRedlineTable::size_type nPosStart = nPos;
-    SwRangeRedline* pOther;
-
-    while (nPosStart > 0 && (pOther = maRedlineTable[nPosStart - 1])
-           && lcl_CanCombineWithRange(pTmp, pOther, *pPamStart, pOther->End(), pOther->Start(),
-                                      *pPamEnd))
-    {
-        nPosStart--;
-        *pPamStart = pOther->Start();
-    }
-    while (nPosEnd + 1 < maRedlineTable.size() && (pOther = maRedlineTable[nPosEnd + 1])
-           && lcl_CanCombineWithRange(pTmp, pOther, *pPamEnd, pOther->Start(), pOther->End(),
-                                      *pPamStart))
-    {
-        nPosEnd++;
-        *pPamEnd = pOther->End();
-    }
-}
-
-bool DocumentRedlineManager::AcceptRedlineRange(SwRedlineTable::size_type nPos, bool bCallDelete,
-                                                SwPosition* pPamStart, SwPosition* pPamEnd,
-                                                SwRedlineTable::size_type& nPosEnd)
+bool DocumentRedlineManager::AcceptRedlineRange(SwRedlineTable::size_type nPosOrigin,
+                                                SwRedlineTable::size_type& nPosStart,
+                                                SwRedlineTable::size_type& nPosEnd,
+                                                bool bCallDelete)
 {
     bool bRet = false;
 
-    SwRangeRedline* pTmp = maRedlineTable[nPos];
+    SwRangeRedline* pTmp = maRedlineTable[nPosOrigin];
     SwRedlineTable::size_type nRdlIdx = nPosEnd + 1;
     SwRedlineData aOrigData = pTmp->GetRedlineData(0);
 
-    SwNodeOffset nPamStartNI = pPamStart->GetNodeIndex();
-    sal_Int32 nPamStartCI = pPamStart->GetContentIndex();
-    SwNodeOffset nPamEndtNI = pPamEnd->GetNodeIndex();
-    sal_Int32 nPamEndCI = pPamEnd->GetContentIndex();
+    SwNodeOffset nPamStartNI = maRedlineTable[nPosStart]->Start()->GetNodeIndex();
+    sal_Int32 nPamStartCI = maRedlineTable[nPosStart]->Start()->GetContentIndex();
+    SwNodeOffset nPamEndtNI = maRedlineTable[nPosEnd]->End()->GetNodeIndex();
+    sal_Int32 nPamEndCI = maRedlineTable[nPosEnd]->End()->GetContentIndex();
     do
     {
         nRdlIdx--;
@@ -2966,6 +3003,36 @@ bool DocumentRedlineManager::AcceptRedlineRange(SwRedlineTable::size_type nPos, 
     return bRet;
 }
 
+bool DocumentRedlineManager::AcceptMovedRedlines(sal_uInt32 nMovedID, bool bCallDelete)
+{
+    assert(nMovedID > 1);   // 0, and 1 is reserved
+    bool bRet = false;
+    SwRedlineTable::size_type nRdlIdx = maRedlineTable.size();
+
+    while (nRdlIdx > 0)
+    {
+        nRdlIdx--;
+        SwRangeRedline* pTmp = maRedlineTable[nRdlIdx];
+        if (pTmp->GetMoved(0) == nMovedID
+            || (pTmp->GetStackCount() > 1 && pTmp->GetMoved(1) == nMovedID))
+        {
+            if (m_rDoc.GetIDocumentUndoRedo().DoesUndo())
+            {
+                m_rDoc.GetIDocumentUndoRedo().AppendUndo(
+                    std::make_unique<SwUndoAcceptRedline>(*pTmp));
+            }
+
+            if (pTmp->GetMoved(0) == nMovedID)
+                bRet |= lcl_AcceptRedline(maRedlineTable, nRdlIdx, bCallDelete);
+            else
+                bRet |= lcl_AcceptInnerInsertRedline(maRedlineTable, nRdlIdx, 1);
+
+            nRdlIdx++; //we will decrease it in the loop anyway.
+        }
+    }
+    return bRet;
+}
+
 bool DocumentRedlineManager::AcceptRedline(SwRedlineTable::size_type nPos, bool bCallDelete,
                                            bool bRange)
 {
@@ -2997,13 +3064,23 @@ bool DocumentRedlineManager::AcceptRedline(SwRedlineTable::size_type nPos, bool 
         if (bRange && !nSeqNo && !bAnonym
             && !pTmp->Start()->GetNode().StartOfSectionNode()->IsTableNode())
         {
-            auto [pPamStart, pPamEnd] = pTmp->StartEnd();
-            SwRedlineTable::size_type nPosEnd;
-            FindRangeToAcceptReject(nPos, &pPamStart, &pPamEnd, nPosEnd);
+            sal_uInt32 nMovedID = pTmp->GetMoved(0);
+            if (nMovedID > 1)
+            {
+                // Accept all redlineData with this unique move id
+                bRet |= AcceptMovedRedlines(nMovedID, bCallDelete);
+            }
+            else
+            {
+                SwRedlineTable::size_type nPosStart = nPos;
+                SwRedlineTable::size_type nPosEnd = nPos;
 
-            // Accept redlines between pPamStart-pPamEnd.
-            // but only those that can be combined with the selected.
-            bRet |= AcceptRedlineRange(nPos, bCallDelete, pPamStart, pPamEnd, nPosEnd);
+                maRedlineTable.getConnectedArea(nPos, nPosStart, nPosEnd, true);
+
+                // Accept redlines between pPamStart-pPamEnd.
+                // but only those that can be combined with the selected.
+                bRet |= AcceptRedlineRange(nPos, nPosStart, nPosEnd, bCallDelete);
+            }
         }
         else do {
 
@@ -3140,20 +3217,21 @@ void DocumentRedlineManager::AcceptRedlineParagraphFormatting( const SwPaM &rPam
     }
 }
 
-bool DocumentRedlineManager::RejectRedlineRange(SwRedlineTable::size_type nPos, bool bCallDelete,
-                                                SwPosition* pPamStart, SwPosition* pPamEnd,
-                                                SwRedlineTable::size_type& nPosEnd)
+bool DocumentRedlineManager::RejectRedlineRange(SwRedlineTable::size_type nPosOrigin,
+                                                SwRedlineTable::size_type& nPosStart,
+                                                SwRedlineTable::size_type& nPosEnd,
+                                                bool bCallDelete)
 {
     bool bRet = false;
 
-    SwRangeRedline* pTmp = maRedlineTable[nPos];
+    SwRangeRedline* pTmp = maRedlineTable[nPosOrigin];
     SwRedlineTable::size_type nRdlIdx = nPosEnd + 1;
     SwRedlineData aOrigData = pTmp->GetRedlineData(0);
 
-    SwNodeOffset nPamStartNI = pPamStart->GetNodeIndex();
-    sal_Int32 nPamStartCI = pPamStart->GetContentIndex();
-    SwNodeOffset nPamEndtNI = pPamEnd->GetNodeIndex();
-    sal_Int32 nPamEndCI = pPamEnd->GetContentIndex();
+    SwNodeOffset nPamStartNI = maRedlineTable[nPosStart]->Start()->GetNodeIndex();
+    sal_Int32 nPamStartCI = maRedlineTable[nPosStart]->Start()->GetContentIndex();
+    SwNodeOffset nPamEndtNI = maRedlineTable[nPosEnd]->End()->GetNodeIndex();
+    sal_Int32 nPamEndCI = maRedlineTable[nPosEnd]->End()->GetContentIndex();
     do
     {
         nRdlIdx--;
@@ -3211,6 +3289,40 @@ bool DocumentRedlineManager::RejectRedlineRange(SwRedlineTable::size_type nPos, 
     return bRet;
 }
 
+bool DocumentRedlineManager::RejectMovedRedlines(sal_uInt32 nMovedID, bool bCallDelete)
+{
+    assert(nMovedID > 1); // 0, and 1 is reserved
+    bool bRet = false;
+    SwRedlineTable::size_type nRdlIdx = maRedlineTable.size();
+
+    while (nRdlIdx > 0)
+    {
+        nRdlIdx--;
+        SwRangeRedline* pTmp = maRedlineTable[nRdlIdx];
+        if (pTmp->GetMoved(0) == nMovedID
+            || (pTmp->GetStackCount() > 1 && pTmp->GetMoved(1) == nMovedID))
+        {
+            if (m_rDoc.GetIDocumentUndoRedo().DoesUndo())
+            {
+                std::unique_ptr<SwUndoRejectRedline> pUndoRdl
+                    = std::make_unique<SwUndoRejectRedline>(*pTmp);
+#if OSL_DEBUG_LEVEL > 0
+                pUndoRdl->SetRedlineCountDontCheck(true);
+#endif
+                m_rDoc.GetIDocumentUndoRedo().AppendUndo(std::move(pUndoRdl));
+            }
+
+            if (pTmp->GetMoved(0) == nMovedID)
+                bRet |= lcl_RejectRedline(maRedlineTable, nRdlIdx, bCallDelete);
+            else
+                bRet |= lcl_AcceptRedline(maRedlineTable, nRdlIdx, bCallDelete);
+
+            nRdlIdx++; //we will decrease it in the loop anyway.
+        }
+    }
+    return bRet;
+}
+
 bool DocumentRedlineManager::RejectRedline(SwRedlineTable::size_type nPos,
                                            bool bCallDelete, bool bRange)
 {
@@ -3242,14 +3354,23 @@ bool DocumentRedlineManager::RejectRedline(SwRedlineTable::size_type nPos,
         if (bRange && !nSeqNo && !bAnonym
             && !pTmp->Start()->GetNode().StartOfSectionNode()->IsTableNode())
         {
-            auto [pPamStart, pPamEnd] = pTmp->StartEnd();
-            SwRedlineTable::size_type nPosEnd;
-            FindRangeToAcceptReject(nPos, &pPamStart, &pPamEnd, nPosEnd);
+            sal_uInt32 nMovedID = pTmp->GetMoved(0);
+            if (nMovedID > 1)
+            {
+                // Reject all redlineData with this unique move id
+                bRet |= RejectMovedRedlines(nMovedID, bCallDelete);
+            }
+            else
+            {
+                SwRedlineTable::size_type nPosStart = nPos;
+                SwRedlineTable::size_type nPosEnd = nPos;
+                maRedlineTable.getConnectedArea(nPos, nPosStart, nPosEnd, true);
 
-            // Reject items between pPamStart-pPamEnd
-            // but only those that can be combined with the selected.
+                // Reject items between pPamStart-pPamEnd
+                // but only those that can be combined with the selected.
 
-            bRet |= RejectRedlineRange(nPos, bCallDelete, pPamStart, pPamEnd, nPosEnd);
+                bRet |= RejectRedlineRange(nPos, nPosStart, nPosEnd, bCallDelete);
+            }
         }
         else do {
 

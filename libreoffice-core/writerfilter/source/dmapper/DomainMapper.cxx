@@ -137,6 +137,8 @@ DomainMapper::DomainMapper( const uno::Reference< uno::XComponentContext >& xCon
         m_pImpl->SetDocumentSettingsProperty("FrameAutowidthWithMorePara", uno::Any(true));
         m_pImpl->SetDocumentSettingsProperty("FootnoteInColumnToPageEnd", uno::Any(true));
         m_pImpl->SetDocumentSettingsProperty("TabAtLeftIndentForParagraphsInList", uno::Any(true));
+        m_pImpl->SetDocumentSettingsProperty("NoGapAfterNoteNumber",
+                                             uno::Any(true));
 
         // Enable only for new documents, since pasting from clipboard can influence existing doc
         m_pImpl->SetDocumentSettingsProperty("NoNumberingShowFollowBy", uno::Any(true));
@@ -1190,9 +1192,6 @@ void DomainMapper::lcl_attribute(Id nName, Value & val)
                 m_pImpl->PushSdt();
                 break;
             }
-            if (m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText
-                && GetCurrentTextRange().is())
-                m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
             m_pImpl->SetSdt(true);
         }
         break;
@@ -2411,8 +2410,6 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
     }
     break;
     case NS_ooxml::LN_CT_PPrBase_framePr:
-    // Avoid frames if we're inside a structured document tag, would just cause outer tables fail to create.
-    if (!m_pImpl->GetSdt())
     {
         PropertyMapPtr pContext = m_pImpl->GetTopContextOfType(CONTEXT_PARAGRAPH);
         if( pContext )
@@ -3849,10 +3846,7 @@ void DomainMapper::lcl_text(const sal_uInt8 * data_, size_t len)
                 case 0x0c: //page break
                     // page breaks aren't supported in footnotes and endnotes
                     if (!m_pImpl->IsInFootOrEndnote())
-                    {
                         m_pImpl->deferBreak(PAGE_BREAK);
-                        m_pImpl->SetIsDummyParaAddedForTableInSectionPage(false);
-                    }
                     return;
                 case 0x0e: //column break
                     m_pImpl->deferBreak(COLUMN_BREAK);
@@ -4115,7 +4109,6 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
         {
             m_pImpl->m_pSdtHelper->createPlainTextControl();
             finishParagraph();
-            m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
             return;
         }
     }
@@ -4288,7 +4281,6 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
                             && !bSingleParagraphAfterRedline
                             && !bIsColumnBreak
                             && !m_pImpl->GetParaHadField()
-                            && (!m_pImpl->GetIsDummyParaAddedForTableInSectionPage())
                             && !m_pImpl->GetIsPreviousParagraphFramed()
                             && !m_pImpl->HasTopAnchoredObjects()
                             && !m_pImpl->IsParaWithInlineObject());
@@ -4308,15 +4300,6 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
             finishParagraph(bRemove, bNoNumbering);
             if (bRemove)
                 m_pImpl->RemoveLastParagraph();
-
-            // When the table is closed and the section's initial dummy paragraph has been processed
-            // then any following sectPr paragraph in the section must be eligible for removal.
-            if (!bRemove && m_pImpl->GetIsDummyParaAddedForTableInSectionPage() && !IsInTable()
-                && !m_pImpl->GetFootnoteContext() && !m_pImpl->IsInComments() && !IsInHeaderFooter()
-                && !IsInShape())
-            {
-               m_pImpl->SetIsDummyParaAddedForTableInSectionPage(false);
-            }
 
             m_pImpl->SetParaSectpr(false);
         }
@@ -4369,10 +4352,9 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
                 m_pImpl->clearDeferredBreaks();
             }
 
-            bool bSdtBlockUnusedText
-                = m_pImpl->m_pSdtHelper->GetSdtType() != NS_ooxml::LN_CT_SdtRun_sdtContent
-                  && m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText
-                  && m_pImpl->m_pSdtHelper->hasUnusedText();
+            bool bInSdtBlockText
+                = m_pImpl->m_pSdtHelper->GetSdtType() == NS_ooxml::LN_CT_SdtBlock_sdtContent
+                  && m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText;
             if (pContext && pContext->GetFootnote().is())
             {
                 pContext->GetFootnote()->setLabel( sText );
@@ -4382,32 +4364,39 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
             }
             else if (m_pImpl->IsOpenFieldCommand() && !m_pImpl->IsForceGenericFields())
             {
-                if (bSdtBlockUnusedText)
-                    m_pImpl->m_pSdtHelper->createPlainTextControl();
+                if (bInSdtBlockText)
+                {
+                    if (m_pImpl->m_pSdtHelper->hasUnusedText())
+                        m_pImpl->m_pSdtHelper->createPlainTextControl();
+                    else if (!m_pImpl->m_pSdtHelper->isFieldStartRangeSet())
+                        m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
+                }
                 m_pImpl->AppendFieldCommand(sText);
-                if (bSdtBlockUnusedText)
-                    m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
             }
             else if( m_pImpl->IsOpenField() && m_pImpl->IsFieldResultAsString())
             {
-                if (bSdtBlockUnusedText)
-                    m_pImpl->m_pSdtHelper->createPlainTextControl();
+                if (bInSdtBlockText)
+                {
+                    if (m_pImpl->m_pSdtHelper->hasUnusedText())
+                        m_pImpl->m_pSdtHelper->createPlainTextControl();
+                    else if (!m_pImpl->m_pSdtHelper->isFieldStartRangeSet())
+                        m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
+                }
                 /*depending on the success of the field insert operation this result will be
                   set at the field or directly inserted into the text*/
                 m_pImpl->AppendFieldResult(sText);
-                if (bSdtBlockUnusedText)
-                    m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
             }
             else
             {
                 if (pContext == nullptr)
                     pContext = new PropertyMap();
 
+                if (bInSdtBlockText && !m_pImpl->m_pSdtHelper->hasUnusedText())
+                    m_pImpl->m_pSdtHelper->setFieldStartRange(GetCurrentTextRange()->getEnd());
+
                 m_pImpl->appendTextPortion( sText, pContext );
 
-                if (m_pImpl->m_pSdtHelper->GetSdtType() == NS_ooxml::LN_CT_SdtBlock_sdtContent
-                    && m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText
-                    && !sText.isEmpty())
+                if (bInSdtBlockText && !sText.isEmpty())
                     m_pImpl->m_pSdtHelper->setHasUnusedText(true);
             }
 

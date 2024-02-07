@@ -721,7 +721,6 @@ SwFramePage::SwFramePage(weld::Container* pPage, weld::DialogController* pContro
     if (comphelper::LibreOfficeKit::isActive())
     {
         m_xAnchorAtPageRB->hide();
-        m_xAnchorAtParaRB->hide();
         m_xAnchorAtFrameRB->hide();
     }
 }
@@ -1050,9 +1049,23 @@ void SwFramePage::Reset( const SfxItemSet *rSet )
     const SwFrameFormat* pFlyFormat = pSh->GetFlyFrameFormat();
     if (!pFlyFormat || !ContainsSingleTable(*pFlyFormat) || ContainsChain(*pFlyFormat))
     {
+        bool bSingleTable = false;
+        if (!pFlyFormat && m_bNew)
+        {
+            // No fly is selected: check if a whole table is selected. If so, allow moving that into
+            // a split fly.
+            if (SwFlyFrameAttrMgr::SingleTableSelected(*pSh))
+            {
+                bSingleTable = true;
+            }
+        }
+
         // Only allow fly split if the frame contains a single table, otherwise it would be hard to
         // save the resulting model to Word formats.
-        m_xFlySplitCB->hide();
+        if (!bSingleTable)
+        {
+            m_xFlySplitCB->hide();
+        }
     }
 
     Init(*rSet);
@@ -1264,7 +1277,13 @@ bool SwFramePage::FillItemSet(SfxItemSet *rSet)
 
     pOldItem = GetOldItem(*rSet, RES_FRM_SIZE);
 
-    if ((pOldItem && aSz != *pOldItem) || (!pOldItem && !m_bFormat) ||
+    bool bSizeChanged = pOldItem && aSz != *pOldItem;
+    if (!bSizeChanged && m_bNew)
+    {
+        // If no custom size is provided, always set a size for a new frame, to avoid ~zero width.
+        bSizeChanged = true;
+    }
+    if (bSizeChanged || (!pOldItem && !m_bFormat) ||
             (m_bFormat &&
                 (aSz.GetWidth() > 0 || aSz.GetWidthPercent() > 0) &&
                     (aSz.GetHeight() > 0 || aSz.GetHeightPercent() > 0)))

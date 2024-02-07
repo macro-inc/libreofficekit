@@ -47,6 +47,7 @@
 #include <sfx2/printer.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
+#include <svx/svxids.hrc>
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/charclass.hxx>
 #include <utility>
@@ -522,7 +523,7 @@ ReferenceMark ScInputHandler::GetReferenceMark( const ScViewData& rViewData, ScD
     Fraction aZoomX = rViewData.GetZoomX();
     Fraction aZoomY = rViewData.GetZoomY();
 
-    ScTableInfo aTabInfo;
+    ScTableInfo aTabInfo(nY1, nY2, true);
     pDocSh->GetDocument().FillInfo( aTabInfo, nX1, nY1, nX2, nY2,
                                     nTab, nPPTX, nPPTY, false, false );
 
@@ -1811,8 +1812,7 @@ void ScInputHandler::LOKPasteFunctionData(const OUString& rFunctionName)
     }
 }
 
-void ScInputHandler::LOKSendFormulabarUpdate(EditView* pActiveView,
-                                             const SfxViewShell* pActiveViewSh,
+void ScTabViewShell::LOKSendFormulabarUpdate(EditView* pActiveView,
                                              const OUString& rText,
                                              const ESelection& rSelection)
 {
@@ -1829,13 +1829,35 @@ void ScInputHandler::LOKSendFormulabarUpdate(EditView* pActiveView,
             OUString::number(rSelection.nStartPara) + ";" + OUString::number(rSelection.nEndPara);
     }
 
+    sal_uInt64 nCurrentShellId = reinterpret_cast<sal_uInt64>(this);
+
+    // We can get three updates per keystroke, StartExtTextInput, ExtTextInput and PostExtTextInput
+    // Skip duplicate updates. Be conservative and don't skip duplicates that are 5+ seconds
+    // apart.
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    if (maSendFormulabarUpdate.m_nShellId == nCurrentShellId &&
+        maSendFormulabarUpdate.m_aText == rText &&
+        maSendFormulabarUpdate.m_aSelection == aSelection &&
+        std::chrono::duration_cast<std::chrono::seconds>(
+            now - maSendFormulabarUpdate.m_nTimeStamp) < std::chrono::seconds(5))
+    {
+        return;
+    }
+
+    maSendFormulabarUpdate.m_nShellId = nCurrentShellId;
+    maSendFormulabarUpdate.m_aText = rText;
+    maSendFormulabarUpdate.m_aSelection = aSelection;
+    maSendFormulabarUpdate.m_nTimeStamp = now;
+    maSendFormulabarUpdate.Send();
+}
+
+void ScTabViewShell::SendFormulabarUpdate::Send()
+{
     std::unique_ptr<jsdialog::ActionDataMap> pData = std::make_unique<jsdialog::ActionDataMap>();
     (*pData)["action_type"] = "setText";
-    (*pData)["text"] = rText;
-    (*pData)["selection"] = aSelection;
-
-    sal_uInt64 nCurrentShellId = reinterpret_cast<sal_uInt64>(pActiveViewSh);
-    std::string sWindowId = std::to_string(nCurrentShellId) + "formulabar";
+    (*pData)["text"] = m_aText;
+    (*pData)["selection"] = m_aSelection;
+    std::string sWindowId = std::to_string(m_nShellId) + "formulabar";
     jsdialog::SendAction(sWindowId, "sc_input_window", std::move(pData));
 }
 
@@ -2611,7 +2633,7 @@ bool ScInputHandler::StartTable( sal_Unicode cTyped, bool bFromCommand, bool bIn
                 aStr = aStr.copy(1, aStr.getLength() -2);
                 mpEditEngine->SetTextCurrentDefaults(aStr);
                 if ( pInputWin )
-                    pInputWin->SetTextString(aStr);
+                    pInputWin->SetTextString(aStr, true);
             }
 
             UpdateAdjust( cTyped );
@@ -2706,7 +2728,7 @@ IMPL_LINK_NOARG(ScInputHandler, ModifyHdl, LinkParamNone*, void)
         // wrapped by DataChanging/DataChanged calls (like Drag&Drop)
         OUString aText(ScEditUtil::GetMultilineString(*mpEditEngine));
         lcl_RemoveTabs(aText);
-        pInputWin->SetTextString(aText);
+        pInputWin->SetTextString(aText, true);
     }
 }
 
@@ -2753,6 +2775,8 @@ void ScInputHandler::DataChanged( bool bFromTopNotify, bool bSetModified )
 
     UpdateParenthesis(); // Highlight parentheses anew
 
+    const bool bUpdateKit = comphelper::LibreOfficeKit::isActive() && pActiveViewSh && pInputWin;
+
     if (eMode==SC_INPUT_TYPE || eMode==SC_INPUT_TABLE)
     {
         OUString aText;
@@ -2762,8 +2786,11 @@ void ScInputHandler::DataChanged( bool bFromTopNotify, bool bSetModified )
             aText = GetEditText(mpEditEngine.get());
         lcl_RemoveTabs(aText);
 
-        if ( pInputWin )
-            pInputWin->SetTextString( aText );
+        if (pInputWin)
+        {
+            // If we will end up updating LoKit at the end, we can skip it here
+            pInputWin->SetTextString(aText, !bUpdateKit);
+        }
 
         if (comphelper::LibreOfficeKit::isActive())
         {
@@ -2809,15 +2836,15 @@ void ScInputHandler::DataChanged( bool bFromTopNotify, bool bSetModified )
         }
     }
 
-    if (comphelper::LibreOfficeKit::isActive() && pActiveViewSh && pInputWin)
+    if (bUpdateKit)
     {
         UpdateActiveView();
         if (pActiveView)
             aSel = pActiveView->GetSelection();
 
-        ScInputHandler::LOKSendFormulabarUpdate(pActiveView, pActiveViewSh,
-                                                ScEditUtil::GetMultilineString(*mpEditEngine),
-                                                aSel);
+        pActiveViewSh->LOKSendFormulabarUpdate(pActiveView,
+                                               ScEditUtil::GetMultilineString(*mpEditEngine),
+                                               aSel);
     }
 
     UpdateFormulaMode();
@@ -3117,6 +3144,17 @@ void ScInputHandler::EnterHandler( ScEnterMode nBlockMode, bool bBeforeSavingInL
     }
     lcl_RemoveTabs(aString);
     lcl_RemoveTabs(aPreAutoCorrectString);
+
+    if (aString.indexOf('\n') != -1)
+    {
+        // Cell contains line breaks, enable wrapping
+        ScLineBreakCell aBreakItem(true);
+        pActiveViewSh->ApplyAttr(aBreakItem);
+
+        SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+        if (pViewFrm)
+            pViewFrm->GetBindings().Invalidate(SID_ATTR_ALIGN_LINEBREAK);
+    }
 
     // Test if valid (always with simple string)
     if (bModified && nValidation && pActiveViewSh)
@@ -3778,6 +3816,15 @@ bool ScInputHandler::KeyInput( const KeyEvent& rKEvt, bool bStartEdit /* = false
 
         if (pActiveViewSh)
             pActiveViewSh->FindNextUnprot( bShift, true );
+
+        ScModule* pScMod = SC_MOD();
+        const ScInputOptions& rOpt = pScMod->GetInputOptions();
+        const bool bKit = comphelper::LibreOfficeKit::isActive();
+
+        if ( (rOpt.GetMoveKeepEdit() && !bKit)
+             || (pActiveViewSh && pActiveViewSh->GetMoveKeepEdit() && bKit) )
+            pScMod->SetInputMode( SC_INPUT_TABLE );
+
         return true;
     }
 
@@ -3817,6 +3864,14 @@ bool ScInputHandler::KeyInput( const KeyEvent& rKEvt, bool bStartEdit /* = false
 
                 if (pActiveViewSh)
                     pActiveViewSh->MoveCursorEnter( bShift && !bControl );
+
+                ScModule* pScMod = SC_MOD();
+                const ScInputOptions& rOpt = pScMod->GetInputOptions();
+                const bool bKit = comphelper::LibreOfficeKit::isActive();
+
+                if ( (rOpt.GetMoveKeepEdit() && !bKit)
+                    || (pActiveViewSh && pActiveViewSh->GetMoveKeepEdit() && bKit) )
+                    pScMod->SetInputMode( SC_INPUT_TABLE );
 
                 bUsed = true;
             }
@@ -4273,10 +4328,15 @@ void ScInputHandler::NotifyChange( const ScInputHdlState* pState,
                         bTextValid = true;              //! To begin with remember as a string
                     }
 
-                    if ( pInputWin )
-                        pInputWin->SetTextString(aString);
+                    const bool bUpdateKit = comphelper::LibreOfficeKit::isActive() && pActiveViewSh;
 
-                    if (comphelper::LibreOfficeKit::isActive() && pActiveViewSh)
+                    if (pInputWin)
+                    {
+                        // If we will end up updating LoKit after this, we can skip it here
+                        pInputWin->SetTextString(aString, !bUpdateKit);
+                    }
+
+                    if (bUpdateKit)
                     {
                         UpdateActiveView();
                         EditView* pActiveView = pTopView ? pTopView : pTableView;
@@ -4289,7 +4349,7 @@ void ScInputHandler::NotifyChange( const ScInputHdlState* pState,
                         if (aSel.nEndPara == EE_PARA_NOT_FOUND)
                             aSel.nEndPara = 0;
 
-                        ScInputHandler::LOKSendFormulabarUpdate(pActiveView, pActiveViewSh, aString, aSel);
+                        pActiveViewSh->LOKSendFormulabarUpdate(pActiveView, aString, aSel);
                         // TODO: deprecated?
                         pActiveViewSh->libreOfficeKitViewCallback(LOK_CALLBACK_CELL_FORMULA, aString.toUtf8().getStr());
                     }
@@ -4432,7 +4492,7 @@ IMPL_LINK_NOARG( ScInputHandler, DelayTimer, Timer*, void )
         if ( pInputWin )
         {
             pInputWin->SetPosString( OUString() );
-            pInputWin->SetTextString( OUString() );
+            pInputWin->SetTextString(OUString(), true);
             pInputWin->Disable();
         }
 
@@ -4453,7 +4513,7 @@ void ScInputHandler::InputSelection( const EditView* pView )
     {
         EditView* pActiveView = pTopView ? pTopView : pTableView;
         ESelection aSel = pActiveView ? pActiveView->GetSelection() : ESelection();
-        ScInputHandler::LOKSendFormulabarUpdate(pActiveView, pActiveViewSh, GetEditString(), aSel);
+        pActiveViewSh->LOKSendFormulabarUpdate(pActiveView, GetEditString(), aSel);
     }
 }
 

@@ -1442,9 +1442,19 @@ void SwFlyFrame::Format( vcl::RenderContext* /*pRenderContext*/, const SwBorderA
                 SwTwips nDeadline = GetFlyAnchorBottom(this, *pAnchor);
                 SwTwips nTop = aRectFnSet.GetTop(getFrameArea());
                 SwTwips nBottom = aRectFnSet.GetTop(getFrameArea()) + nRemaining;
-                if (nBottom > nDeadline && nDeadline > nTop)
+                if (nBottom > nDeadline)
                 {
-                    nRemaining = nDeadline - nTop;
+                    if (nDeadline > nTop)
+                    {
+                        nRemaining = nDeadline - nTop;
+                    }
+                    else
+                    {
+                        // Even the top is below the deadline, set size to empty and mark it as
+                        // clipped so we re-format later.
+                        nRemaining = 0;
+                        m_bHeightClipped = true;
+                    }
                 }
             }
 
@@ -2106,9 +2116,9 @@ void SwFlyFrame::ActiveUnfloatButton(SwWrtShell* pWrtSh)
     SwEditWin& rEditWin = pWrtSh->GetView().GetEditWin();
     SwFrameControlsManager& rMngr = rEditWin.GetFrameControlsManager();
     SwFrameControlPtr pControl = rMngr.GetControl(FrameControlType::FloatingTable, this);
-    if (pControl && pControl->GetWindow())
+    if (pControl && pControl->GetIFacePtr())
     {
-        pControl->GetWindow()->MouseButtonDown(MouseEvent());
+        pControl->GetIFacePtr()->GetButton()->clicked();
     }
 }
 

@@ -5,7 +5,7 @@
   <object class="GtkDialog" id="CondFormatEasyDlg">
     <property name="can-focus">False</property>
     <property name="border-width">6</property>
-    <property name="title" translatable="yes" context="stock">Apply conditional formatting...</property>
+    <property name="title" translatable="yes" context="conditionaleasydialog|title">Apply conditional formatting...</property>
     <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox">
@@ -68,7 +68,7 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
-            <property name="spacing">12</property>
+            <property name="spacing">24</property>
             <child>
               <object class="GtkFrame">
                 <property name="visible">True</property>
@@ -79,6 +79,10 @@
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkBox">
@@ -86,7 +90,7 @@
                         <property name="can-focus">False</property>
                         <property name="spacing">12</property>
                         <child>
-                          <object class="GtkSpinButton" id="entryNumber">
+                          <object class="GtkEntry" id="entryNumber">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <accessibility>
@@ -100,7 +104,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkSpinButton" id="entryNumber2">
+                          <object class="GtkEntry" id="entryNumber2">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <accessibility>
@@ -129,7 +133,7 @@
                           <object class="GtkLabel" id="with">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes" context="stock">with</property>
+                            <property name="label" translatable="yes" context="conditionaleasydialog|label">with</property>
                             <accessibility>
                               <relation type="label-for" target="themeCombo"/>
                             </accessibility>
@@ -167,7 +171,7 @@
                   <object class="GtkLabel" id="description">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes" context="stock">Apply conditional formatting to cells</property>
+                    <property name="label" translatable="yes" context="conditionaleasydialog|label">Apply conditional formatting to cells</property>
                     <accessibility>
                       <relation type="label-for" target="entryNumber"/>
                       <relation type="label-for" target="entryNumber2"/>
@@ -191,6 +195,11 @@
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
+                    <property name="spacing">12</property>
                     <child>
                       <object class="GtkEntry" id="entryRange">
                         <property name="visible">True</property>
@@ -205,13 +214,31 @@
                         <property name="position">0</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkButton" id="rbassign">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="valign">center</property>
+                        <child internal-child="accessible">
+                          <object class="AtkObject" id="rbassign-atkobject">
+                            <property name="AtkObject::accessible-description" translatable="yes" context="conditionaleasydialog|extended_tip|rbassign">Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size.</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
                 <child type="label">
                   <object class="GtkLabel" id="range">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes" context="stock">Range:</property>
+                    <property name="label" translatable="yes" context="conditionaleasydialog|label">Range:</property>
                     <accessibility>
                       <relation type="label-for" target="entryRange"/>
                     </accessibility>
