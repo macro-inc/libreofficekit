@@ -523,8 +523,6 @@ void SwGetRefField::UpdateField(const SwTextField* pFieldTextAttr, SwFrame* pFra
 {
     SwDoc& rDoc = static_cast<SwGetRefFieldType*>(GetTyp())->GetDoc();
 
-    rText.clear();
-
     // finding the reference target (the number)
     sal_Int32 nNumStart = -1;
     sal_Int32 nNumEnd = -1;
@@ -535,10 +533,14 @@ void SwGetRefField::UpdateField(const SwTextField* pFieldTextAttr, SwFrame* pFra
     // not found?
     if ( !pTextNd )
     {
-        rText = SwViewShell::GetShellRes()->aGetRefField_RefItemNotFound;
+        // LibreOffice would update the referenced text to "Error: Reference source not found"
+        // when the source is, well, not found, e.g source got deleted
+        // rText = SwViewShell::GetShellRes()->aGetRefField_RefItemNotFound;
 
         return;
     }
+
+    rText.clear();
 
     // where is the category name (e.g. "Illustration")?
     const OUString aText = pTextNd->GetText();
