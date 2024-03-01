@@ -221,6 +221,7 @@ uno::Any SAL_CALL SwXTextView::queryInterface( const uno::Type& aType )
     else if(aType == cppu::UnoType<text::XTextViewLayoutSupplier>::get())
     {
         uno::Reference<text::XTextViewLayoutSupplier> xRet = this;
+        aRet <<= xRet;
     }
     else if(aType == cppu::UnoType<qa::XDumper>::get())
     {
