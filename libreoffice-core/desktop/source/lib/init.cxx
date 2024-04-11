@@ -2956,12 +2956,12 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
             pDocument->maFontsMissing.insert(aFontMappingUseData[i].mOriginalFont);
         }
 
+        // [MACRO-2259] We don't respect the readonly flag.
+        // If the document is loaded readonly, we need to set it to false.
         SfxBaseModel* pBaseModel = dynamic_cast<SfxBaseModel*>(pDocument->mxComponent.get());
         if (pBaseModel != nullptr) {
             SfxObjectShell* pObjectShell = pBaseModel->GetObjectShell();
             if (pObjectShell != nullptr) {
-                // [MACRO-2259] We don't respect the readonly flag.
-                // If the document is readonly, we need to set it to false.
                 if (pObjectShell->IsLoadReadonly()) {
                     pObjectShell->SetReadOnlyUI(false);
                 }
