@@ -2956,6 +2956,21 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
             pDocument->maFontsMissing.insert(aFontMappingUseData[i].mOriginalFont);
         }
 
+        SfxBaseModel* pBaseModel = dynamic_cast<SfxBaseModel*>(pDocument->mxComponent.get());
+        if (!pBaseModel)
+            return nullptr;
+
+        SfxObjectShell* pObjectShell = pBaseModel->GetObjectShell();
+        if (!pObjectShell)
+            return nullptr;
+
+        // [MACRO-2259] We don't respect the readonly flag.
+        // If the document is readonly, we need to set it to false.
+        if (pObjectShell->IsLoadReadonly()) {
+            pObjectShell->SetReadOnlyUI(false);
+        }
+
+
         return pDocument;
     }
     catch (const uno::Exception& exception)
@@ -6298,6 +6313,7 @@ static char* getDocReadOnly(LibreOfficeKitDocument* pThis)
     SfxObjectShell* pObjectShell = pBaseModel->GetObjectShell();
     if (!pObjectShell)
         return nullptr;
+
 
     boost::property_tree::ptree aTree;
     aTree.put("commandName", ".uno:ReadOnly");
