@@ -50,6 +50,7 @@
 #include <com/sun/star/uno/Any.h>
 #include <com/sun/star/task/ErrorCodeRequest.hpp>
 
+#include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
 
@@ -66,6 +67,7 @@
 #include <basic/sbx.hxx>
 #include <svtools/sfxecode.hxx>
 
+#include <unotools/mediadescriptor.hxx>
 #include <unotools/ucbhelper.hxx>
 #include <tools/urlobj.hxx>
 #include <svl/sharecontrolfile.hxx>
@@ -80,6 +82,7 @@
 #include <ucbhelper/simpleinteractionrequest.hxx>
 #include <officecfg/Office/Common.hxx>
 
+#include <sfx2/brokenpackageint.hxx>
 #include <sfx2/signaturestate.hxx>
 #include <sfx2/app.hxx>
 #include <appdata.hxx>
@@ -1940,26 +1943,61 @@ bool SfxObjectShell_Impl::hasTrustedScriptingSignature( bool bAllowUIToAddAuthor
     return bResult;
 }
 
-bool SfxObjectShell::IsContinueImportOnFilterExceptions(std::u16string_view aErrMessage)
+
+bool SfxObjectShell::IsContinueImportOnFilterExceptions()
 {
     if (mbContinueImportOnFilterExceptions == undefined)
     {
-        if (Application::GetDialogCancelMode() == DialogCancelMode::Off)
+        if (!pMedium)
         {
-            // Ask the user to try to continue or abort loading
-            OUString aMessage = SfxResId(STR_QMSG_ERROR_OPENING_FILE);
-            if (!aErrMessage.empty())
-                aMessage += SfxResId(STR_QMSG_ERROR_OPENING_FILE_DETAILS) + aErrMessage;
-            aMessage += SfxResId(STR_QMSG_ERROR_OPENING_FILE_CONTINUE);
-            std::unique_ptr<weld::MessageDialog> xBox(Application::CreateMessageDialog(nullptr,
-                                                      VclMessageType::Question, VclButtonsType::YesNo, aMessage));
-            mbContinueImportOnFilterExceptions = (xBox->run() == RET_YES) ? yes : no;
-        }
-        else
             mbContinueImportOnFilterExceptions = no;
+            return false;
+        }
+
+        if (utl::MediaDescriptor desc(pMedium->GetArgs());
+            !desc.getUnpackedValueOrDefault("RepairAllowed", true))
+        {
+            mbContinueImportOnFilterExceptions = no;
+            return false;
+        }
+
+        if (const SfxBoolItem* pRepairItem
+            = pMedium->GetItemSet()->GetItem(SID_REPAIRPACKAGE, false);
+            pRepairItem && pRepairItem->GetValue())
+        {
+            mbContinueImportOnFilterExceptions = yes;
+            return true;
+        }
+
+        auto xInteractionHandler = pMedium->GetInteractionHandler();
+        if (!xInteractionHandler)
+        {
+            mbContinueImportOnFilterExceptions = no;
+            return false;
+        }
+
+        const OUString aDocName(pMedium->GetURLObject().getName(
+            INetURLObject::LAST_SEGMENT, true, INetURLObject::DecodeMechanism::WithCharset));
+        RequestPackageReparation aRequest(aDocName);
+        // MACRO: automatically approve the repair request {
+        /* xInteractionHandler->handle(aRequest.GetRequest()); */
+        /* if (aRequest.isApproved()) */
+        {
+            mbContinueImportOnFilterExceptions = yes;
+            // lok: we want to overwrite file in jail, so don't use template flag
+            bool bIsLOK = comphelper::LibreOfficeKit::isActive();
+            // allow repair
+            pMedium->GetItemSet()->Put(SfxBoolItem(SID_REPAIRPACKAGE, true));
+            pMedium->GetItemSet()->Put(SfxBoolItem(SID_TEMPLATE, !bIsLOK));
+            pMedium->GetItemSet()->Put(SfxStringItem(SID_DOCINFO_TITLE, aDocName));
+        }
+        /* else */
+            /* mbContinueImportOnFilterExceptions = no; */
+        // MACRO: }
     }
     return mbContinueImportOnFilterExceptions == yes;
 }
+
 
 bool SfxObjectShell::isEditDocLocked() const
 {
