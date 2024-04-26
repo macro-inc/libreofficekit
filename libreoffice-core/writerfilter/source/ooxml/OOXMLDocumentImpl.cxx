@@ -516,14 +516,19 @@ void OOXMLDocumentImpl::resolve(Stream & rStream)
     }
     catch (xml::sax::SAXException const& rErr)
     {
+
+        // MACRO: silently swallow there - we don't have access to prompt the user
+        // better to try and load it then to fail silently {
+        SAL_WARN("writerfilter.ooxml", "Unhandled SAXException: " << rErr.Message);
         // don't silently swallow these - handlers may not have been executed,
         // and the domain mapper is likely in an inconsistent state
         // In case user chooses to try to continue loading, don't ask again for this file
-        SfxObjectShell* rShell = SfxObjectShell::GetShellFromComponent(mxModel);
-        if (!rShell
-            || !rShell->IsContinueImportOnFilterExceptions(
-                Concat2View("SAXException: " + rErr.Message)))
-            throw;
+        /* SfxObjectShell* rShell = SfxObjectShell::GetShellFromComponent(mxModel); */
+        /* if (!rShell */
+        /*     || !rShell->IsContinueImportOnFilterExceptions( */
+        /*         Concat2View("SAXException: " + rErr.Message))) */
+        /*     throw; */
+        // MACRO: }
     }
     catch (uno::RuntimeException const&)
     {
