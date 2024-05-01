@@ -5884,6 +5884,16 @@ static char* getPageColor()
     return leakyStrDup(defaultColorHex);
 }
 
+static char* getCursorPosition()
+{
+    tools::JsonWriter aJson;
+    SfxViewShell* pViewShell = SfxViewShell::Current();
+    const int nViewId = sal_Int32(pViewShell->GetViewShellId());
+    std::optional<OString> payload = pViewShell->getLOKPayload(LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR, nViewId);
+    aJson.put("rect", payload.value_or(OString()));
+    return aJson.extractData();;
+}
+
 
 static char* getPageSize()
 {
@@ -6702,6 +6712,10 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     if (!strcmp(pCommand, ".uno:PageColor"))
     {
         return getPageColor();
+    }
+    else if (!strcmp(pCommand, ".uno:CursorPosition"))
+    {
+        return getCursorPosition();
     }
     else if (!strcmp(pCommand, ".uno:PageSize"))
     {
