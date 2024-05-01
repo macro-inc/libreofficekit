@@ -1921,13 +1921,17 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
 
                     case SwComparePosition::Inside:
                         {
+                            // Redlines have the same start position
                             if( *pRStt == *pStt )
                             {
                                 // #i97421#
                                 // redline w/out extent loops
+                                // new redline has some content
                                 if (*pStt != *pEnd)
                                 {
-                                    pNewRedl->PushData( *pRedl, false );
+
+                                    // MACRO :
+                                    /* pNewRedl->PushData( *pRedl, false ); */
                                     pRedl->SetStart( *pEnd, pRStt );
                                     // re-insert
                                     maRedlineTable.Remove( n );
@@ -1937,7 +1941,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                             }
                             else
                             {
-                                pNewRedl->PushData( *pRedl, false );
+                                // MACRO :
+                                /* pNewRedl->PushData( *pRedl, false ); */
                                 if( *pREnd != *pEnd )
                                 {
                                     pNew = new SwRangeRedline( *pRedl );
