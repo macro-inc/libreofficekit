@@ -911,20 +911,21 @@ namespace
                     // MACRO : MACRO-1781 {
                     // Instead of simply resetting all attributes, we only
                     // reset the attributes that were changed by the redline.
-                    if (const SwRedlineExtraData_FormatColl* pExtraData = dynamic_cast<const SwRedlineExtraData_FormatColl*>(pRedl->GetExtraData()))
+                    const SwRedlineExtraData_FormatColl* pExtraData =
+                        dynamic_cast<const SwRedlineExtraData_FormatColl*>(pRedl->GetExtraData());
+                    if (pExtraData)
                     {
+                        o3tl::sorted_vector<sal_uInt16> aResetAttrsArray;
 
-                    o3tl::sorted_vector<sal_uInt16> aResetAttrsArray;
+                        WhichRangesContainer rangesContainer = pExtraData->GetItemSet()->GetRanges();
 
-                    WhichRangesContainer rangesContainer = pExtraData->GetItemSet()->GetRanges();
+                        for (const auto& [nBegin, nEnd] : rangesContainer)
+                        {
+                            for (sal_uInt16 i = nBegin; i <= nEnd; ++i)
+                                aResetAttrsArray.insert( i );
+                        }
 
-                    for (const auto& [nBegin, nEnd] : rangesContainer)
-                    {
-                        for (sal_uInt16 i = nBegin; i <= nEnd; ++i)
-                            aResetAttrsArray.insert( i );
-                    }
-
-                    rDoc.ResetAttrs(aPam, false, aResetAttrsArray);
+                        rDoc.ResetAttrs(aPam, false, aResetAttrsArray);
                     }
                     // MACRO : MACRO-1781 }
                 }
