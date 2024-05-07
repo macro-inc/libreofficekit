@@ -1941,13 +1941,23 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
 
                     case SwComparePosition::Inside:
                         {
+                            // Redlines have the same start position
                             if( *pRStt == *pStt )
                             {
                                 // #i97421#
                                 // redline w/out extent loops
+                                // new redline has some content
                                 if (*pStt != *pEnd)
                                 {
-                                    pNewRedl->PushData( *pRedl, false );
+
+                                    // MACRO-1723: Fix Author when adding deletion within
+                                    // an existing insertion: {
+                                    // Copy the redline data from the existing redline
+                                    // but keep the author of the new redline
+                                    SwRedlineData pTmp = pRedl->GetRedlineData();
+                                    pTmp.SetAuthor(pNewRedl->GetAuthor());
+                                    pNewRedl->PushData( pTmp, false );
+                                    // MACRO: }
                                     pRedl->SetStart( *pEnd, pRStt );
                                     // re-insert
                                     maRedlineTable.Remove( n );
@@ -1957,7 +1967,14 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                             }
                             else
                             {
-                                pNewRedl->PushData( *pRedl, false );
+                                // MACRO-1723: Fix Author when adding deletion within
+                                // an existing insertion: {
+                                // Copy the redline data from the existing redline
+                                // but keep the author of the new redline
+                                SwRedlineData pTmp = pRedl->GetRedlineData();
+                                pTmp.SetAuthor(pNewRedl->GetAuthor());
+                                pNewRedl->PushData( pTmp, false );
+                                // MACRO : }
                                 if( *pREnd != *pEnd )
                                 {
                                     pNew = new SwRangeRedline( *pRedl );
