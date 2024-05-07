@@ -2116,6 +2116,7 @@ void SwRangeRedline::PushData( const SwRangeRedline& rRedl, bool bOwnAsNext )
     }
 }
 
+// MACRO-1723: {
 void SwRangeRedline::PushData( const SwRedlineData& rData, bool bOwnAsNext)
 {
     SwRedlineData* pNew = new SwRedlineData(rData, false);
@@ -2130,6 +2131,7 @@ void SwRangeRedline::PushData( const SwRedlineData& rData, bool bOwnAsNext)
         m_pRedlineData->m_pNext = pNew;
     }
 }
+// MACRO: }
 
 bool SwRangeRedline::PopData()
 {
