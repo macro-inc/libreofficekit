@@ -1930,8 +1930,13 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                                 if (*pStt != *pEnd)
                                 {
 
-                                    // MACRO :
-                                    /* pNewRedl->PushData( *pRedl, false ); */
+                                    // MACRO : {
+                                    // Copy the redline data from the existing redline
+                                    // but keep the author of the new redline
+                                    SwRedlineData pTmp = pRedl->GetRedlineData();
+                                    pTmp.SetAuthor(pNewRedl->GetAuthor());
+                                    pNewRedl->PushData( pTmp, false );
+                                    // MACRO: }
                                     pRedl->SetStart( *pEnd, pRStt );
                                     // re-insert
                                     maRedlineTable.Remove( n );
@@ -1941,8 +1946,13 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                             }
                             else
                             {
-                                // MACRO :
-                                /* pNewRedl->PushData( *pRedl, false ); */
+                                // MACRO : {
+                                // Copy the redline data from the existing redline
+                                // but keep the author of the new redline
+                                SwRedlineData pTmp = pRedl->GetRedlineData();
+                                pTmp.SetAuthor(pNewRedl->GetAuthor());
+                                pNewRedl->PushData( pTmp, false );
+                                // MACRO : }
                                 if( *pREnd != *pEnd )
                                 {
                                     pNew = new SwRangeRedline( *pRedl );
