@@ -1930,7 +1930,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                                 if (*pStt != *pEnd)
                                 {
 
-                                    // MACRO : {
+                                    // MACRO-1723: Fix Author when adding deletion within
+                                    // an existing insertion: {
                                     // Copy the redline data from the existing redline
                                     // but keep the author of the new redline
                                     SwRedlineData pTmp = pRedl->GetRedlineData();
@@ -1946,7 +1947,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                             }
                             else
                             {
-                                // MACRO : {
+                                // MACRO-1723: Fix Author when adding deletion within
+                                // an existing insertion: {
                                 // Copy the redline data from the existing redline
                                 // but keep the author of the new redline
                                 SwRedlineData pTmp = pRedl->GetRedlineData();
